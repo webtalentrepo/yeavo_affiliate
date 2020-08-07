@@ -128,8 +128,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "offer-scout",
@@ -226,28 +224,168 @@ var render = function() {
     "v-container",
     [
       _c(
-        "v-container",
+        "v-row",
         [
           _c(
+            "v-col",
+            { attrs: { cols: "12" } },
+            [
+              _c("v-text-field", {
+                attrs: {
+                  filled: "",
+                  label:
+                    "Enter keyword, or leave blank if you don't have a keyword yet.",
+                  "append-icon": "mdi-search-web"
+                },
+                model: {
+                  value: _vm.search_str,
+                  callback: function($$v) {
+                    _vm.search_str = $$v
+                  },
+                  expression: "search_str"
+                }
+              })
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-row",
+        [
+          _c("v-col", { attrs: { cols: "12", md: "3", sm: "12" } }, [
+            _c("div", [_vm._v("Sale $Amount")]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "d-flex align-center" },
+              [
+                _c("v-text-field", {
+                  attrs: {
+                    label: "Min",
+                    type: "number",
+                    clearable: "",
+                    disabled: _vm.disableMin[_vm.sel_network]
+                  },
+                  model: {
+                    value: _vm.sale_min,
+                    callback: function($$v) {
+                      _vm.sale_min = $$v
+                    },
+                    expression: "sale_min"
+                  }
+                }),
+                _vm._v(" "),
+                _c("div", { staticClass: "pl-2 pr-2" }, [_vm._v("-")]),
+                _vm._v(" "),
+                _c("v-text-field", {
+                  attrs: {
+                    label: "Max",
+                    type: "number",
+                    disabled: _vm.disableMin[_vm.sel_network],
+                    clearable: ""
+                  },
+                  model: {
+                    value: _vm.sale_max,
+                    callback: function($$v) {
+                      _vm.sale_max = $$v
+                    },
+                    expression: "sale_max"
+                  }
+                })
+              ],
+              1
+            )
+          ]),
+          _vm._v(" "),
+          _c("v-col", { attrs: { cols: "12", md: "3", sm: "12" } }, [
+            _c("div", [_vm._v("Popularity")]),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "d-flex align-center" },
+              [
+                _c("v-text-field", {
+                  attrs: {
+                    label: "Min",
+                    type: "number",
+                    disabled: _vm.disableMin[_vm.sel_network],
+                    clearable: ""
+                  },
+                  model: {
+                    value: _vm.pop_min,
+                    callback: function($$v) {
+                      _vm.pop_min = $$v
+                    },
+                    expression: "pop_min"
+                  }
+                }),
+                _vm._v(" "),
+                _c("div", { staticClass: "pl-2 pr-2" }, [_vm._v("-")]),
+                _vm._v(" "),
+                _c("v-text-field", {
+                  attrs: {
+                    label: "Max",
+                    type: "number",
+                    disabled: _vm.disableMin[_vm.sel_network],
+                    clearable: ""
+                  },
+                  model: {
+                    value: _vm.pop_max,
+                    callback: function($$v) {
+                      _vm.pop_max = $$v
+                    },
+                    expression: "pop_max"
+                  }
+                })
+              ],
+              1
+            )
+          ]),
+          _vm._v(" "),
+          _c(
+            "v-col",
+            { attrs: { cols: "12", md: "4", sm: "12" } },
+            [
+              _c("div", [_vm._v("Network")]),
+              _vm._v(" "),
+              _c("v-select", {
+                attrs: { items: _vm.scout_network },
+                on: {
+                  change: function($event) {
+                    return _vm.getSalesData()
+                  }
+                },
+                model: {
+                  value: _vm.sel_network,
+                  callback: function($$v) {
+                    _vm.sel_network = $$v
+                  },
+                  expression: "sel_network"
+                }
+              })
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _vm.searchStart
+        ? _c(
             "v-row",
             [
               _c(
                 "v-col",
                 { attrs: { cols: "12" } },
                 [
-                  _c("v-text-field", {
+                  _c("v-progress-linear", {
                     attrs: {
-                      filled: "",
-                      label:
-                        "Enter keyword, or leave blank if you don't have a keyword yet.",
-                      "append-icon": "mdi-search-web"
-                    },
-                    model: {
-                      value: _vm.search_str,
-                      callback: function($$v) {
-                        _vm.search_str = $$v
-                      },
-                      expression: "search_str"
+                      color: "teal accent-4",
+                      indeterminate: "",
+                      height: "3"
                     }
                   })
                 ],
@@ -255,198 +393,52 @@ var render = function() {
               )
             ],
             1
-          ),
-          _vm._v(" "),
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      _c(
+        "v-row",
+        [
           _c(
-            "v-row",
+            "v-col",
+            { attrs: { cols: "12" } },
             [
-              _c("v-col", { attrs: { cols: "12", md: "3", sm: "12" } }, [
-                _c("div", [_vm._v("Sale $Amount")]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "d-flex align-center" },
-                  [
-                    _c("v-text-field", {
-                      attrs: {
-                        label: "Min",
-                        type: "number",
-                        clearable: "",
-                        disabled: _vm.disableMin[_vm.sel_network]
-                      },
-                      model: {
-                        value: _vm.sale_min,
-                        callback: function($$v) {
-                          _vm.sale_min = $$v
-                        },
-                        expression: "sale_min"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "pl-2 pr-2" }, [_vm._v("-")]),
-                    _vm._v(" "),
-                    _c("v-text-field", {
-                      attrs: {
-                        label: "Max",
-                        type: "number",
-                        disabled: _vm.disableMin[_vm.sel_network],
-                        clearable: ""
-                      },
-                      model: {
-                        value: _vm.sale_max,
-                        callback: function($$v) {
-                          _vm.sale_max = $$v
-                        },
-                        expression: "sale_max"
-                      }
-                    })
-                  ],
-                  1
-                )
-              ]),
-              _vm._v(" "),
-              _c("v-col", { attrs: { cols: "12", md: "3", sm: "12" } }, [
-                _c("div", [_vm._v("Popularity")]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "d-flex align-center" },
-                  [
-                    _c("v-text-field", {
-                      attrs: {
-                        label: "Min",
-                        type: "number",
-                        disabled: _vm.disableMin[_vm.sel_network],
-                        clearable: ""
-                      },
-                      model: {
-                        value: _vm.pop_min,
-                        callback: function($$v) {
-                          _vm.pop_min = $$v
-                        },
-                        expression: "pop_min"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "pl-2 pr-2" }, [_vm._v("-")]),
-                    _vm._v(" "),
-                    _c("v-text-field", {
-                      attrs: {
-                        label: "Max",
-                        type: "number",
-                        disabled: _vm.disableMin[_vm.sel_network],
-                        clearable: ""
-                      },
-                      model: {
-                        value: _vm.pop_max,
-                        callback: function($$v) {
-                          _vm.pop_max = $$v
-                        },
-                        expression: "pop_max"
-                      }
-                    })
-                  ],
-                  1
-                )
-              ]),
+              _c("v-data-table", {
+                staticClass: "elevation-1",
+                attrs: {
+                  headers: _vm.headers,
+                  items: _vm.desserts,
+                  page: _vm.page,
+                  "items-per-page": _vm.itemsPerPage,
+                  "hide-default-footer": ""
+                },
+                on: {
+                  "update:page": function($event) {
+                    _vm.page = $event
+                  },
+                  "page-count": function($event) {
+                    _vm.pageCount = $event
+                  }
+                }
+              }),
               _vm._v(" "),
               _c(
-                "v-col",
-                { attrs: { cols: "12", md: "4", sm: "12" } },
-                [
-                  _c("div", [_vm._v("Network")]),
-                  _vm._v(" "),
-                  _c("v-select", {
-                    attrs: { items: _vm.scout_network },
-                    on: {
-                      change: function($event) {
-                        return _vm.getSalesData()
-                      }
-                    },
-                    model: {
-                      value: _vm.sel_network,
-                      callback: function($$v) {
-                        _vm.sel_network = $$v
-                      },
-                      expression: "sel_network"
-                    }
-                  })
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _vm.searchStart
-            ? _c(
                 "v-row",
                 [
                   _c(
                     "v-col",
                     { attrs: { cols: "12" } },
                     [
-                      _c("v-progress-linear", {
-                        attrs: {
-                          color: "teal accent-4",
-                          indeterminate: "",
-                          height: "3"
+                      _c("v-pagination", {
+                        attrs: { length: _vm.pageCount, circle: "" },
+                        model: {
+                          value: _vm.page,
+                          callback: function($$v) {
+                            _vm.page = $$v
+                          },
+                          expression: "page"
                         }
                       })
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _c(
-            "v-row",
-            [
-              _c(
-                "v-col",
-                { attrs: { cols: "12" } },
-                [
-                  _c("v-data-table", {
-                    staticClass: "elevation-1",
-                    attrs: {
-                      headers: _vm.headers,
-                      items: _vm.desserts,
-                      page: _vm.page,
-                      "items-per-page": _vm.itemsPerPage,
-                      "hide-default-footer": ""
-                    },
-                    on: {
-                      "update:page": function($event) {
-                        _vm.page = $event
-                      },
-                      "page-count": function($event) {
-                        _vm.pageCount = $event
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c(
-                    "v-row",
-                    [
-                      _c(
-                        "v-col",
-                        { attrs: { cols: "12" } },
-                        [
-                          _c("v-pagination", {
-                            attrs: { length: _vm.pageCount, circle: "" },
-                            model: {
-                              value: _vm.page,
-                              callback: function($$v) {
-                                _vm.page = $$v
-                              },
-                              expression: "page"
-                            }
-                          })
-                        ],
-                        1
-                      )
                     ],
                     1
                   )
@@ -482,6 +474,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _offer_scout_vue_vue_type_template_id_3b15ca18___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./offer-scout.vue?vue&type=template&id=3b15ca18& */ "./resources/js/pages/offer-scout.vue?vue&type=template&id=3b15ca18&");
 /* harmony import */ var _offer_scout_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./offer-scout.vue?vue&type=script&lang=js& */ "./resources/js/pages/offer-scout.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vuetify-loader/lib/runtime/installComponents.js */ "./node_modules/vuetify-loader/lib/runtime/installComponents.js");
+/* harmony import */ var _node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuetify/lib/components/VGrid */ "./node_modules/vuetify/lib/components/VGrid/index.js");
+/* harmony import */ var vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuetify/lib/components/VDataTable */ "./node_modules/vuetify/lib/components/VDataTable/index.js");
+/* harmony import */ var vuetify_lib_components_VPagination__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuetify/lib/components/VPagination */ "./node_modules/vuetify/lib/components/VPagination/index.js");
+/* harmony import */ var vuetify_lib_components_VProgressLinear__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuetify/lib/components/VProgressLinear */ "./node_modules/vuetify/lib/components/VProgressLinear/index.js");
+/* harmony import */ var vuetify_lib_components_VSelect__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuetify/lib/components/VSelect */ "./node_modules/vuetify/lib/components/VSelect/index.js");
+/* harmony import */ var vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuetify/lib/components/VTextField */ "./node_modules/vuetify/lib/components/VTextField/index.js");
 
 
 
@@ -499,6 +499,19 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
   null
   
 )
+
+/* vuetify-loader */
+
+
+
+
+
+
+
+
+
+_node_modules_vuetify_loader_lib_runtime_installComponents_js__WEBPACK_IMPORTED_MODULE_3___default()(component, {VCol: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_4__["VCol"],VContainer: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_4__["VContainer"],VDataTable: vuetify_lib_components_VDataTable__WEBPACK_IMPORTED_MODULE_5__["VDataTable"],VPagination: vuetify_lib_components_VPagination__WEBPACK_IMPORTED_MODULE_6__["VPagination"],VProgressLinear: vuetify_lib_components_VProgressLinear__WEBPACK_IMPORTED_MODULE_7__["VProgressLinear"],VRow: vuetify_lib_components_VGrid__WEBPACK_IMPORTED_MODULE_4__["VRow"],VSelect: vuetify_lib_components_VSelect__WEBPACK_IMPORTED_MODULE_8__["VSelect"],VTextField: vuetify_lib_components_VTextField__WEBPACK_IMPORTED_MODULE_9__["VTextField"]})
+
 
 /* hot reload */
 if (false) { var api; }
