@@ -14,6 +14,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/0.vuetify-components.css') }}" rel="stylesheet"/>
+    <link href="{{ asset('css/js/app.vuetify-components.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet"/>
 
     <script>
