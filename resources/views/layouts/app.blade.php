@@ -31,8 +31,8 @@
 </div>
 @section('scripts')
 @show
-<script type="text/javascript" src="{{ asset('js/manifest.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/vendor.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/app.js') }}" defer></script>
+<script type="text/javascript" src="{{ url(mix('js/manifest.js')) }}"></script>
+<script type="text/javascript" src="{{ url(mix('js/vendor.js')) }}"></script>
+<script type="text/javascript" src="{{ url(mix('js/app.js')) }}" defer></script>
 </body>
 </html>
