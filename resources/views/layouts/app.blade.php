@@ -13,10 +13,8 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
 
     <!-- Styles -->
+    <link href="{{ asset('css/0.vuetify-components.css') }}" rel="stylesheet"/>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet"/>
-
-    <!-- Scripts -->
-    <script src="{{ asset('vendor/pace.js') }}"></script>
 
     <script>
         window.laravel = '{!! json_encode(['csrfToken' => csrf_token()]) !!}';

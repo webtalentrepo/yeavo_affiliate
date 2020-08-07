@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+require('vuetifyjs-mix-extension');
 
 /*
  |--------------------------------------------------------------------------
@@ -11,6 +12,12 @@ const mix = require('laravel-mix');
  |
  */
 
+const options = {
+    progressiveImages: true,
+    extract: 'css/vuetify-components.css'
+}
+
 mix.js('resources/js/app.js', 'public/js')
+    .vuetify('vuetify-loader', options)
     .sass('resources/sass/app.scss', 'public/css')
-    .extract(['vue', 'axios', 'jquery', 'vuex']);
+    .extract(['vue', 'axios', 'jquery', 'vuex', 'bootstrap']);
