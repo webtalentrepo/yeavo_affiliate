@@ -2,7 +2,7 @@ const state = {
     scout_network: [
         // 'clickbank.com',
         'cj.com',
-        'linkshare.com',
+        'Rakuten Linkshare',
         'maxbounty.com',
         'jvzoo.com',
         'shareasale.com',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\ScoutRepository;
+use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
 
 class ScoutController extends Controller
@@ -58,6 +59,10 @@ class ScoutController extends Controller
 
                 $pageCount = round($p_re['data']['products']['count'] / $params['limit']);
             }
+        } elseif ($sel_network == 'Rakuten Linkshare') {
+            $re = $this->scoutRepo->getRakutenProduct($params);
+
+            var_dump($re);
         }
 
         return response()->json([

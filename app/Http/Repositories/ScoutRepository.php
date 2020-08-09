@@ -93,6 +93,40 @@ class ScoutRepository
 
     public function getRakutenProduct($params)
     {
-        
+        $apiKey = config('services.rakuten_token');
+//
+//        $client = new Client();
+//        $client->setSecret('ec3da475028d2a8d761dfa3002cbecbc1564be57a8746709f3b7590dd80f0c34');
+//        $client->setAffiliateId('3706879');
+//
+//        $parameter = ['hits' => $params['limit'], 'page' => $params['page']];
+//
+//        if ($params['keywords'] && !is_null($params['keywords'])) {
+//            $parameter['keyword'] = $params['keywords'];
+//        }
+//
+//        $response = $client->execute('ProductSearch', $parameter);
+//        $responseCode = $response->getCode();
+//
+//        if ($responseCode != 200) {
+//            $arReturn['message'] = $response->getMessage();
+//        } else {
+//            $data = $response->getData();
+//            $arData = [];
+//            $arData['totalRecords'] = $data['count'];
+//            $arData['pageCount'] = $data['pageCount'];
+//            $arData['data'] = $data['Items'];
+//            $arReturn['data'] = $arData;
+//        }
+//
+//        return $arReturn;
+        $client = new RakuteAPI('Bearer ' . $apiKey);
+        $parameters = ['max' => $params['limit']];
+        if ($params['keywords'] && !is_null($params['keywords'])) {
+            $parameters['keyword'] = $params['keywords'];
+        }
+        $products = $client->productSearch($parameters);
+
+        return $products;
     }
 }
