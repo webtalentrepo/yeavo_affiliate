@@ -7,8 +7,8 @@
                     filled
                     label="Enter keyword, or leave blank if you don't have a keyword yet."
                     append-icon="mdi-search-web"
-                    @keyup.enter="getSalesData"
-                    @click:append="getSalesData"
+                    @keyup.enter="searchData"
+                    @click:append="searchData"
                 ></v-text-field>
             </v-col>
         </v-row>
@@ -163,6 +163,10 @@
             this.getSalesData();
         },
         methods: {
+            searchData() {
+                this.page = 1;
+                this.getSalesData();
+            },
             getSalesData() {
                 this.searchStart = true;
                 const params = {
