@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c65bc60e9a5646e71c2b210f24b4e7c7",
+    "content-hash": "fa06a9350a6e64bb685d9111d107fb30",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -109,6 +109,53 @@
                 }
             ],
             "time": "2020-04-15T15:59:35+00:00"
+        },
+        {
+            "name": "bsushil/rakuten-api",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bSushil/rakuten.git",
+                "reference": "aea424b5aa72b7d3dadf5cb4b3deb8657c1ecbcc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bSushil/rakuten/zipball/aea424b5aa72b7d3dadf5cb4b3deb8657c1ecbcc",
+                "reference": "aea424b5aa72b7d3dadf5cb4b3deb8657c1ecbcc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Rakuten\\": "lib/",
+                    "Rakuten\\Clients\\": "lib/HttpClient/",
+                    "Rakuten\\Api\\": "lib/Api/",
+                    "Rakuten\\Api\\Definition\\": "lib/Api/Definition/",
+                    "Rakuten\\Response\\": "lib/ApiResponse/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sushil Bajimaya",
+                    "email": "sushil.bajimaya@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Rakuten PHP API SDK",
+            "homepage": "https://github.com/bSushil/rakuten",
+            "keywords": [
+                "products",
+                "rakuten",
+                "search"
+            ],
+            "time": "2015-07-30T06:00:20+00:00"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -7709,11 +7756,15 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "bsushil/rakuten-api": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.2.5"
+        "php": "^7.2.5",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"

@@ -11,6 +11,10 @@ class ScoutRepository
 
     }
 
+    /**
+     * @param $params
+     * @return mixed
+     */
     public function getClickBankData($params)
     {
         $dev_key = config('services.clickbank.dev_key');
@@ -33,9 +37,13 @@ class ScoutRepository
         return $result;
     }
 
+    /**
+     * Get cj products data
+     * @param $params
+     * @return mixed
+     */
     public function getCJProductsData($params)
     {
-        $access_key = env('CJ_ACCESS_TOKEN');
         $companyId = '2632470';
         $qry = '{ products(companyId: "' . $companyId . '", offset: ' . $params['page'] . ', limit: ' . $params['limit'];
         if ($params['keywords'] && !is_null($params['keywords'])) {
@@ -60,7 +68,7 @@ class ScoutRepository
 
     private function getCJResponse($qry)
     {
-        $access_key = env('CJ_ACCESS_TOKEN');
+        $access_key = config('services.cj_access_token');
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, "https://ads.api.cj.com/query");
@@ -81,5 +89,10 @@ class ScoutRepository
         curl_close($ch);
 
         return $result;
+    }
+
+    public function getRakutenProduct($params)
+    {
+        
     }
 }

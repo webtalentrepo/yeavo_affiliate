@@ -135,7 +135,7 @@
                 disableMin: {
                     'clickbank.com': true,
                     'cj.com': true,
-                    'linkshare.com': false,
+                    'Rakuten Linkshare': false,
                     'maxbounty.com': false,
                     'jvzoo.com': false,
                     'shareasale.com': false,

@@ -35,6 +35,7 @@ return [
         'clerk_key' => env('CLICKBANK_CLERK_KEY')
     ],
 
-    'cj_access_tokey' => env('CJ_ACCESS_TOKEN')
+    'cj_access_token' => env('CJ_ACCESS_TOKEN'),
+    'rakuten_token' => env('RAKUTEN_SEC_KEY'),
 
 ];
