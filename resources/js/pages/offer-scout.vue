@@ -7,6 +7,8 @@
                     filled
                     label="Enter keyword, or leave blank if you don't have a keyword yet."
                     append-icon="mdi-search-web"
+                    @keyup.enter="getSalesData"
+                    @click:append="getSalesData"
                 ></v-text-field>
             </v-col>
         </v-row>
@@ -64,15 +66,15 @@
             </v-col>
         </v-row>
 
-        <v-row v-if="searchStart">
-            <v-col cols="12">
-                <v-progress-linear
-                    color="teal accent-4"
-                    indeterminate
-                    height="3"
-                ></v-progress-linear>
-            </v-col>
-        </v-row>
+        <!--        <v-row v-if="searchStart">-->
+        <!--            <v-col cols="12">-->
+        <!--                <v-progress-linear-->
+        <!--                    color="teal accent-4"-->
+        <!--                    indeterminate-->
+        <!--                    height="3"-->
+        <!--                ></v-progress-linear>-->
+        <!--            </v-col>-->
+        <!--        </v-row>-->
 
         <v-row>
             <v-col cols="12">
@@ -83,14 +85,20 @@
                     :items-per-page="itemsPerPage"
                     hide-default-footer
                     class="elevation-1"
-                    @page-count="pageCount = $event"
-                ></v-data-table>
+                    :loading="searchStart"
+                    loading-text="Loading... Please wait"
+                >
+                    <template v-slot:item.sign_up="{ item }">
+                        <a :href="item.sign_up" target="_blank">Sign Up</a>
+                    </template>
+                </v-data-table>
                 <v-row>
                     <v-col cols="12">
                         <v-pagination
                             v-model="page"
                             :length="pageCount"
-                            circle
+                            :total-visible="10"
+                            @input="getSalesData"
                         ></v-pagination>
                     </v-col>
 
@@ -126,7 +134,7 @@
                 searchStart: false,
                 disableMin: {
                     'clickbank.com': true,
-                    'cj.com': false,
+                    'cj.com': true,
                     'linkshare.com': false,
                     'maxbounty.com': false,
                     'jvzoo.com': false,
@@ -134,7 +142,7 @@
                 },
                 page: 1,
                 pageCount: 0,
-                itemsPerPage: 100,
+                itemsPerPage: 10,
                 headers: [
                     {text: 'Offer Name', value: 'name'},
                     {text: '$ Sale', value: 'sale'},
@@ -165,10 +173,14 @@
                     popular_min: this.pop_min,
                     popular_max: this.pop_max,
                     page: this.page,
+                    limit: this.itemsPerPage,
                 }
 
                 this.$http.post('/api/scout-data', params).then((r) => {
-                    console.log(r.data)
+                    if (r.data.result === 'success') {
+                        this.desserts = r.data.rows
+                        this.pageCount = r.data.pageCount
+                    }
                     this.searchStart = false;
                 }).catch((e) => {
                     this.searchStart = false;
