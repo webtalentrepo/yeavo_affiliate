@@ -47,7 +47,7 @@ class ScoutController extends Controller
                 foreach ($re['data']['products']['resultList'] as $key => $row) {
                     $reData[$key] = [
                         'name' => $row['title'],
-                        'sale' => $row['price']['amount'] . ' ' . $row['price']['currency'],
+                        'sale' => $row['salePrice'] ? $row['salePrice']['amount'] . ' ' . $row['salePrice']['currency'] : $row['price']['amount'] . ' ' . $row['price']['currency'],
                         'popularity' => '',
                         'network' => $sel_network,
                         'sign_up' => $row['link'],
