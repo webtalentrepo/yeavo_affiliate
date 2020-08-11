@@ -139,8 +139,8 @@ class ScoutController extends Controller
                         'name' => $row['mid'] . ' - ' . $row['merchantname'] . '(' . $row['productname'] . ')',
                         'popularity' => '',
                         'network' => $sel_network,
-                        'sale' => 'https://cli.linksynergy.com/cli/publisher/programs/apply_confirmation.php',
-//                        'sale' => $row['saleprice'],
+//                        'sale' => 'https://cli.linksynergy.com/cli/publisher/programs/apply_confirmation.php',
+                        'sale' => $row['saleprice'],
                         'sign_up' => $row['linkurl'],
                         'details' => $row,
                     ];
