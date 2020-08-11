@@ -14,7 +14,7 @@
         </v-row>
 
         <v-row>
-            <v-col cols="12" md="3" sm="12">
+            <v-col cols="12" md="3" sm="12" v-if="!disableMin[sel_network]">
                 <div>Sale $Amount</div>
                 <div class="d-flex align-center">
                     <v-text-field
@@ -23,6 +23,7 @@
                         type="number"
                         clearable
                         :disabled="disableMin[sel_network]"
+                        @keyup.enter="searchData"
                     ></v-text-field>
                     <div class="pl-2 pr-2">-</div>
                     <v-text-field
@@ -30,12 +31,13 @@
                         label="Max"
                         type="number"
                         :disabled="disableMin[sel_network]"
+                        @keyup.enter="searchData"
                         clearable
                     ></v-text-field>
                 </div>
             </v-col>
 
-            <v-col cols="12" md="3" sm="12">
+            <v-col cols="12" md="3" sm="12" v-if="!disableMin[sel_network]">
                 <div>Popularity</div>
                 <div class="d-flex align-center">
                     <v-text-field
@@ -43,6 +45,7 @@
                         label="Min"
                         type="number"
                         :disabled="disableMin[sel_network]"
+                        @keyup.enter="searchData"
                         clearable
                     ></v-text-field>
                     <div class="pl-2 pr-2">-</div>
@@ -51,6 +54,7 @@
                         label="Max"
                         type="number"
                         :disabled="disableMin[sel_network]"
+                        @keyup.enter="searchData"
                         clearable
                     ></v-text-field>
                 </div>
@@ -142,11 +146,11 @@
                 },
                 page: 1,
                 pageCount: 0,
-                itemsPerPage: 10,
+                itemsPerPage: 25,
                 headers: [
-                    {text: 'Offer Name', value: 'name'},
-                    {text: '$ Sale', value: 'sale'},
-                    {text: 'Popularity(Is it selling well)', value: 'popularity'},
+                    {text: 'Offer Name', value: 'name', sortable: false},
+                    {text: '$ Sale', value: 'sale', sortable: false},
+                    {text: 'Popularity(Is it selling well)', value: 'popularity', sortable: false},
                     {text: 'Network', value: 'network', sortable: false},
                     {text: 'Sign Up', value: 'sign_up', sortable: false},
                 ],

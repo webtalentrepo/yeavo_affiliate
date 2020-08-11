@@ -117,100 +117,87 @@ class CommissionJunctionGraphQL extends \Oara\Network
             throw new \Exception("Error checking connection: " . $error_message);
         }
         $this->_connected = true;
+
         return $this->_connected;
     }
 
     /**
+     * @param array $params
      * @return array
      */
-    public function getMerchantList()
+    public function getMerchantList($params = [])
     {
-        $merchants = array();
-        $merchantsExport = self::getMerchantExport();
-        foreach ($merchantsExport as $merchantData) {
-            $obj = array();
-            $obj['cid'] = $merchantData[0];
-            $obj['name'] = $merchantData[1];
-            // Added more info - 2018-04-23 <PN>
-            $obj['status'] = $merchantData[2];
-            $obj['relationship_status'] = $merchantData[3];
-            $obj['url'] = $merchantData[4];
-            $merchants[] = $obj;
-        }
-        return $merchants;
+//        $merchants = array();
+        return self::getMerchantExport($params);
+//        print_r($merchantsExport);
+//        exit;
+//        foreach ($merchantsExport as $merchantData) {
+//            $obj = array();
+//            $obj['cid'] = $merchantData[0];
+//            $obj['name'] = $merchantData[1];
+//            // Added more info - 2018-04-23 <PN>
+//            $obj['status'] = $merchantData[2];
+//            $obj['relationship_status'] = $merchantData[3];
+//            $obj['url'] = $merchantData[4];
+//            $merchants[] = $obj;
+//        }
+//        return $merchants;
     }
 
     /**
+     * @param $params
      * @return array
      */
-    private function getMerchantExport()
+    private function getMerchantExport($params)
     {
-        $merchantReportList = array();
-        $page = 1;
-        $per_page = 100;
-        $total_pages = 99;
-        $start = time();
-        $per_minute = 0;
-        do {
-            if ($page > $total_pages) {
-                exit;
-            }
-            if ($per_minute++ > 25 && (time() - $start) < 60) {
-                // Don't go above the 25 calls/minute
-                while ((time() - $start) < 60) {
-                    sleep(1);
-                }
-                $per_minute = 0;
-                $start = time();
-            }
-            // Get All programs even if not active - 2018-04-23 <PN>
-            $response = self::apiCall('https://advertiser-lookup.api.cj.com/v3/advertiser-lookup?advertiser-ids=&records-per-page=' . $per_page . '&page-number=' . $page);
-            $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING);
-            if (!isset($xml->advertisers)) {
-                break;
-            }
-            $total_adv = (int)$xml->advertisers[0]['total-matched'];
-            $total_pages = ceil($total_adv / $per_page);
+        $merchantReportList = [];
 
-            foreach ($xml->advertisers->advertiser as $adv) {
+        $page = isset($params['page']) ? $params['page'] : 1;
+        $per_page = isset($params['limit']) ? $params['limit'] : 25;
+//        $total_pages = ceil(10000 / $per_page);
+//        $start = time();
+//        $per_minute = 0;
 
-                $adv_id = '';
-                $adv_name = '';
+        $qry = 'advertiser-ids=&records-per-page=' . $per_page . '&page-number=' . $page;
 
-                foreach ($adv->children() as $key => $value) {
+        if (isset($params['keywords']) && !is_null($params['keywords']) && $params['keywords'] != '') {
+            $qry .= '&keywords=' . urlencode($params['keywords']);
+        }
 
-                    if ($key == 'advertiser-id') {
-                        $adv_id = (string)$value;
-                    }
-                    if ($key == 'advertiser-name') {
-                        $adv_name = (string)$value;
-                    }
-                    // Added more info - 2018-04-23 <PN>
-                    if ($key == 'account-status') {
-                        $adv_status = (string)$value;
-                    }
-                    if ($key == 'relationship-status') {
-                        $adv_relationship_status = (string)$value;
-                    }
-                    if ($key == 'program-url') {
-                        $adv_url = (string)$value;
-                    }
-                }
-                if (trim($adv_id) != '' && trim($adv_name) != '') {
-                    $merchantReportList[] = [
-                        $adv_id,
-                        $adv_name,
-                        $adv_status,
-                        $adv_relationship_status,
-                        $adv_url,
-                    ];
-                }
+//        do {
+//            if ($page > $total_pages) {
+//                exit;
+//            }
+//
+//            if ($per_minute++ > 25 && (time() - $start) < 60) {
+//                // Don't go above the 25 calls/minute
+//                while ((time() - $start) < 60) {
+//                    sleep(1);
+//                }
+//
+//                $per_minute = 0;
+//                $start = time();
+//            }
 
-            }
-            $page++;
-        } while ($total_pages >= $page);
+        // Get All programs even if not active - 2018-04-23 <PN>
+        $response = self::apiCall('https://advertiser-lookup.api.cj.com/v3/advertiser-lookup?' . $qry);
+        $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING);
+        if (!isset($xml->advertisers)) {
+            return null;
+        }
 
-        return $merchantReportList;
+        $json = json_encode($xml);
+        return json_decode($json, true);
+
+//            $total_adv = (int)$xml->advertisers[0]['total-matched'];
+//            $total_pages = ceil($total_adv / $per_page);
+//
+//            $merchantReportList = array_merge($merchantReportList, $array['advertisers']['advertiser']);
+//
+//            $page++;
+//        } while ($total_pages >= $page);
+//
+//        return $merchantReportList;
     }
 
     /**
@@ -455,6 +442,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
         }
         $curl_results = curl_exec($ch);
         curl_close($ch);
+
         return $curl_results;
     }
 

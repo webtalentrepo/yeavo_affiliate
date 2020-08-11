@@ -4,6 +4,7 @@
 namespace App\Http\Repositories;
 
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
+
 use App\Http\Repositories\Affiliates\Merchant;
 use Oara\Network\Publisher\CommissionJunctionGraphQL;
 use Exception;
@@ -75,31 +76,30 @@ class CommissionJunction
         return $this->_logged;
     }
 
-    public function getMerchants()
+    public function getMerchants($params)
     {
-        $arrResult = array();
-        $merchantList = $this->_network->getMerchantList();
-        foreach ($merchantList as $merchant) {
-            if ($merchant['status'] == 'Setup') {
-                // Ignore setup programs not yet active
-                continue;
-            }
-            try {
-                $Merchant = Merchant::createInstance();
-                $Merchant->merchant_ID = $merchant['cid'];
-                $Merchant->name = $merchant['name'];
-                $Merchant->url = $merchant['url'];
-                if ($merchant['status'] == 'Active') {
-                    $Merchant->status = $merchant['relationship_status'];
-                } else {
-                    $Merchant->status = $merchant['status'];
-                }
-                $arrResult[] = $Merchant;
-            } catch (Exception $e) {
-            }
-        }
+//        $arrResult = [];
+        //        foreach ($merchantList as $merchant) {
+//            if ($merchant['status'] == 'Setup') {
+//                // Ignore setup programs not yet active
+//                continue;
+//            }
+//            try {
+//                $Merchant = Merchant::createInstance();
+//                $Merchant->merchant_ID = $merchant['cid'];
+//                $Merchant->name = $merchant['name'];
+//                $Merchant->url = $merchant['url'];
+//                if ($merchant['status'] == 'Active') {
+//                    $Merchant->status = $merchant['relationship_status'];
+//                } else {
+//                    $Merchant->status = $merchant['status'];
+//                }
+//                $arrResult[] = $Merchant;
+//            } catch (Exception $e) {
+//            }
+//        }
 
-        return $arrResult;
+        return $this->_network->getMerchantList($params);
     }
 
     public function addAllowedSite($idSite)
