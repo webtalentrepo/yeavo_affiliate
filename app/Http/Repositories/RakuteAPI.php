@@ -45,9 +45,14 @@ class RakuteAPI
      * @return array Commission Junction API response, converted to a PHP array
      * @throws Exception on cURL failure or http status code greater than or equal to 400
      */
-    public function productSearch(array $parameters = array())
+    public function productSearch($parameters = array())
     {
         return $this->api("productsearch", "productsearch", $parameters);
+    }
+
+    public function linkSearch($parameters = array())
+    {
+        return $this->api("linklocator", "getMerchByAppStatus/approved", $parameters);
     }
 
     public function getToken()
