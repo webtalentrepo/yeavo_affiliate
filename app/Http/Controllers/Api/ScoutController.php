@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\CommissionJunction;
+use App\Http\Repositories\LinkShare;
 use App\Http\Repositories\ScoutRepository;
 use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
@@ -130,8 +131,26 @@ class ScoutController extends Controller
         } elseif ($sel_network == 'Rakuten Linkshare') {
             $re = $this->scoutRepo->getRakutenProduct($params);
 
-            print_r($re);
-            exit;
+            if ($re && isset($re['item'])) {
+                $pageCount = ceil($re['TotalMatches'] / $params['limit']);
+
+                foreach ($re['item'] as $key => $row) {
+                    $reData[$key] = [
+                        'name' => $row['mid'] . ' - ' . $row['merchantname'] . '(' . $row['productname'] . ')',
+                        'popularity' => '',
+                        'network' => $sel_network,
+                        'sale' => 'https://cli.linksynergy.com/cli/publisher/programs/apply_confirmation.php',
+//                        'sale' => $row['saleprice'],
+                        'sign_up' => $row['linkurl'],
+                        'details' => $row,
+                    ];
+                }
+            }
+//            $rtLs = new LinkShare();
+//
+//            $re = $rtLs->getMerchants($params);
+//
+//            print_r($re);
         }
 
         return response()->json([

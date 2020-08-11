@@ -4,6 +4,8 @@
 namespace App\Http\Repositories;
 
 
+use Rakuten\Exception;
+
 class RakuteAPI
 {
     public $domain = "https://api.rakutenmarketing.com/%s/%s";
@@ -30,8 +32,10 @@ class RakuteAPI
      */
     public function __construct($api_key, $curl = null)
     {
-        $this->api_key = $api_key;
+//        $this->api_key = $api_key;
         if ($curl) $this->setCurl($curl);
+
+        $this->api_key = $this->getToken();
     }
 
     /**
@@ -73,7 +77,7 @@ class RakuteAPI
      * @return array Commission Junction API response, converted to a PHP array
      * @throws Exception on cURL failure or http status code greater than or equal to 400
      */
-    public function api($subdomain, $resource, array $parameters = array(), $version = '1.0')
+    public function api($subdomain, $resource, $parameters = [], $version = '1.0')
     {
         $ch = $this->getCurl();
         $url = sprintf($this->domain, $subdomain, $version, $resource);
@@ -84,7 +88,7 @@ class RakuteAPI
             CURLOPT_URL => $url,
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/xml',
-                'Authorization: ' . $this->api_key,
+                'Authorization: Bearer ' . $this->api_key,
             )
         ));
         $body = curl_exec($ch);
@@ -101,7 +105,7 @@ class RakuteAPI
         return json_decode(json_encode((array)simplexml_load_string($body)), true);
     }
 
-    public function apiToken($subdomain, $resource, array $parameters = array(), $version = '1.0')
+    public function apiToken($subdomain, $resource, $parameters = array(), $version = '1.0')
     {
         $data = array("grant_type" => "password", "username" => "deadbeat", 'password' => '2m1K2i4oel!#', 'scope' => '3706879');
 
@@ -114,7 +118,7 @@ class RakuteAPI
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Accept: */*',
             'Content-Type: application/x-www-form-urlencoded',
-            'Authorization: ' . $this->api_key,
+            'Authorization: Basic ' . config('services.rakuten.token'),
         ));
         $body = curl_exec($ch);
         $errno = curl_errno($ch);
@@ -126,7 +130,12 @@ class RakuteAPI
         if ($http_status >= 400) {
             throw new Exception(sprintf("CommissionJunction Error Token  [%s] %s", $http_status, strip_tags($body)), $http_status);
         }
-        return json_decode($body);
+
+        $response = json_decode($body);
+        if ($response && $response->access_token) {
+            $this->api_key = $response->access_token;
+        }
+        return $this->api_key;
     }
 
     /**

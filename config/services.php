@@ -36,6 +36,9 @@ return [
     ],
 
     'cj_access_token' => env('CJ_ACCESS_TOKEN'),
-    'rakuten_token' => env('RAKUTEN_SEC_KEY'),
+    'rakuten' => [
+        'sec_key' => env('RAKUTEN_SEC_KEY'),
+        'token' => env('LINKSHARE_TOKEN')
+    ],
 
 ];

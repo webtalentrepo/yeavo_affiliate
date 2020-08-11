@@ -5,7 +5,7 @@ namespace App\Http\Repositories;
 
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
-use App\Http\Repositories\Affiliates\Merchant;
+//use App\Http\Repositories\Affiliates\Merchant;
 use Oara\Network\Publisher\CommissionJunctionGraphQL;
 use Exception;
 

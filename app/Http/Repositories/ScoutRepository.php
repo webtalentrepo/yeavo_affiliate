@@ -93,7 +93,8 @@ class ScoutRepository
 
     public function getRakutenProduct($params)
     {
-        $apiKey = config('services.rakuten_token');
+//        $apiKey = config('services.rakuten_token');
+        $apiKey = 'de46fda6e3f3beee56c1dc4a142844';
 //
 //        $client = new Client();
 //        $client->setSecret('ec3da475028d2a8d761dfa3002cbecbc1564be57a8746709f3b7590dd80f0c34');
@@ -120,13 +121,12 @@ class ScoutRepository
 //        }
 //
 //        return $arReturn;
-        $client = new RakuteAPI('Bearer ' . $apiKey);
-        $parameters = ['max' => $params['limit']];
+        $client = new RakuteAPI($apiKey);
+        $parameters = ['max' => $params['limit'], 'pagenumber' => $params['page']];
         if ($params['keywords'] && !is_null($params['keywords'])) {
             $parameters['keyword'] = $params['keywords'];
         }
-        $products = $client->productSearch($parameters);
 
-        return $products;
+        return $client->productSearch($parameters);
     }
 }

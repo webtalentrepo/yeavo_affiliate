@@ -1,5 +1,9 @@
 <?php
+
 namespace Oara\Network\Publisher;
+
+use http\Exception;
+
 /**
  * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
  * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
@@ -44,6 +48,7 @@ class LinkShare extends \Oara\Network
 
     /**
      * @param $credentials
+     * @throws \Exception
      */
     public function login($credentials)
     {
@@ -52,28 +57,26 @@ class LinkShare extends \Oara\Network
         $this->_idSite = $credentials ['idSite'];
 
         // If the Bearer authentication token is defined into environment use it directly to get the access token - <PN> 2019-12-10
-        if (isset($_ENV['LINKSHARE_TOKEN'])) {
-            $this->_bearer = $_ENV['LINKSHARE_TOKEN'];
+        if (config('services.rakuten.token')) {
+            $this->_bearer = config('services.rakuten.token');
             if (!empty($this->_bearer)) {
                 $this->getToken($this->_bearer);
                 // Create a dummy site structure (allows access to only one site at a time)
-                $site = new \stdClass ();
+                $site = new \stdClass();
                 $site->website = '';
-                $site->url = '';;
+                $site->url = '';
                 $site->id = $this->_idSite;
                 $site->token = $this->_token;
                 if (isset($_ENV['LINKSHARE_SECURITY_TOKEN'])) {
                     // Get security token from the environment - 2019-10-12 <PN>
                     $site->secureToken = $_ENV['LINKSHARE_SECURITY_TOKEN'];
-                }
-                else {
+                } else {
                     $site->secureToken = '';;
                 }
-                $siteList [] = $site;
+                $siteList[] = $site;
                 $this->_siteList = $siteList;
             }
-        }
-        else {
+        } else {
             // Try to login as a dashboard user to grab token from web services page
             $this->_client = new \Oara\Curl\Access ($credentials);
 
@@ -130,25 +133,25 @@ class LinkShare extends \Oara\Network
         return $credentials;
     }
 
-    public function getToken($apiKey) {
-        if (!empty($this->_token)) {
-            return $this->_token;
-        }
+    public function getToken($apiKey)
+    {
+//        if (!empty($this->_token) && !is_null($this->_token)) {
+//            return $this->_token;
+//        }
 
-        if (empty($apiKey)) {
-            if (!empty($this->_bearer)) {
-                $apiKey = $this->_bearer;
-            }
-            else {
-                // If the Bearer authentication token is defined into environment use it directly to get the access token - <PN> 2019-12-10
-                if (isset($_ENV['LINKSHARE_TOKEN'])) {
-                    $this->_bearer = $_ENV['LINKSHARE_TOKEN'];
-                    if (!empty($this->_bearer)) {
-                        $apiKey = $this->_bearer;
-                    }
-                }
-            }
-        }
+//        if (empty($apiKey)) {
+//            if (!empty($this->_bearer)) {
+//                $apiKey = $this->_bearer;
+//            } else {
+//                // If the Bearer authentication token is defined into environment use it directly to get the access token - <PN> 2019-12-10
+//                if (isset($_ENV['LINKSHARE_TOKEN'])) {
+//                    $this->_bearer = $_ENV['LINKSHARE_TOKEN'];
+//                    if (!empty($this->_bearer)) {
+//                        $apiKey = $this->_bearer;
+//                    }
+//                }
+//            }
+//        }
 
         // Retrieve access token
         $loginUrl = "https://api.rakutenmarketing.com/token";
@@ -169,11 +172,11 @@ class LinkShare extends \Oara\Network
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $loginUrl);
         curl_setopt($ch, CURLOPT_POST, TRUE);
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $post_params);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_params);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Basic " . $apiKey));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Basic " . config('services.rakuten.token')));
 
         $curl_results = curl_exec($ch);
         curl_close($ch);
@@ -274,13 +277,16 @@ class LinkShare extends \Oara\Network
     }
 
 
-
-    public function getMerchantList()
+    public function getMerchantList($params = [])
     {
-        $arrResult = array();
+//        $arrResult = array();
         try {
-            if (empty($this->_token)) {
+            if (empty($this->_token) || !$this->_token || is_null($this->_token)) {
                 $this->_token = $this->getToken('');
+            }
+
+            if (is_null($this->_token)) {
+                return null;
             }
 
             // https://api.rakutenmarketing.com/linklocator/1.0/getMerchByAppStatus/{status}
@@ -288,48 +294,58 @@ class LinkShare extends \Oara\Network
             // Get all merchants with status "approved"
 
             $url = "https://api.rakutenmarketing.com/linklocator/1.0/getMerchByAppStatus/approved";
-            $arrResult = array();
+//            $arrResult = array();
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_POST, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_token));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Accept: */*',
+                'Content-Type: application/x-www-form-urlencoded',
+                'Authorization: Bearer ' . $this->_token,
+            ));
 
             $curl_results = curl_exec($ch);
             curl_close($ch);
 
-            $response = xml2array($curl_results);
+            return $curl_results;
+
+//            $response = xml2array($curl_results);
+//            $response = json_decode($response, true);
+
             if (!is_array($response) || count($response) <= 0) {
                 $message = 'Linkshare: getMerchantList XML Error';
                 throw new \Exception($message);
             }
+
             if (!isset($response['ns1:getMerchByAppStatusResponse'])) {
                 $message = 'Linkshare: getMerchantList XML Error';
                 throw new \Exception($message);
             }
+
             $result = $response['ns1:getMerchByAppStatusResponse'];
-            $merchants = $result['ns1:return'];
-            foreach ($merchants as $key => $merchant) {
-                $mid = isset($merchant['ns1:mid']) ? $merchant['ns1:mid'] : '';
-                $name = isset($merchant['ns1:name']) ? $merchant['ns1:name'] : '';
-                $status = isset($merchant['ns1:applicationStatus']) ? $merchant['ns1:applicationStatus'] : '';
-                $arrResult[] = array(
-                    'cid' => $mid,
-                    'name' => $name,
-                    'status' => $status,
-                    'termination_date' => null,
-                    'url' => null,
-                );
-            }
-            return $arrResult;
-        }
-        catch (\Exception $e) {
-            echo "LinkShare getMerchantList error: ".$e->getMessage()."\n ";
+
+            return $result['ns1:return']; // $merchants
+
+//            foreach ($merchants as $key => $merchant) {
+//                $mid = isset($merchant['ns1:mid']) ? $merchant['ns1:mid'] : '';
+//                $name = isset($merchant['ns1:name']) ? $merchant['ns1:name'] : '';
+//                $status = isset($merchant['ns1:applicationStatus']) ? $merchant['ns1:applicationStatus'] : '';
+//                $arrResult[] = array(
+//                    'cid' => $mid,
+//                    'name' => $name,
+//                    'status' => $status,
+//                    'termination_date' => null,
+//                    'url' => null,
+//                );
+//            }
+//            return $arrResult;
+        } catch (\Exception $e) {
+            echo "LinkShare getMerchantList error: " . $e->getMessage() . "\n ";
             throw new \Exception($e);
         }
-        return $arrResult;
     }
 
 
@@ -338,15 +354,14 @@ class LinkShare extends \Oara\Network
      * @param \DateTime|null $dStartDate
      * @param \DateTime|null $dEndDate
      * @return array
-     * @throws Exception
      */
     public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
     {
-        $totalTransactions = Array();
+        $totalTransactions = array();
         $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
         foreach ($this->_siteList as $site) {
-            if (!empty($this->_idSite) && !$site == $this->_idSite){
+            if (!empty($this->_idSite) && !$site == $this->_idSite) {
                 break;
             }
             if (empty($this->_sitesAllowed) || in_array($site->id, $this->_sitesAllowed)) {
@@ -381,8 +396,8 @@ class LinkShare extends \Oara\Network
                     $signatureData = str_getcsv($exportData [$j], ",");
                     $orderId = $signatureData[3];
                     // BV-886 - Special case ... comma in order id ... remove it
-                    if (strpos($orderId,",") !== false) {
-                        $orderId = str_replace(",","",$orderId);
+                    if (strpos($orderId, ",") !== false) {
+                        $orderId = str_replace(",", "", $orderId);
                     }
                     $signatureMap[$orderId] = $signatureData[0];
                 }
@@ -393,8 +408,8 @@ class LinkShare extends \Oara\Network
                     try {
                         $transactionData = \str_getcsv($exportData [$j], ",");
 
-                        if (count($transactionData) > 10 && (count($merchantIdList)==0 || isset($merchantIdList[$transactionData[3]]))) {
-                            if ($transactionData[1] === '' && strpos($transactionData[2],'/') !== false) {
+                        if (count($transactionData) > 10 && (count($merchantIdList) == 0 || isset($merchantIdList[$transactionData[3]]))) {
+                            if ($transactionData[1] === '' && strpos($transactionData[2], '/') !== false) {
                                 // BV-886 - Special case ... empty field after transaction id ... remove from array
                                 unset($transactionData[1]);
                                 $transactionData = array_values($transactionData);
@@ -409,8 +424,7 @@ class LinkShare extends \Oara\Network
 
                             if (isset($signatureMap[$transactionData[0]])) {
                                 $transaction['custom_id'] = $signatureMap[$transactionData[0]];
-                            }
-                            else {
+                            } else {
                                 echo "[LinkShare][getTransactionsList] Warning: Cannot find signature (u1) for order id " . $transactionData[0] . " transaction id " . $transactionData[10];
                             }
                             $transaction['unique_id'] = $transactionData[10];
@@ -437,8 +451,7 @@ class LinkShare extends \Oara\Network
                             $transaction['IP'] = '';    // not available
                             $totalTransactions [] = $transaction;
                         }
-                    }
-                    catch (\Exception $e) {
+                    } catch (\Exception $e) {
                         echo "[LinkShare][getTransactionsList] Error: " . $e->getMessage();
                     }
                 }
@@ -449,7 +462,7 @@ class LinkShare extends \Oara\Network
 
     /**
      * Get list of Vouchers / Coupons / Offers
-     * @param $apiKey   Api Key is needed to access data feed
+     * @param $apiKey   string api Key is needed to access data feed
      * @return array
      */
     public function getVouchers($apiKey, $network)
@@ -467,7 +480,7 @@ class LinkShare extends \Oara\Network
             $loginUrl = "https://api.rakutenmarketing.com/coupon/1.0";
             $currentPage = 1;
             $arrResult = array();
-            if (strpos($network,',') !== false) {
+            if (strpos($network, ',') !== false) {
                 // If more than one networks are provided ... don't use network parameter to get ALL networks - 2019-06-24 <PN>
                 $network = null;
             }
@@ -607,10 +620,10 @@ class LinkShare extends \Oara\Network
 
 
         } catch (\Exception $e) {
-            echo "LinkShare getVouchers error:".$e->getMessage()."\n ";
+            echo "LinkShare getVouchers error:" . $e->getMessage() . "\n ";
             throw new \Exception($e);
         }
-        return $vouchers;
+//        return $vouchers;
     }
 
 
