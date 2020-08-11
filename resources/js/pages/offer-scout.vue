@@ -93,7 +93,7 @@
                     loading-text="Loading... Please wait"
                 >
                     <template v-slot:item.sign_up="{ item }">
-                        <a :href="item.sign_up" target="_blank">Sign Up</a>
+                        <a>Sign Up</a>
                     </template>
                 </v-data-table>
                 <v-row>
@@ -186,6 +186,7 @@
 
                 this.$http.post('/api/scout-data', params).then((r) => {
                     if (r.data.result === 'success') {
+                        // console.log(r)
                         this.desserts = r.data.rows
                         this.pageCount = r.data.pageCount
                     }
