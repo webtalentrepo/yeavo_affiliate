@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Repositories\CommissionJunction;
 use App\Http\Repositories\ScoutRepository;
 use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
@@ -42,23 +43,27 @@ class ScoutController extends Controller
 ////                });
 //            }
         } elseif ($sel_network == 'cj.com') {
-            $re = $this->scoutRepo->getCJProductsData($params);
+//            $re = $this->scoutRepo->getCJProductsData($params);
+//
+//            if ($re && isset($re['data']) && isset($re['data']['products']) && isset($re['data']['products']['resultList'])) {
+//                foreach ($re['data']['products']['resultList'] as $key => $row) {
+//                    $reData[$key] = [
+//                        'name' => $row['title'],
+//                        'sale' => $row['salePrice'] ? $row['salePrice']['amount'] . ' ' . $row['salePrice']['currency'] : $row['price']['amount'] . ' ' . $row['price']['currency'],
+//                        'popularity' => '',
+//                        'network' => $sel_network,
+//                        'sign_up' => $row['link'],
+//                    ];
+//                }
+//
+//                $p_re = $this->scoutRepo->getCJProductsCount($params);
+//
+//                $pageCount = round($p_re['data']['products']['count'] / $params['limit']);
+//            }
+            $cj = new CommissionJunction();
+            $re = $cj->getMerchants();
 
-            if ($re && isset($re['data']) && isset($re['data']['products']) && isset($re['data']['products']['resultList'])) {
-                foreach ($re['data']['products']['resultList'] as $key => $row) {
-                    $reData[$key] = [
-                        'name' => $row['title'],
-                        'sale' => $row['salePrice'] ? $row['salePrice']['amount'] . ' ' . $row['salePrice']['currency'] : $row['price']['amount'] . ' ' . $row['price']['currency'],
-                        'popularity' => '',
-                        'network' => $sel_network,
-                        'sign_up' => $row['link'],
-                    ];
-                }
-
-                $p_re = $this->scoutRepo->getCJProductsCount($params);
-
-                $pageCount = round($p_re['data']['products']['count'] / $params['limit']);
-            }
+            var_dump($re);
         } elseif ($sel_network == 'Rakuten Linkshare') {
             $re = $this->scoutRepo->getRakutenProduct($params);
 
