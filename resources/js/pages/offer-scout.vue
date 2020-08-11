@@ -93,7 +93,7 @@
                     loading-text="Loading... Please wait"
                 >
                     <template v-slot:item.sign_up="{ item }">
-                        <a>Sign Up</a>
+                        <a v-if="!disableMin[sel_network]">Sign Up</a>
                     </template>
                 </v-data-table>
                 <v-row>

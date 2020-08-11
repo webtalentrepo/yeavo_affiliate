@@ -130,7 +130,8 @@ class ScoutController extends Controller
         } elseif ($sel_network == 'Rakuten Linkshare') {
             $re = $this->scoutRepo->getRakutenProduct($params);
 
-            var_dump($re);
+            print_r($re);
+            exit;
         }
 
         return response()->json([
