@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\CommissionJunction;
 use App\Http\Repositories\LinkShare;
 use App\Http\Repositories\ScoutRepository;
+use App\Http\Repositories\ShareSale;
 use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
 
@@ -151,6 +152,12 @@ class ScoutController extends Controller
 //            $re = $rtLs->getMerchants($params);
 //
 //            print_r($re);
+        } elseif ($sel_network == 'shareasale.com') {
+            $ss = new ShareSale();
+
+            $re = $ss->getMerchants($params);
+
+            print_r($re);
         }
 
         return response()->json([

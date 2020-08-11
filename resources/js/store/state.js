@@ -3,8 +3,8 @@ const state = {
         // 'clickbank.com',
         'cj.com',
         'Rakuten Linkshare',
-        'maxbounty.com',
-        'jvzoo.com',
+        // 'maxbounty.com',
+        // 'jvzoo.com',
         'shareasale.com',
     ]
 }
