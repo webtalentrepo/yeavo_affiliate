@@ -122,11 +122,11 @@ class ScoutRepository
         $s_min = 0;
         $s_max = 0;
         if (isset($params['sale_min']) && !is_null($params['sale_min']) && $params['sale_min'] != '') {
-            $s_min = intval($params['sale_min']);
+            $s_min = $params['sale_min'] * 1;
         }
 
         if (isset($params['sale_max']) && !is_null($params['sale_max']) && $params['sale_max'] != '') {
-            $s_max = intval($params['sale_max']);
+            $s_max = $params['sale_max'] * 1;
         }
 
         if ($s_min != 0) {
@@ -140,11 +140,11 @@ class ScoutRepository
         $p_min = 0;
         $p_max = 0;
         if (isset($params['popular_min']) && !is_null($params['popular_min']) && $params['popular_min'] != '') {
-            $p_min = intval($params['popular_min']);
+            $p_min = $params['popular_min'] * 1;
         }
 
         if (isset($params['popular_max']) && !is_null($params['popular_max']) && $params['popular_max'] != '') {
-            $p_max = intval($params['popular_max']);
+            $p_max = $params['popular_max'] * 1;
         }
 
         if ($p_min != 0) {
