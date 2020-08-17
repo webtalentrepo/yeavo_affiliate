@@ -155,9 +155,9 @@ class ScoutRepository
             $qry = $qry->where('popular_rank', '<=', $p_max);
         }
 
-//        $qry = $qry->orderBy('popular_rank', 'desc')
-//            ->orderBy('p_commission', 'desc')
-//            ->get();
+        $qry = $qry->orderBy('p_gravity', 'desc')
+            ->orderBy('p_commission', 'desc')
+            ->get();
 
         $qry = $qry->get();
 
