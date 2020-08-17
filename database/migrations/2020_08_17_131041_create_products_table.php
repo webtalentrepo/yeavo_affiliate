@@ -22,11 +22,12 @@ class CreateProductsTable extends Migration
             $table->integer('popular_rank')->index();
             $table->text('p_title')->nullable();
             $table->text('p_description')->nullable();
-            $table->double('p_commission');
-            $table->double('p_gravity');
-            $table->double('p_percent_sale');
-            $table->boolean('deleted_flag');
-            $table->boolean('edited_flag');
+            $table->double('p_commission')->index();
+            $table->string('p_commission_unit', 100);
+            $table->double('p_gravity')->index();
+            $table->double('p_percent_sale')->index();
+            $table->boolean('deleted_flag')->index();
+            $table->boolean('edited_flag')->index();
             $table->timestamps();
         });
     }
