@@ -127,9 +127,9 @@
                 pageCount: 0,
                 itemsPerPage: 25,
                 headers: [
-                    {text: 'Offer Name', value: 'name', sortable: false},
-                    {text: '$ Sale', value: 'sale', sortable: false},
-                    {text: 'Popularity(Is it selling well)', value: 'popularity', sortable: false},
+                    {text: 'Offer Name', value: 'name'},
+                    {text: '$ Sale', value: 'sale'},
+                    {text: 'Popularity(Is it selling well)', value: 'popularity'},
                     {text: 'Network', value: 'network', sortable: false},
                     {text: 'Sign Up', value: 'sign_up', sortable: false},
                 ],

@@ -35,17 +35,33 @@ class ScoutsController extends Controller
         $reData = [];
         $pageCount = 0;
 
-        if ($sel_network == 'clickbank.com') {
-            $re = file_get_contents(public_path('downloads/marketplace_feed_v2.xml/marketplace_feed_v2.xml'));
+        $re = $this->scoutRepo->getScoutData($params, $sel_network);
 
-            $xml = \simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+//        if ($sel_network == 'clickbank.com') {
+//            $re = file_get_contents(public_path('downloads/marketplace_feed_v2.xml/marketplace_feed_v2.xml'));
+//
+//            $xml = \simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+//
+//            $json = json_encode($xml);
+//            $array = json_decode($json, true);
+//
+//            print_r($array);
+//        }
+        if ($re) {
+            $reData = $re->map(function ($el) use ($sel_network) {
+                $el->name = $el->site_id . ' - ' . $el->p_title;
+                $el->popularity = $el->popular_rank;
+                $el->sale = $el->p_commission . ($el->p_commission_unit == '%' ? '%' : ' ' . $el->p_commission_unit);
 
-            $json = json_encode($xml);
-            $array = json_decode($json, true);
+                if ($sel_network == 'cj.com') {
+                    $el->sign_up = 'https://members.cj.com/member/2536227/publisher/links/search/#!advertiserIds=' . $el->site_id;
+                }
 
-            print_r($array);
+                return $el;
+            });
+
+            $pageCount = ceil(sizeof($re->toArray()) / $params['limit']);
         }
-
 
         return response()->json([
             'result' => 'success',
