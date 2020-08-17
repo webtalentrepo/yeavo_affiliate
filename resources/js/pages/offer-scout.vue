@@ -137,8 +137,8 @@
                 sel_network: 'cj.com',
                 searchStart: false,
                 disableMin: {
-                    'clickbank.com': true,
-                    'cj.com': true,
+                    'clickbank.com': false,
+                    'cj.com': false,
                     'Rakuten Linkshare': false,
                     'maxbounty.com': false,
                     'jvzoo.com': false,

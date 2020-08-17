@@ -153,10 +153,10 @@ class CommissionJunctionGraphQL extends \Oara\Network
         $merchantReportList = [];
 
         $page = isset($params['page']) ? $params['page'] : 1;
-        $per_page = isset($params['limit']) ? $params['limit'] : 25;
-//        $total_pages = ceil(10000 / $per_page);
-//        $start = time();
-//        $per_minute = 0;
+        $per_page = isset($params['limit']) ? $params['limit'] : 100;
+        $total_pages = ceil(10000 / $per_page);
+        $start = time();
+        $per_minute = 0;
 
         $qry = 'advertiser-ids=&records-per-page=' . $per_page . '&page-number=' . $page;
 
@@ -164,40 +164,40 @@ class CommissionJunctionGraphQL extends \Oara\Network
             $qry .= '&keywords=' . urlencode($params['keywords']);
         }
 
-//        do {
-//            if ($page > $total_pages) {
-//                exit;
-//            }
-//
-//            if ($per_minute++ > 25 && (time() - $start) < 60) {
-//                // Don't go above the 25 calls/minute
-//                while ((time() - $start) < 60) {
-//                    sleep(1);
-//                }
-//
-//                $per_minute = 0;
-//                $start = time();
-//            }
+        do {
+            if ($page > $total_pages) {
+                exit;
+            }
 
-        // Get All programs even if not active - 2018-04-23 <PN>
-        $response = self::apiCall('https://advertiser-lookup.api.cj.com/v3/advertiser-lookup?' . $qry);
-        $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING);
-        if (!isset($xml->advertisers)) {
-            return null;
-        }
+            if ($per_minute++ > 25 && (time() - $start) < 60) {
+                // Don't go above the 25 calls/minute
+                while ((time() - $start) < 60) {
+                    sleep(1);
+                }
 
-        $json = json_encode($xml);
-        return json_decode($json, true);
+                $per_minute = 0;
+                $start = time();
+            }
 
-//            $total_adv = (int)$xml->advertisers[0]['total-matched'];
-//            $total_pages = ceil($total_adv / $per_page);
-//
-//            $merchantReportList = array_merge($merchantReportList, $array['advertisers']['advertiser']);
-//
-//            $page++;
-//        } while ($total_pages >= $page);
-//
-//        return $merchantReportList;
+            // Get All programs even if not active - 2018-04-23 <PN>
+            $response = self::apiCall('https://advertiser-lookup.api.cj.com/v3/advertiser-lookup?' . $qry);
+            $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING);
+            if (!isset($xml->advertisers)) {
+                return null;
+            }
+
+            $json = json_encode($xml);
+            $array = json_decode($json, true);
+
+            $total_adv = (int)$xml->advertisers[0]['total-matched'];
+            $total_pages = ceil($total_adv / $per_page);
+
+            $merchantReportList = array_merge($merchantReportList, $array['advertisers']['advertiser']);
+
+            $page++;
+        } while ($total_pages >= $page);
+
+        return $merchantReportList;
     }
 
     /**

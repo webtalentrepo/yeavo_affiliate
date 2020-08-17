@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/scout-data', 'Api\ScoutController@index');
-Route::get('/scout-data', 'Api\ScoutController@index');
+Route::post('/scout-data', 'Api\ScoutsController@index');
+Route::get('/scout-data', 'Api\ScoutsController@index');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
