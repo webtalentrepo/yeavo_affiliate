@@ -97,7 +97,7 @@
                         <div v-if="sel_network === 'cj.com'">
                             7 day EPC: {{ item.seven_day_epc }}
                         </div>
-                        <div>
+                        <div class="mt-2">
                             Sale: {{ item.sale }}
                         </div>
                     </template>
