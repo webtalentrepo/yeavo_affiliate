@@ -45,14 +45,14 @@ class ScoutsDataInsert extends Command
 
         for ($i = 0; $i < count($links); $i++) {
             if ($links[$i] == 'cj.com') {
-//                $cj = new CommissionJunction();
-//                $re = $cj->getMerchants([]);
-//
-////                Log::info(json_encode($re));
-//
-//                if ($re) {
-//                    $cj->saveDataToTable($re, $links[$i]);
-//                }
+                $cj = new CommissionJunction();
+                $re = $cj->getMerchants([]);
+
+//                Log::info(json_encode($re));
+
+                if ($re) {
+                    $cj->saveDataToTable($re, $links[$i]);
+                }
             } elseif ($links[$i] == 'clickbank.com') {
                 $path = public_path('downloads');
                 chmod($path, 0777);
