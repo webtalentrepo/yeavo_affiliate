@@ -25,6 +25,9 @@ class CreateProductsTable extends Migration
             $table->double('p_commission')->index();
             $table->string('p_commission_unit', 100);
             $table->double('p_gravity')->index();
+            $table->string('seven_day_epc', 50);
+            $table->string('three_month_epc', 50);
+            $table->string('earning_uint', 20);
             $table->double('p_percent_sale')->index();
             $table->boolean('deleted_flag')->index();
             $table->boolean('edited_flag')->index();

@@ -6,6 +6,7 @@ namespace App\Http\Repositories;
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
 //use App\Http\Repositories\Affiliates\Merchant;
+use App\Models\Product;
 use Oara\Network\Publisher\CommissionJunctionGraphQL;
 use Exception;
 
@@ -106,6 +107,133 @@ class CommissionJunction
     {
         if (trim($idSite) != '') {
             $this->_network->addAllowedSite($idSite);
+        }
+    }
+
+    public function saveDataToTable($re, $link)
+    {
+        foreach ($re as $key => $row) {
+            if (!isset($row['advertiser-id'])) {
+                continue;
+            }
+
+            $sale = '0';
+            $c_name = '';
+            if (isset($row['actions'])) {
+                if (isset($row['actions']['action'])) {
+                    if (isset($row['actions']['action']['commission'])) {
+                        if (isset($row['actions']['action']['name'])) {
+                            $c_name = $row['actions']['action']['name'];
+                        }
+
+                        if (isset($row['actions']['action']['commission']['default'])) {
+                            $sale = $row['actions']['action']['commission']['default'];
+                        }
+                    } else {
+                        if (isset($row['actions']['action'][0]) && isset($row['actions']['action'][0]['commission'])) {
+                            $sale = $row['actions']['action'][0]['commission']['default'];
+
+                            if (isset($row['actions']['action'][0]['name'])) {
+                                $c_name = $row['actions']['action'][0]['name'];
+                            }
+                        }
+                    }
+                }
+            }
+
+            $aid = '';
+            if (!is_array($row['advertiser-id'])) {
+                $aid = $row['advertiser-id'];
+            } else {
+                if (is_array($row['advertiser-id'])) {
+                    if (sizeof($row['advertiser-id']) > 0) {
+                        $aid = $row['advertiser-id'][0];
+                    }
+                } else {
+                    $aid = $row['advertiser-id'];
+                }
+            }
+
+            if (isset($row['advertiser-name'])) {
+                if (is_array($row['advertiser-name'])) {
+                    if (sizeof($row['advertiser-name']) > 0) {
+                        $name = $row['advertiser-name'][0];
+                    } else {
+                        $name = $c_name;
+                    }
+                } else {
+                    $name = $row['advertiser-name'];
+                }
+            } else {
+                $name = $c_name;
+            }
+
+            $commission = (float)$sale;
+            $c_unit_ary = explode($commission, $sale);
+            $c_unit = '%';
+
+            if (isset($c_unit_ary[1]) && trim($c_unit_ary[1]) == '%') {
+                $c_unit = '%';
+            } else {
+                $c_unit_ary = explode(' ', $sale);
+
+                if (isset($c_unit_ary[1]) && !is_nan($c_unit_ary[1] * 1) && is_numeric($c_unit_ary[1] * 1)) {
+                    $c_unit = $c_unit_ary[0];
+                }
+            }
+
+            $scout = Product::where('site_id', $aid)
+                ->where('network', $link)
+                ->first();
+
+            if ($scout) {
+                if ($scout->deleted_flag || $scout->edited_flag) {
+                    continue;
+                }
+            } else {
+                $scout = new Product();
+            }
+
+            $parent = '';
+            $child = '';
+            if (isset($row['primary-category']['parent'])) {
+                if (is_array(isset($row['primary-category']['parent']))) {
+                    if (sizeof($row['primary-category']['parent']) > 0) {
+                        $parent = $row['primary-category']['parent'][0];
+                    }
+                } else {
+                    $parent = $row['primary-category']['parent'];
+                }
+            }
+
+            if (isset($row['primary-category']['child'])) {
+                if (is_array(isset($row['primary-category']['child']))) {
+                    if (sizeof($row['primary-category']['child']) > 0) {
+                        $child = $row['primary-category']['child'][0];
+                    }
+                } else {
+                    $child = $row['primary-category']['child'];
+                }
+            }
+
+            $scout->network = $link;
+            $scout->category = is_array($parent) ? json_encode($parent) : $parent;
+            $scout->child_category = is_array($child) ? json_encode($child) : $child;
+            $scout->site_id = is_array($aid) ? json_encode($aid) : $aid;
+            $scout->popular_rank = isset($row['network-rank']) ? (is_array($row['network-rank']) ? json_encode($row['network-rank']) : $row['network-rank']) : 0;
+            $scout->p_title = is_array($name) ? json_encode($name) : $name;
+            $scout->p_description = is_array($c_name) ? json_encode($c_name) : $c_name;
+            $scout->p_commission = is_array($commission) ? json_encode($commission) : $commission;
+            $scout->p_commission_unit = is_array($c_unit) ? json_encode($c_unit) : $c_unit;
+            $scout->p_gravity = isset($row['network-rank']) ? (is_array($row['network-rank']) ? json_encode($row['network-rank']) : $row['network-rank']) : 0;
+            $scout->seven_day_epc = isset($row['seven-day-epc']) ? (is_array($row['seven-day-epc']) ? json_encode($row['seven-day-epc']) : $row['seven-day-epc']) : '';
+            $scout->three_month_epc = isset($row['three-month-epc']) ? (is_array($row['three-month-epc']) ? json_encode($row['three-month-epc']) : $row['three-month-epc']) : '';
+            $scout->earning_uint = 'USD';
+            $scout->p_percent_sale = ($c_unit == '%') ? (is_array($commission) ? json_encode($commission) : $commission) : 0;
+            $scout->deleted_flag = 0;
+            $scout->edited_flag = 0;
+
+            $scout->save();
         }
     }
 }

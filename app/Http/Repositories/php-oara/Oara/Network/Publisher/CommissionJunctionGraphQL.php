@@ -181,12 +181,11 @@ class CommissionJunctionGraphQL extends \Oara\Network
             $total_adv = (int)$xml->advertisers[0]['total-matched'];
             $total_pages = ceil($total_adv / $per_page);
 
-            foreach ($xml->advertisers->advertiser as $adv) {
-                foreach ($adv->children() as $key => $value) {
-                    $merchantReportList[] = [
-                        $key => $value
-                    ];
-                }
+            $json = json_encode($xml);
+            $array = json_decode($json, true);
+
+            if (isset($array['advertisers']['advertiser'])) {
+                $merchantReportList = array_merge($merchantReportList, $array['advertisers']['advertiser']);
             }
 
             $page++;
