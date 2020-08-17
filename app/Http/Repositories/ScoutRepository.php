@@ -148,11 +148,11 @@ class ScoutRepository
         }
 
         if ($p_min != 0) {
-            $qry = $qry->where('popular_rank', '>=', $p_min);
+            $qry = $qry->where('p_gravity', '>=', $p_min);
         }
 
         if ($p_max != 0) {
-            $qry = $qry->where('popular_rank', '<=', $p_max);
+            $qry = $qry->where('p_gravity', '<=', $p_max);
         }
 
         $qry = $qry->orderBy('p_gravity', 'desc')
