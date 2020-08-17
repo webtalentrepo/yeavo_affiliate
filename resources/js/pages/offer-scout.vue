@@ -90,6 +90,9 @@
                             <div class="text--secondary text-sm-caption">
                                 <span v-if="item.category !== '[]'">{{ item.category }}/</span><span>{{ item.child_category }}</span>
                             </div>
+                            <div class="mt-2 text--secondary text-sm-caption">
+                                {{ item.p_description }}
+                            </div>
                         </div>
                     </template>
                     <template v-slot:item.sale="{ item }">
