@@ -107,7 +107,7 @@
                                 Avg $/Sale: ${{ item.seven_day_epc }}
                             </div>
                             <div class="mt-2">
-                                <span v-if="sel_network === 'clickbank.com'">Avg %/</span>Sale: {{ item.sale }}
+                                <span v-if="sel_network === 'clickbank.com'">Avg %/</span>Sale: {{ (item.seven_day_epc === 0 ? 0 : item.sale) }}
                             </div>
                         </div>
                     </template>
