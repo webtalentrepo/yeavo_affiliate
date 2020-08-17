@@ -159,7 +159,7 @@ class ScoutRepository
             ->orderBy('p_commission', 'desc')
             ->get();
 
-        $qry = $qry->get();
+//        $qry = $qry->get();
 
         return $qry;
     }
