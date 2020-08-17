@@ -82,6 +82,25 @@
                     :loading="searchStart"
                     loading-text="Loading... Please wait"
                 >
+                    <template v-slot:item.name="{ item }">
+                        <div class="text--primary text-sm-body-1">
+                            {{ item.name }}
+                        </div>
+                        <div class="text--secondary text-sm-caption">
+                            <span v-if="item.category !== '[]'">{{ item.category }}/</span><span>{{ item.child_category }}</span>
+                        </div>
+                    </template>
+                    <template v-slot:item.sale="{ item }">
+                        <div v-if="sel_network === 'cj.com'">
+                            3 month EPC: {{ item.three_month_epc }}
+                        </div>
+                        <div v-if="sel_network === 'cj.com'">
+                            7 day EPC: {{ item.seven_day_epc }}
+                        </div>
+                        <div>
+                            Sale: {{ item.sale }}
+                        </div>
+                    </template>
                     <template v-slot:item.sign_up="{ item }">
                         <a v-if="!disableMin[sel_network]" :href="item.sign_up" target="_blank">Sign Up</a>
                     </template>
@@ -93,7 +112,7 @@
                             :length="pageCount"
                             :total-visible="10"
                         ></v-pagination>
-<!--                            @input="getSalesData"-->
+                        <!--                            @input="getSalesData"-->
                     </v-col>
                 </v-row>
             </v-col>

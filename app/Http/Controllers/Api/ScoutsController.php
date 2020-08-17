@@ -37,16 +37,16 @@ class ScoutsController extends Controller
 
         $re = $this->scoutRepo->getScoutData($params, $sel_network);
 
-//        if ($sel_network == 'clickbank.com') {
-//            $re = file_get_contents(public_path('downloads/marketplace_feed_v2.xml/marketplace_feed_v2.xml'));
-//
-//            $xml = \simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
-//
-//            $json = json_encode($xml);
-//            $array = json_decode($json, true);
-//
-//            print_r($array);
-//        }
+        if ($sel_network == 'clickbank.com') {
+            $re = file_get_contents(public_path('downloads/marketplace_feed_v2.xml/marketplace_feed_v2.xml'));
+
+            $xml = \simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+
+            $json = json_encode($xml);
+            $array = json_decode($json, true);
+
+            print_r($array);
+        }
         if ($re) {
             $reData = $re->map(function ($el) use ($sel_network) {
                 $el->name = $el->site_id . ' - ' . $el->p_title;
