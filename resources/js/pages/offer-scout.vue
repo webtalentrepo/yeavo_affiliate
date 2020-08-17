@@ -106,9 +106,6 @@
                             <div v-if="sel_network === 'clickbank.com'">
                                 Avg $/Sale: ${{ item.seven_day_epc }}
                             </div>
-                            <div v-if="sel_network === 'clickbank.com'">
-                                Gravity: {{ item.p_gravity }}
-                            </div>
                             <div class="mt-2">
                                 <span v-if="sel_network === 'clickbank.com'">Avg %/</span>Sale: {{ item.sale }}
                             </div>
