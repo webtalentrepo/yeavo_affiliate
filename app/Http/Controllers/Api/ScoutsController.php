@@ -54,7 +54,7 @@ class ScoutsController extends Controller
                 } else {
                     $el->name = $el->p_title;
                 }
-                $el->popularity = $el->popular_rank;
+                $el->popularity = $el->p_gravity;
                 $el->sale = $el->p_commission . ($el->p_commission_unit == '%' ? '%' : ' ' . $el->p_commission_unit);
 
                 if ($sel_network == 'cj.com') {
