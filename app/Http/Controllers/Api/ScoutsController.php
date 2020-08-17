@@ -49,12 +49,20 @@ class ScoutsController extends Controller
 //        }
         if ($re) {
             $reData = $re->map(function ($el) use ($sel_network) {
-                $el->name = $el->site_id . ' - ' . $el->p_title;
+                if ($sel_network == 'cj.com') {
+                    $el->name = $el->site_id . ' - ' . $el->p_title;
+                } else {
+                    $el->name = $el->p_title;
+                }
                 $el->popularity = $el->popular_rank;
                 $el->sale = $el->p_commission . ($el->p_commission_unit == '%' ? '%' : ' ' . $el->p_commission_unit);
 
                 if ($sel_network == 'cj.com') {
                     $el->sign_up = 'https://members.cj.com/member/2536227/publisher/links/search/#!advertiserIds=' . $el->site_id;
+                } elseif ($sel_network == 'clickbank.com') {
+                    $el->sign_up = 'https://accounts.clickbank.com/info/hoplinkGenerator.htm?vendor=' . $el->site_id;
+                } else {
+                    $el->sign_up = 'https://yeavo.com';
                 }
 
                 return $el;

@@ -92,21 +92,29 @@ class ScoutRepository
         $qry = $this->model()->where('network', $sel_network);
 
         if (isset($params['keywords']) && !is_null($params['keywords']) && $params['keywords'] != '') {
-            $keywordsAry = explode(' ', $params['keywords']);
 
-            $qry = $qry->where(function ($q) use ($keywordsAry) {
-                for ($i = 0; $i < count($keywordsAry); $i++) {
-                    if ($i == 0) {
-                        $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
-                            ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
-                            ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
-                            ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
-                    } else {
-                        $q->orWhere('category', 'like', '%' . $keywordsAry[$i] . '%')
-                            ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
-                            ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
-                            ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
+            $qry = $qry->where(function ($q) use ($params) {
+                $keywordsAry = explode(' ', $params['keywords']);
+
+                if (count($keywordsAry) < 3) {
+                    for ($i = 0; $i < count($keywordsAry); $i++) {
+                        if ($i == 0) {
+                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
+                        } else {
+                            $q->orWhere('category', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
+                        }
                     }
+                } else {
+                    $q->where('category', 'like', '%' . $params['keywords'] . '%')
+                        ->orWhere('child_category', 'like', '%' . $params['keywords'] . '%')
+                        ->orWhere('p_description', 'like', '%' . $params['keywords'] . '%')
+                        ->orWhere('p_title', 'like', '%' . $params['keywords'] . '%');
                 }
             });
         }
@@ -147,9 +155,11 @@ class ScoutRepository
             $qry = $qry->where('popular_rank', '<=', $p_max);
         }
 
-        $qry = $qry->orderBy('popular_rank', 'desc')
-            ->orderBy('p_commission', 'desc')
-            ->get();
+//        $qry = $qry->orderBy('popular_rank', 'desc')
+//            ->orderBy('p_commission', 'desc')
+//            ->get();
+
+        $qry = $qry->get();
 
         return $qry;
     }

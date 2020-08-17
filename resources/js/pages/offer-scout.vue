@@ -83,11 +83,13 @@
                     loading-text="Loading... Please wait"
                 >
                     <template v-slot:item.name="{ item }">
-                        <div class="text--primary text-sm-body-1">
-                            {{ item.name }}
-                        </div>
-                        <div class="text--secondary text-sm-caption">
-                            <span v-if="item.category !== '[]'">{{ item.category }}/</span><span>{{ item.child_category }}</span>
+                        <div class="py-2">
+                            <div class="text--primary text-sm-body-1">
+                                {{ item.name }}
+                            </div>
+                            <div class="text--secondary text-sm-caption">
+                                <span v-if="item.category !== '[]'">{{ item.category }}/</span><span>{{ item.child_category }}</span>
+                            </div>
                         </div>
                     </template>
                     <template v-slot:item.sale="{ item }">
@@ -98,8 +100,17 @@
                             <div v-if="sel_network === 'cj.com'">
                                 7 day EPC: {{ item.seven_day_epc }}
                             </div>
+                            <div v-if="sel_network === 'clickbank.com'">
+                                Initial $/Sale: ${{ item.three_month_epc }}
+                            </div>
+                            <div v-if="sel_network === 'clickbank.com'">
+                                Avg $/Sale: ${{ item.seven_day_epc }}
+                            </div>
+                            <div v-if="sel_network === 'clickbank.com'">
+                                Gravity: {{ item.p_gravity }}
+                            </div>
                             <div class="mt-2">
-                                Sale: {{ item.sale }}
+                                <span v-if="sel_network === 'clickbank.com'">Avg %/</span>Sale: {{ item.sale }}
                             </div>
                         </div>
                     </template>
@@ -148,11 +159,11 @@
                 pageCount: 0,
                 itemsPerPage: 25,
                 headers: [
-                    {text: 'Offer Name', value: 'name'},
-                    {text: '$ Sale', value: 'sale'},
-                    {text: 'Popularity(Is it selling well)', value: 'popularity', align: 'center'},
-                    {text: 'Network', value: 'network', sortable: false},
-                    {text: 'Sign Up', value: 'sign_up', sortable: false},
+                    {text: 'Offer Name', value: 'name', width: '35%'},
+                    {text: '$ Sale', value: 'sale', width: '25%'},
+                    {text: 'Popularity(Is it selling well)', value: 'popularity', align: 'center', width: '15%'},
+                    {text: 'Network', value: 'network', sortable: false, width: '12%'},
+                    {text: 'Sign Up', value: 'sign_up', sortable: false, width: '12%'},
                 ],
                 desserts: []
             }
