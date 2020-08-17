@@ -41,4 +41,6 @@ return [
         'token' => env('LINKSHARE_TOKEN')
     ],
 
+    'jvzoo_key' => env('JVZOO_KEY')
+
 ];

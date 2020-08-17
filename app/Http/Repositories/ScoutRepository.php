@@ -21,14 +21,16 @@ class ScoutRepository
         $clerk_key = config('services.clickbank.clerk_key');
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://api.clickbank.com/rest/1.3/analytics/vendor/?&account=dbbrock1");
+        curl_setopt($ch, CURLOPT_URL, "https://api.clickbank.com/rest/1.3/products/list/?&site=dbbrock1");
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept:application/json", "Authorization:{$dev_key}:{$clerk_key}", "Page:" . $params['page']));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept:application/json", "Authorization:{$dev_key}:{$clerk_key}"));
         curl_setopt($ch, CURLOPT_HTTPGET, true);
 
         $return = curl_exec($ch);
+
+        var_dump($return);
 
         $result = json_decode($return, true);
 

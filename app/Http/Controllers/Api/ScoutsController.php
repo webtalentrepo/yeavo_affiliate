@@ -35,6 +35,17 @@ class ScoutsController extends Controller
         $reData = [];
         $pageCount = 0;
 
+        if ($sel_network == 'clickbank.com') {
+            $re = file_get_contents(public_path('downloads/marketplace_feed_v2.xml/marketplace_feed_v2.xml'));
+
+            $xml = \simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+
+            $json = json_encode($xml);
+            $array = json_decode($json, true);
+
+            print_r($array);
+        }
+
 
         return response()->json([
             'result' => 'success',

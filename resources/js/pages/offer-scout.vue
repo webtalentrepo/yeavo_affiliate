@@ -70,16 +70,6 @@
             </v-col>
         </v-row>
 
-        <!--        <v-row v-if="searchStart">-->
-        <!--            <v-col cols="12">-->
-        <!--                <v-progress-linear-->
-        <!--                    color="teal accent-4"-->
-        <!--                    indeterminate-->
-        <!--                    height="3"-->
-        <!--                ></v-progress-linear>-->
-        <!--            </v-col>-->
-        <!--        </v-row>-->
-
         <v-row>
             <v-col cols="12">
                 <v-data-table
@@ -102,20 +92,9 @@
                             v-model="page"
                             :length="pageCount"
                             :total-visible="10"
-                            @input="getSalesData"
                         ></v-pagination>
+<!--                            @input="getSalesData"-->
                     </v-col>
-
-                    <!--                        <v-col cols="12" md="2">-->
-                    <!--                            <v-text-field-->
-                    <!--                                :value="itemsPerPage"-->
-                    <!--                                label="Items per page"-->
-                    <!--                                type="number"-->
-                    <!--                                min="-1"-->
-                    <!--                                max="15"-->
-                    <!--                                @input="itemsPerPage = parseInt($event, 10)"-->
-                    <!--                            ></v-text-field>-->
-                    <!--                        </v-col>-->
                 </v-row>
             </v-col>
         </v-row>

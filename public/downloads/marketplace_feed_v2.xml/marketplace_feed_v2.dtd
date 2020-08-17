@@ -1,0 +1,22 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ ©2013 ClickBank All Rights Reserved                                                                               ~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<!ELEMENT Catalog ( Category* ) >
+<!ELEMENT Category ( Name, Site*, Category* ) >
+<!ELEMENT Commission ( #PCDATA ) >
+<!ELEMENT Description ( #PCDATA ) >
+<!ELEMENT InitialEarningsPerSale ( #PCDATA ) >
+<!ELEMENT AverageEarningsPerSale ( #PCDATA ) >
+<!ELEMENT TotalRebillAmt ( #PCDATA ) >
+<!ELEMENT HasRecurringProducts ( #PCDATA ) >
+<!ELEMENT Gravity ( #PCDATA ) >
+<!ELEMENT Id ( #PCDATA ) >
+<!ELEMENT Name ( #PCDATA ) >
+<!ELEMENT PercentPerSale ( #PCDATA ) >
+<!ELEMENT PercentPerRebill ( #PCDATA ) >
+<!ELEMENT PopularityRank ( #PCDATA ) >
+<!ELEMENT Referred ( #PCDATA ) >
+<!ELEMENT ActivateDate ( #PCDATA ) >
+<!ELEMENT Site ( Commission? | Site+ | InitialEarningsPerSale? | AverageEarningsPerSale? | TotalRebillAmt? | Gravity? | Id+ | PercentPerSale? | PercentPerRebill? | PopularityRank+ | Title+ | HasRecurringProducts | ActivateDate? )* >
+<!ELEMENT Title ( #PCDATA ) >
