@@ -96,7 +96,7 @@ class ScoutRepository
             $qry = $qry->where(function ($q) use ($params) {
                 $keywordsAry = explode(' ', $params['keywords']);
 
-                if (count($keywordsAry) == 2) {
+                if (count($keywordsAry) && count($keywordsAry) == 2) {
                     for ($i = 0; $i < count($keywordsAry); $i++) {
                         if ($i == 0) {
                             $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
