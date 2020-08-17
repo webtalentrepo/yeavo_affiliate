@@ -91,14 +91,16 @@
                         </div>
                     </template>
                     <template v-slot:item.sale="{ item }">
-                        <div v-if="sel_network === 'cj.com'">
-                            3 month EPC: {{ item.three_month_epc }}
-                        </div>
-                        <div v-if="sel_network === 'cj.com'">
-                            7 day EPC: {{ item.seven_day_epc }}
-                        </div>
-                        <div class="mt-2">
-                            Sale: {{ item.sale }}
+                        <div class="py-2">
+                            <div v-if="sel_network === 'cj.com'">
+                                3 month EPC: {{ item.three_month_epc }}
+                            </div>
+                            <div v-if="sel_network === 'cj.com'">
+                                7 day EPC: {{ item.seven_day_epc }}
+                            </div>
+                            <div class="mt-2">
+                                Sale: {{ item.sale }}
+                            </div>
                         </div>
                     </template>
                     <template v-slot:item.sign_up="{ item }">
