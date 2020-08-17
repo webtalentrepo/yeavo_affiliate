@@ -89,6 +89,18 @@ class ScoutsDataInsert extends Command
                             if ($array && isset($array['Category'])) {
                                 $cb = new ScoutRepository();
                                 $cb->setClickBankData($array['Category'], $links[$i]);
+
+                                if (file_exists(public_path('downloads/marketplace_feed_v2.xml.zip'))) {
+                                    unlink(public_path('downloads/marketplace_feed_v2.xml.zip'));
+                                }
+
+                                if (file_exists(public_path('downloads/marketplace_feed_v2.xml'))) {
+                                    unlink(public_path('downloads/marketplace_feed_v2.xml'));
+                                }
+
+                                if (file_exists(public_path('downloads/marketplace_feed_v2.dtd'))) {
+                                    unlink(public_path('downloads/marketplace_feed_v2.dtd'));
+                                }
                             }
                         }
                     }
