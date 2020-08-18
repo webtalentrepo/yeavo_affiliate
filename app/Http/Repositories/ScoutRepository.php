@@ -62,9 +62,13 @@ class ScoutRepository
             $scout = new Product();
         }
 
+        $category = is_array($category) ? json_encode($category) : $category;
+        $child_category = is_array($child_category) ? json_encode($child_category) : $child_category;
+
         $scout->network = $link;
-        $scout->category = is_array($category) ? json_encode($category) : $category;
-        $scout->child_category = is_array($child_category) ? json_encode($child_category) : $child_category;
+        $scout->category = $category;
+        $scout->child_category = $child_category;
+        $scout->full_category = $category != '[]' ? ($category . '/' . $child_category) : $child_category;
         $scout->site_id = is_array($row['Id']) ? json_encode($row['Id']) : $row['Id'];
         $scout->popular_rank = isset($row['PopularityRank']) ? (is_array($row['PopularityRank']) ? json_encode($row['PopularityRank']) : $row['PopularityRank']) : 0;
         $scout->p_title = isset($row['Title']) ? (is_array($row['Title']) ? json_encode($row['Title']) : $row['Title']) : '';
@@ -95,27 +99,41 @@ class ScoutRepository
 
             $qry = $qry->where(function ($q) use ($params) {
                 $keywordsAry = explode(' ', $params['keywords']);
-
-                if (count($keywordsAry) && count($keywordsAry) >= 2) {
-                    for ($i = 0; $i < count($keywordsAry); $i++) {
-                        if ($i == 0) {
-                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
-                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%');
-//                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
-                        } else {
-                            $q->orWhere('category', 'like', '%' . $keywordsAry[$i] . '%')
-                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%');
-//                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
-                        }
-                    }
+                if (count($keywordsAry) > 1) {
+                    $keywordsAry = array_reverse($keywordsAry);
+                    $keyStr = implode('%', $keywordsAry);
                 } else {
-                    $q->where('category', 'like', '%' . $params['keywords'] . '%')
-                        ->orWhere('child_category', 'like', '%' . $params['keywords'] . '%')
-                        ->orWhere('p_description', 'like', '%' . $params['keywords'] . '%');
-//                        ->orWhere('p_title', 'like', '%' . $params['keywords'] . '%');
+                    $keyStr = '';
                 }
+//
+//                if (count($keywordsAry) && count($keywordsAry) >= 2) {
+//                    for ($i = 0; $i < count($keywordsAry); $i++) {
+//                        if ($i == 0) {
+//                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
+//                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
+//                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
+//                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
+//                        } else {
+//                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
+//                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
+//                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
+//                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
+//                        }
+//                    }
+//                } else {
+                if ($keyStr == '') {
+                    $q->where('full_category', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('p_title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('p_description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%');
+                } else {
+                    $q->where('full_category', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('p_title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('p_description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('full_category', 'like', '%' . $keyStr . '%')
+                        ->orWhere('p_title', 'like', '%' . $keyStr . '%')
+                        ->orWhere('p_description', 'like', '%' . $keyStr . '%');
+                }
+//                }
             });
         }
 

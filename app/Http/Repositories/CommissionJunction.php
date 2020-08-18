@@ -216,9 +216,13 @@ class CommissionJunction
                 }
             }
 
+            $parent = is_array($parent) ? json_encode($parent) : $parent;
+            $child = is_array($child) ? json_encode($child) : $child;
+
             $scout->network = $link;
-            $scout->category = is_array($parent) ? json_encode($parent) : $parent;
-            $scout->child_category = is_array($child) ? json_encode($child) : $child;
+            $scout->category = $parent;
+            $scout->child_category = $child;
+            $scout->full_category = $parent != '[]' ? ($parent . '/' . $child) : $child;
             $scout->site_id = is_array($aid) ? json_encode($aid) : $aid;
             $scout->popular_rank = isset($row['network-rank']) ? (is_array($row['network-rank']) ? json_encode($row['network-rank']) : $row['network-rank']) : 0;
             $scout->p_title = is_array($name) ? json_encode($name) : $name;
