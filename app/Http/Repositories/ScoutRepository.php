@@ -94,7 +94,7 @@ class ScoutRepository
         if (isset($params['keywords']) && !is_null($params['keywords']) && $params['keywords'] != '') {
 
             $qry = $qry->where(function ($q) use ($params) {
-                $keywordsAry = explode(' ', $params['keywords']);
+//                $keywordsAry = explode(' ', $params['keywords']);
 
 //                if (count($keywordsAry) && count($keywordsAry) == 2) {
 //                    for ($i = 0; $i < count($keywordsAry); $i++) {
