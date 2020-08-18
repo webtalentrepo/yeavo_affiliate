@@ -94,28 +94,28 @@ class ScoutRepository
         if (isset($params['keywords']) && !is_null($params['keywords']) && $params['keywords'] != '') {
 
             $qry = $qry->where(function ($q) use ($params) {
-//                $keywordsAry = explode(' ', $params['keywords']);
+                $keywordsAry = explode(' ', $params['keywords']);
 
-//                if (count($keywordsAry) && count($keywordsAry) == 2) {
-//                    for ($i = 0; $i < count($keywordsAry); $i++) {
-//                        if ($i == 0) {
-//                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
+                if (count($keywordsAry) && count($keywordsAry) >= 2) {
+                    for ($i = 0; $i < count($keywordsAry); $i++) {
+                        if ($i == 0) {
+                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%');
 //                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
 //                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
-//                        } else {
-//                            $q->orWhere('category', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
+                        } else {
+                            $q->orWhere('category', 'like', '%' . $keywordsAry[$i] . '%')
+                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%');
 //                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
 //                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
-//                        }
-//                    }
-//                } else {
-                $q->where('category', 'like', '%' . $params['keywords'] . '%')
-                    ->orWhere('child_category', 'like', '%' . $params['keywords'] . '%')
-                    ->orWhere('p_description', 'like', '%' . $params['keywords'] . '%')
-                    ->orWhere('p_title', 'like', '%' . $params['keywords'] . '%');
-//                }
+                        }
+                    }
+                } else {
+                    $q->where('category', 'like', '%' . $params['keywords'] . '%')
+                        ->orWhere('child_category', 'like', '%' . $params['keywords'] . '%')
+                        ->orWhere('p_description', 'like', '%' . $params['keywords'] . '%')
+                        ->orWhere('p_title', 'like', '%' . $params['keywords'] . '%');
+                }
             });
         }
 
