@@ -113,8 +113,8 @@ class ScoutRepository
                 } else {
                     $q->where('category', 'like', '%' . $params['keywords'] . '%')
                         ->orWhere('child_category', 'like', '%' . $params['keywords'] . '%')
-                        ->orWhere('p_description', 'like', '%' . $params['keywords'] . '%')
-                        ->orWhere('p_title', 'like', '%' . $params['keywords'] . '%');
+                        ->orWhere('p_description', 'like', '%' . $params['keywords'] . '%');
+//                        ->orWhere('p_title', 'like', '%' . $params['keywords'] . '%');
                 }
             });
         }
