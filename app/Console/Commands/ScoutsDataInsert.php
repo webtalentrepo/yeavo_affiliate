@@ -55,6 +55,11 @@ class ScoutsDataInsert extends Command
                 }
             } elseif ($links[$i] == 'clickbank.com') {
                 $path = public_path('downloads');
+
+                if (!file_exists($path)) {
+                    mkdir($path);
+                }
+
                 chmod($path, 0777);
                 if (file_exists(public_path('downloads/marketplace_feed_v2.xml.zip'))) {
                     unlink(public_path('downloads/marketplace_feed_v2.xml.zip'));
