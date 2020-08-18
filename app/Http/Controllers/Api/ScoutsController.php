@@ -54,8 +54,10 @@ class ScoutsController extends Controller
                 } else {
                     $el->name = $el->p_title;
                 }
-                $el->popularity = $el->p_gravity;
-                $el->sale = $el->p_commission . ($el->p_commission_unit == '%' ? '%' : ' ' . $el->p_commission_unit);
+                $el->popularity = round($el->p_gravity, 2);
+                $el->seven_day_epc = round($el->seven_day_epc, 2);
+                $el->three_month_epc = round($el->three_month_epc, 2);
+                $el->sale = round($el->p_commission, 2) . ($el->p_commission_unit == '%' ? '%' : ' ' . $el->p_commission_unit);
 
                 if ($sel_network == 'cj.com') {
                     $el->sign_up = 'https://members.cj.com/member/2536227/publisher/links/search/#!advertiserIds=' . $el->site_id;
