@@ -110,7 +110,7 @@
                                 Avg $/Sale: ${{ item.seven_day_epc }}
                             </div>
                             <div class="mt-2">
-                                <span v-if="sel_network === 'clickbank.com'">Avg %/</span>Sale: {{ (item.seven_day_epc === 0 ? 0 : item.sale) }}
+                                <span v-if="item.network === 'clickbank.com'">Avg %/</span>Sale: {{ (item.seven_day_epc === 0 ? 0 : item.sale) }}
                             </div>
                         </div>
                     </template>
@@ -145,7 +145,7 @@
                 sale_max: '',
                 pop_min: '',
                 pop_max: '',
-                sel_network: 'cj.com',
+                sel_network: 'All Networks',
                 searchStart: false,
                 disableMin: {
                     'clickbank.com': false,

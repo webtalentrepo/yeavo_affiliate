@@ -93,7 +93,11 @@ class ScoutRepository
      */
     public function getScoutData($params, $sel_network)
     {
-        $qry = $this->model()->where('network', $sel_network);
+        $qry = $this->model();
+
+        if ($sel_network != 'All Networks') {
+            $qry = $qry->where('network', $sel_network);
+        }
 
         if (isset($params['keywords']) && !is_null($params['keywords']) && $params['keywords'] != '') {
 
@@ -173,7 +177,8 @@ class ScoutRepository
             $qry = $qry->where('p_gravity', '<=', $p_max);
         }
 
-        $qry = $qry->orderBy('p_gravity', 'desc')
+        $qry = $qry->orderBy('network')
+            ->orderBy('p_gravity', 'desc')
             ->orderBy('p_commission', 'desc')
             ->get();
 

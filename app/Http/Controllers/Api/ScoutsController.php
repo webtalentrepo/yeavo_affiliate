@@ -48,8 +48,8 @@ class ScoutsController extends Controller
 ////            print_r($array);
 //        }
         if ($re) {
-            $reData = $re->map(function ($el) use ($sel_network) {
-                if ($sel_network == 'cj.com') {
+            $reData = $re->map(function ($el) {
+                if ($el->network == 'cj.com') {
                     $el->name = $el->site_id . ' - ' . $el->p_title;
                 } else {
                     $el->name = $el->p_title;
@@ -59,9 +59,9 @@ class ScoutsController extends Controller
                 $el->three_month_epc = round($el->three_month_epc, 2);
                 $el->sale = round($el->p_commission, 2) . ($el->p_commission_unit == '%' ? '%' : ' ' . $el->p_commission_unit);
 
-                if ($sel_network == 'cj.com') {
+                if ($el->network == 'cj.com') {
                     $el->sign_up = 'https://members.cj.com/member/2536227/publisher/links/search/#!advertiserIds=' . $el->site_id;
-                } elseif ($sel_network == 'clickbank.com') {
+                } elseif ($el->network == 'clickbank.com') {
                     $el->sign_up = 'https://accounts.clickbank.com/info/hoplinkGenerator.htm?vendor=' . $el->site_id;
                 } else {
                     $el->sign_up = 'https://yeavo.com';
