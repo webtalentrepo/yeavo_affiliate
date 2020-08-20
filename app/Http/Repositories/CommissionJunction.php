@@ -5,7 +5,6 @@ namespace App\Http\Repositories;
 
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
-//use App\Http\Repositories\Affiliates\Merchant;
 use App\Models\Product;
 use Oara\Network\Publisher\CommissionJunctionGraphQL;
 use Exception;
@@ -79,27 +78,6 @@ class CommissionJunction
 
     public function getMerchants($params)
     {
-//        $arrResult = [];
-        //        foreach ($merchantList as $merchant) {
-//            if ($merchant['status'] == 'Setup') {
-//                // Ignore setup programs not yet active
-//                continue;
-//            }
-//            try {
-//                $Merchant = Merchant::createInstance();
-//                $Merchant->merchant_ID = $merchant['cid'];
-//                $Merchant->name = $merchant['name'];
-//                $Merchant->url = $merchant['url'];
-//                if ($merchant['status'] == 'Active') {
-//                    $Merchant->status = $merchant['relationship_status'];
-//                } else {
-//                    $Merchant->status = $merchant['status'];
-//                }
-//                $arrResult[] = $Merchant;
-//            } catch (Exception $e) {
-//            }
-//        }
-
         return $this->_network->getMerchantList($params);
     }
 
@@ -108,6 +86,35 @@ class CommissionJunction
         if (trim($idSite) != '') {
             $this->_network->addAllowedSite($idSite);
         }
+    }
+
+    public function getProductDetails($aid)
+    {
+        //, sincePostingDate: "2020-06-08T00:00:00Z", beforePostingDate: "2020-07-08T00:00:00Z"
+        $query = '{ publisher{ contracts(publisherId: "' . $this->_publisher_id . '", limit: 1, filters: {advertiserId: "' . $aid . '"}){ totalCount count resultList';
+        $query .= ' { startTime endTime status advertiserId programTerms { id name specialTerms { name body } isDefault actionTerms { id actionTracker { id name description type }';
+        $query .= ' referralPeriod referralOccurrences lockingMethod { type durationInDays } performanceIncentives { threshold { type value } reward { type commissionType value }';
+        $query .= ' currency } commissions { rank situation { id name } itemList { id name } promotionalProperties { id name } isViewThrough rate { type value currency } } } } } } } }';
+
+        return $this->postGraphQL('https://programs.api.cj.com/query', $query);
+    }
+
+    private function postGraphQL($url, $query)
+    {
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_passwordApi));
+
+        $curl_results = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($curl_results, true);
     }
 
     public function saveDataToTable($re, $link)

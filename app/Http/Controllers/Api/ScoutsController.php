@@ -37,16 +37,6 @@ class ScoutsController extends Controller
 
         $re = $this->scoutRepo->getScoutData($params, $sel_network);
 
-//        if ($sel_network == 'clickbank.com') {
-////            $re = file_get_contents(public_path('downloads/marketplace_feed_v2.xml'));
-////
-////            $xml = \simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
-////
-////            $json = json_encode($xml);
-////            $array = json_decode($json, true);
-////
-////            print_r($array);
-//        }
         if ($re) {
             $reData = $re->map(function ($el) {
                 if ($el->network == 'cj.com') {
@@ -78,5 +68,13 @@ class ScoutsController extends Controller
             'rows' => $reData,
             'pageCount' => $pageCount
         ]);
+    }
+
+    public function getTestCall()
+    {
+        $cj = new CommissionJunction();
+        $c_detail = $cj->getProductDetails('129899');
+        print_r($c_detail);
+        exit;
     }
 }

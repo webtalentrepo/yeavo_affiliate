@@ -97,16 +97,16 @@
                     </template>
                     <template v-slot:item.sale="{ item }">
                         <div class="py-2">
-                            <div v-if="sel_network === 'cj.com'">
+                            <div v-if="item.network === 'cj.com'">
                                 3 month EPC: {{ item.three_month_epc }}
                             </div>
-                            <div v-if="sel_network === 'cj.com'">
+                            <div v-if="item.network === 'cj.com'">
                                 7 day EPC: {{ item.seven_day_epc }}
                             </div>
-                            <div v-if="sel_network === 'clickbank.com'">
+                            <div v-if="item.network === 'clickbank.com'">
                                 Initial $/Sale: ${{ item.three_month_epc }}
                             </div>
-                            <div v-if="sel_network === 'clickbank.com'">
+                            <div v-if="item.network === 'clickbank.com'">
                                 Avg $/Sale: ${{ item.seven_day_epc }}
                             </div>
                             <div class="mt-2">

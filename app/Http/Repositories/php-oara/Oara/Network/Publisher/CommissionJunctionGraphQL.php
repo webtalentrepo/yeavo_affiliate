@@ -127,21 +127,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
      */
     public function getMerchantList($params = [])
     {
-//        $merchants = array();
         return self::getMerchantExport($params);
-//        print_r($merchantsExport);
-//        exit;
-//        foreach ($merchantsExport as $merchantData) {
-//            $obj = array();
-//            $obj['cid'] = $merchantData[0];
-//            $obj['name'] = $merchantData[1];
-//            // Added more info - 2018-04-23 <PN>
-//            $obj['status'] = $merchantData[2];
-//            $obj['relationship_status'] = $merchantData[3];
-//            $obj['url'] = $merchantData[4];
-//            $merchants[] = $obj;
-//        }
-//        return $merchants;
     }
 
     /**
@@ -379,7 +365,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
         $ch = curl_init();
 
         if (stripos($query, '#cid#') !== false) {
-            // Replace placeholder with requestor cid
+            // Replace placeholder with request cid
             $query = str_ireplace('#cid#', $this->_requestor_cid, $query);
         }
 
@@ -393,6 +379,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
 
         $curl_results = curl_exec($ch);
         curl_close($ch);
+
         return json_decode($curl_results);
     }
 

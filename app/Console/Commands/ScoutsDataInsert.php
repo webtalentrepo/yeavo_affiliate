@@ -48,8 +48,6 @@ class ScoutsDataInsert extends Command
                 $cj = new CommissionJunction();
                 $re = $cj->getMerchants([]);
 
-//                Log::info(json_encode($re));
-
                 if ($re) {
                     $cj->saveDataToTable($re, $links[$i]);
                 }
