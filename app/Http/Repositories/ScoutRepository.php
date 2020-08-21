@@ -4,6 +4,7 @@
 namespace App\Http\Repositories;
 
 
+use App\Models\ChildProduct;
 use App\Models\Product;
 
 class ScoutRepository
@@ -16,6 +17,11 @@ class ScoutRepository
     public function model()
     {
         return app(Product::class);
+    }
+
+    public function child_model()
+    {
+        return app(ChildProduct::class);
     }
 
     public function setClickBankData($re, $link)
@@ -184,6 +190,58 @@ class ScoutRepository
             ->get();
 
 //        $qry = $qry->get();
+
+        return $qry;
+    }
+
+    public function getChildData($params)
+    {
+        $qry = $this->child_model()->where('parent_id', $params['parent_id']);
+
+        if (isset($params['keywords']) && !is_null($params['keywords']) && $params['keywords'] != '') {
+            $keywordsAry = explode(' ', $params['keywords']);
+            if (count($keywordsAry) > 1) {
+                $keywordsAry = array_reverse($keywordsAry);
+                $keyStr = implode('%', $keywordsAry);
+            } else {
+                $keyStr = '';
+            }
+
+            $qry = $qry->where(function ($q) use ($params, $keyStr) {
+                if ($keyStr == '') {
+                    $q->where('title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('brand', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%');
+                } else {
+                    $q->where('title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('brand', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+                        ->orWhere('title', 'like', '%' . $keyStr . '%')
+                        ->orWhere('description', 'like', '%' . $keyStr . '%')
+                        ->orWhere('brand', 'like', '%' . $keyStr . '%');
+                }
+            });
+        }
+
+        $s_min = 0;
+        $s_max = 0;
+        if (isset($params['sale_min']) && !is_null($params['sale_min']) && $params['sale_min'] != '') {
+            $s_min = $params['sale_min'] * 1;
+        }
+
+        if (isset($params['sale_max']) && !is_null($params['sale_max']) && $params['sale_max'] != '') {
+            $s_max = $params['sale_max'] * 1;
+        }
+
+        if ($s_min != 0) {
+            $qry = $qry->where('s_amount', '>=', $s_min);
+        }
+
+        if ($s_max != 0) {
+            $qry = $qry->where('s_amount', '<=', $s_max);
+        }
+
+        $qry = $qry->get();
 
         return $qry;
     }

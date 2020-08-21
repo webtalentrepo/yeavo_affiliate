@@ -71,6 +71,38 @@ class ScoutsController extends Controller
         ]);
     }
 
+    public function getChildData(Request $request)
+    {
+        $params = [
+            'keywords' => $request->input('search_str'),
+            'sale_min' => $request->input('sale_min'),
+            'sale_max' => $request->input('sale_max'),
+            'parent_id' => $request->input('parent_id'),
+            'limit' => $request->input('limit'),
+        ];
+
+        $reData = [];
+        $pageCount = 0;
+
+        $re = $this->scoutRepo->getChildData($params);
+
+        if ($re) {
+            $pageCount = ceil(sizeof($re->toArray()) / $params['limit']);
+
+            $reData = $re->map(function ($el) {
+                $el->sign_up = 'https://members.cj.com/member/accounts/publisher/affiliations/joinprograms.do?onJoin=clickSearch&advertiserId=' . $el->advertiser_id;
+
+                return $el;
+            });
+        }
+
+        return response()->json([
+            'result' => 'success',
+            'rows' => $reData,
+            'pageCount' => $pageCount
+        ]);
+    }
+
     public function getTestCall()
     {
         $cj = new CommissionJunction();

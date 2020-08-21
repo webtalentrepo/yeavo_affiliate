@@ -151,8 +151,8 @@
                         </v-btn>
                         <v-toolbar-title>Products</v-toolbar-title>
                     </v-toolbar>
-                    <v-row>
-                        <v-col cols="12">
+                    <v-row class="overflow-auto">
+                        <v-col cols="12" class="overflow-auto">
                             <v-data-table
                                 :headers="c_headers"
                                 :items="c_deserts"
@@ -164,12 +164,12 @@
                                 loading-text="Loading... Please wait"
                             >
                                 <template v-slot:item.name="{ item }">
-                                    <div class="py-2">
+                                    <div class="py-1">
                                         <div class="text--primary text-sm-body-1">
-                                            {{ item.name }}
+                                            {{ item.title }}
                                         </div>
                                         <div class="text--secondary text-sm-caption">
-                                            {{ item.title }}
+                                            {{ item.brand }}
                                         </div>
                                         <div class="mt-2 text--secondary text-sm-caption">
                                             {{ item.description }}
@@ -177,7 +177,7 @@
                                     </div>
                                 </template>
                                 <template v-slot:item.sale="{ item }">
-                                    <div class="py-2">
+                                    <div class="py-1">
                                         <div>
                                             Price: {{ item.p_amount }} {{ item.p_currency }}
                                         </div>
@@ -268,7 +268,33 @@
             showDialog(network, id) {
                 if (network === 'cj.com') {
                     this.cj_dialog = true;
+
+                    this.getChildData(id);
                 }
+            },
+            getChildData(id) {
+                this.page = 1;
+                this.cSearchStart = true;
+
+                const params = {
+                    search_str: this.search_str,
+                    sale_min: this.sale_min,
+                    sale_max: this.sale_max,
+                    limit: this.cItemsPerPage,
+                    parent_id: id,
+                }
+
+                this.$http.post('/api/child-data', params).then((r) => {
+                    if (r.data.result === 'success') {
+                        // console.log(r)
+                        this.c_deserts = r.data.rows
+                        this.c_pageCount = r.data.pageCount
+                    }
+
+                    this.cSearchStart = false;
+                }).catch((e) => {
+                    this.cSearchStart = false;
+                })
             },
             searchData() {
                 this.page = 1;
@@ -321,7 +347,11 @@
 
     .v-toolbar.primary .v-toolbar__content {
         display: flex;
-        justify-content: center;
         align-items: center;
+    }
+
+    .v-dialog.v-dialog--fullscreen .v-data-table__wrapper {
+        height: 80vh;
+        overflow: auto;
     }
 </style>

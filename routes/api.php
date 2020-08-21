@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('/scout-data', 'Api\ScoutsController@index');
+Route::post('/child-data', 'Api\ScoutsController@getChildData');
 Route::get('/scout-data', 'Api\ScoutsController@index');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
