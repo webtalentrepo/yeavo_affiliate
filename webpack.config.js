@@ -1,6 +1,7 @@
-const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin');
+const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
+
 module.exports = {
     plugins: [
-        new VuetifyLoaderPlugin(),
-    ]
-};
+        new VuetifyLoaderPlugin()
+    ],
+}
