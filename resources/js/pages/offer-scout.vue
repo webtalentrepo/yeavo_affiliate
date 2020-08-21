@@ -327,7 +327,7 @@
         }
     }
 </script>
-<style>
+<style lang="scss">
     .v-dialog.v-dialog--fullscreen {
         position: fixed;
         width: 100%;
