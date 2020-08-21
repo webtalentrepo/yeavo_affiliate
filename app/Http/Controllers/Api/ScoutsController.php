@@ -51,6 +51,7 @@ class ScoutsController extends Controller
 
                 if ($el->network == 'cj.com') {
                     $el->sign_up = 'https://members.cj.com/member/2536227/publisher/links/search/#!advertiserIds=' . $el->site_id;
+//                    $el->sign_up = 'https://members.cj.com/member/accounts/publisher/affiliations/joinprograms.do?onJoin=clickSearch&advertiserId=' . $el->site_id;
                 } elseif ($el->network == 'clickbank.com') {
                     $el->sign_up = 'https://accounts.clickbank.com/info/hoplinkGenerator.htm?vendor=' . $el->site_id;
                 } else {

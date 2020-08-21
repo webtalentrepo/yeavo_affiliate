@@ -14,20 +14,25 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        \App\Console\Commands\ScoutsDataInsert::class
+        \App\Console\Commands\ScoutsDataInsert::class,
+        \App\Console\Commands\ChildProductsInsert::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->command('scoutsdata:insert')
-             ->everyFourHours()
-             ->runInBackground();
+        $schedule->command('scoutsdata:insert')
+            ->everyFourHours()
+            ->runInBackground();
+
+        $schedule->command('childproduct:insert')
+            ->daily()
+            ->runInBackground();
     }
 
     /**
@@ -37,7 +42,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

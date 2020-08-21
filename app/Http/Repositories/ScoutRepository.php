@@ -100,31 +100,15 @@ class ScoutRepository
         }
 
         if (isset($params['keywords']) && !is_null($params['keywords']) && $params['keywords'] != '') {
+            $keywordsAry = explode(' ', $params['keywords']);
+            if (count($keywordsAry) > 1) {
+                $keywordsAry = array_reverse($keywordsAry);
+                $keyStr = implode('%', $keywordsAry);
+            } else {
+                $keyStr = '';
+            }
 
-            $qry = $qry->where(function ($q) use ($params) {
-                $keywordsAry = explode(' ', $params['keywords']);
-                if (count($keywordsAry) > 1) {
-                    $keywordsAry = array_reverse($keywordsAry);
-                    $keyStr = implode('%', $keywordsAry);
-                } else {
-                    $keyStr = '';
-                }
-//
-//                if (count($keywordsAry) && count($keywordsAry) >= 2) {
-//                    for ($i = 0; $i < count($keywordsAry); $i++) {
-//                        if ($i == 0) {
-//                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
-//                        } else {
-//                            $q->where('category', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('child_category', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('p_description', 'like', '%' . $keywordsAry[$i] . '%')
-//                                ->orWhere('p_title', 'like', '%' . $keywordsAry[$i] . '%');
-//                        }
-//                    }
-//                } else {
+            $qry = $qry->where(function ($q) use ($params, $keyStr) {
                 if ($keyStr == '') {
                     $q->where('full_category', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
                         ->orWhere('p_title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
@@ -137,9 +121,26 @@ class ScoutRepository
                         ->orWhere('p_title', 'like', '%' . $keyStr . '%')
                         ->orWhere('p_description', 'like', '%' . $keyStr . '%');
                 }
-//                }
             });
+
+//            $qry = $qry->with(['child_products' => function ($q) use ($params, $keyStr) {
+//                if ($keyStr == '') {
+//                    $q->where('title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+//                        ->orWhere('description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+//                        ->orWhere('brand', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%');
+//                } else {
+//                    $q->where('title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+//                        ->orWhere('description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+//                        ->orWhere('brand', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
+//                        ->orWhere('title', 'like', '%' . $keyStr . '%')
+//                        ->orWhere('description', 'like', '%' . $keyStr . '%')
+//                        ->orWhere('brand', 'like', '%' . $keyStr . '%');
+//                }
+//            }]);
         }
+//        else {
+////            $qry = $qry->with('child_products');
+//        }
 
         $s_min = 0;
         $s_max = 0;

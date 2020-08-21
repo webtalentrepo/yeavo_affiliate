@@ -5,6 +5,7 @@ namespace App\Http\Repositories;
 
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
+use App\Models\ChildProduct;
 use App\Models\Product;
 use Oara\Network\Publisher\CommissionJunctionGraphQL;
 use Exception;
@@ -91,12 +92,36 @@ class CommissionJunction
     public function getProductDetails($aid)
     {
         //, sincePostingDate: "2020-06-08T00:00:00Z", beforePostingDate: "2020-07-08T00:00:00Z"
-        $query = '{ publisher{ contracts(publisherId: "' . $this->_publisher_id . '", limit: 1, filters: {advertiserId: "' . $aid . '"}){ totalCount count resultList';
-        $query .= ' { startTime endTime status advertiserId programTerms { id name specialTerms { name body } isDefault actionTerms { id actionTracker { id name description type }';
-        $query .= ' referralPeriod referralOccurrences lockingMethod { type durationInDays } performanceIncentives { threshold { type value } reward { type commissionType value }';
-        $query .= ' currency } commissions { rank situation { id name } itemList { id name } promotionalProperties { id name } isViewThrough rate { type value currency } } } } } } } }';
+        $query = '{
+    products(companyId: "' . $this->_publisher_id . '", limit: 1000, partnerIds: ["' . $aid . '"]) {
+      resultList {
+        imageLink,
+        link,
+        adId,
+        advertiserId,
+        brand,
+        catalogId,
+        id,
+        title,
+        description,
+        price {
+          amount,
+          currency
+        },
+        salePrice {
+          amount,
+          currency
+        },
+        salePriceEffectiveDateEnd,
+        salePriceEffectiveDateStart,
+        sourceFeedType,
+        targetCountry,
+        itemListName
+      }
+    }
+  }';
 
-        return $this->postGraphQL('https://programs.api.cj.com/query', $query);
+        return $this->postGraphQL('https://ads.api.cj.com/query', $query);
     }
 
     private function postGraphQL($url, $query)
@@ -245,6 +270,56 @@ class CommissionJunction
             $scout->edited_flag = 0;
 
             $scout->save();
+        }
+    }
+
+    public function setChildProducts($re, $parent_id)
+    {
+        if ($re && isset($re['data'])) {
+            if (isset($re['data']['products']) && isset($re['data']['products']['resultList'])) {
+                $data = $re['data']['products']['resultList'];
+                if (sizeof($data) > 0) {
+                    foreach ($data as $key => $row) {
+                        if (!isset($row['advertiserId']) || !isset($row['id'])) {
+                            continue;
+                        }
+
+                        $product = ChildProduct::where('parent_id', $parent_id)
+                            ->where('product_id', $row['id'])
+                            ->where('advertiser_id', $row['advertiserId'])
+                            ->first();
+
+                        if ($product) {
+                            if ($product->deleted_flag || $product->edited_flag) {
+                                continue;
+                            }
+                        } else {
+                            $product = new ChildProduct();
+                        }
+
+                        $product->parent_id = $parent_id;
+                        $product->product_id = $row['id'];
+                        $product->advertiser_id = $row['advertiserId'];
+                        $product->ad_id = isset($row['adId']) ? (is_array($row['adId']) ? json_encode($row['adId']) : $row['adId']) : '';
+                        $product->source_feed_type = isset($row['sourceFeedType']) ? (is_array($row['sourceFeedType']) ? json_encode($row['sourceFeedType']) : $row['sourceFeedType']) : '';
+                        $product->title = isset($row['title']) ? (is_array($row['title']) ? json_encode($row['title']) : $row['title']) : '';
+                        $product->description = isset($row['description']) ? (is_array($row['description']) ? json_encode($row['description']) : $row['description']) : '';
+                        $product->target_country = isset($row['targetCountry']) ? (is_array($row['targetCountry']) ? json_encode($row['targetCountry']) : $row['targetCountry']) : '';
+                        $product->brand = isset($row['brand']) ? (is_array($row['brand']) ? json_encode($row['brand']) : $row['brand']) : '';
+                        $product->link = isset($row['link']) ? (is_array($row['link']) ? json_encode($row['link']) : $row['link']) : '';
+                        $product->image_link = isset($row['imageLink']) ? (is_array($row['imageLink']) ? json_encode($row['imageLink']) : $row['imageLink']) : '';
+                        $product->p_amount = isset($row['price']) && isset($row['price']['amount']) ? (is_array($row['price']['amount']) ? json_encode($row['price']['amount']) : $row['price']['amount']) : 0;
+                        $product->p_currency = isset($row['price']) && isset($row['price']['currency']) ? (is_array($row['price']['currency']) ? json_encode($row['price']['currency']) : $row['price']['currency']) : '';
+                        $product->s_amount = isset($row['salePrice']) && isset($row['salePrice']['amount']) ? (is_array($row['salePrice']['amount']) ? json_encode($row['salePrice']['amount']) : $row['salePrice']['amount']) : 0;
+                        $product->s_currency = isset($row['salePrice']) && isset($row['salePrice']['currency']) ? (is_array($row['salePrice']['currency']) ? json_encode($row['salePrice']['currency']) : $row['salePrice']['currency']) : '';
+                        $product->catalog_id = isset($row['catalogId']) ? (is_array($row['catalogId']) ? json_encode($row['catalogId']) : $row['catalogId']) : '';
+                        $product->deleted_flag = 0;
+                        $product->edited_flag = 0;
+
+                        $product->save();
+                    }
+                }
+            }
         }
     }
 }
