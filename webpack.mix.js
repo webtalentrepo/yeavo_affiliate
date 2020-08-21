@@ -13,8 +13,7 @@ require('vuetifyjs-mix-extension');
  */
 
 const options = {
-    progressiveImages: true,
-    extract: 'css/vuetify-components.css'
+    progressiveImages: true
 }
 
 mix.js('resources/js/app.js', 'public/js')

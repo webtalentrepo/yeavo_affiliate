@@ -15,3 +15,14 @@ yarn-error.log
 /public/css/*
 /public/js/*
 /public/fonts/*
+public/0.js
+public/1.js
+public/3.js
+public/4.js
+public/5.js
+public/css/
+public/downloads/
+public/fonts/
+public/js/
+public/mix-manifest.json
+resources/views/admin/
