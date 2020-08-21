@@ -21,8 +21,8 @@ class ShareSale
     public function __construct()
     {
         $this->_network = new \Oara\Network\Publisher\ShareASale;
-        $this->_username = 'dbbrock1';
-        $this->_password = 'DimaPassWord136';
+        $this->_username = '6QSm2r7tTJdB7r0P';
+        $this->_password = 'MVg7mf1a0DEtbc0rNHy4nc3k7XThtd2l';
         $this->_idSite = '1142939';
 
         $this->login($this->_username, $this->_password, $this->_idSite);
@@ -63,7 +63,7 @@ class ShareSale
 
     public function getMerchants($params)
     {
-        $parameter = '';
+        $parameter = '&Category=hea';
 
         return $this->_network->getMerchantList($parameter);
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\CommissionJunction;
 use App\Http\Repositories\LinkShare;
+use App\Http\Repositories\RakuteAPI;
 use App\Http\Repositories\ScoutRepository;
 use App\Http\Repositories\ShareSale;
 use Facade\Ignition\Support\Packagist\Package;
@@ -105,9 +106,9 @@ class ScoutsController extends Controller
 
     public function getTestCall()
     {
-        $cj = new CommissionJunction();
-        $c_detail = $cj->getProductDetails('129899');
+        $cj = new ShareSale();
+        $c_detail = $cj->getMerchants([]);
+
         print_r($c_detail);
-        exit;
     }
 }

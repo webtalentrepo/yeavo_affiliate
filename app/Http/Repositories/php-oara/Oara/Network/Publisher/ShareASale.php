@@ -135,9 +135,14 @@ class ShareASale extends \Oara\Network
 
 //        $merchants = array();
 
-        $returnResult = self::makeCall("merchantStatus", $params);
+        $response = self::makeCall("merchantSearch", $params);
 
-        return str_getcsv($returnResult, "\r\n"); //$exportData
+        $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+
+        $json = json_encode($xml);
+        return json_decode($json, true);
+
+//        return str_getcsv($returnResult, "\r\n"); //$exportData
 //        $num = count($exportData);
 //        for ($i = 1; $i < $num; $i++) {
 //            $merchantArray = str_getcsv($exportData[$i], "|");
@@ -348,7 +353,7 @@ class ShareASale extends \Oara\Network
         $sigHash = hash("sha256", $sig);
         $myHeaders = array("x-ShareASale-Date: $myTimeStamp", "x-ShareASale-Authentication: $sigHash");
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->_apiServer . "affiliateId=" . $this->_affiliateId . "&token=" . $this->_apiToken . "&version=" . $this->_apiVersion . "&action=" . $actionVerb . $params);
+        curl_setopt($ch, CURLOPT_URL, $this->_apiServer . "affiliateId=" . $this->_affiliateId . "&token=" . $this->_apiToken . "&version=" . $this->_apiVersion . "&XMLFormat=1&format=xml&action=" . $actionVerb . $params);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $myHeaders);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt($ch, CURLOPT_HEADER, 0);
