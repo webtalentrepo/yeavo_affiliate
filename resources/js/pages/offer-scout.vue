@@ -351,7 +351,7 @@
     }
 
     .v-dialog.v-dialog--fullscreen .v-data-table__wrapper {
-        height: 78vh;
+        height: 70vh;
         overflow-y: auto;
         overflow-x: hidden;
     }

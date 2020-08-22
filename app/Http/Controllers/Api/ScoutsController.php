@@ -109,6 +109,6 @@ class ScoutsController extends Controller
         $cj = new ShareSale();
         $c_detail = $cj->getMerchants([]);
 
-        print_r($c_detail);
+        var_dump($c_detail['merchantSearchrecord']);
     }
 }
