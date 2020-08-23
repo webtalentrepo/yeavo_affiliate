@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Http\Repositories\CommissionJunction;
 use App\Http\Repositories\ScoutRepository;
+use App\Http\Repositories\ShareSale;
 use App\Models\Product;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +42,7 @@ class ScoutsDataInsert extends Command
      */
     public function handle()
     {
-        $links = ['clickbank.com', 'cj.com', 'shareasale.com'];
+        $links = ['clickbank.com', 'cj.com'];
 
         for ($i = 0; $i < count($links); $i++) {
             if ($links[$i] == 'cj.com') {

@@ -140,24 +140,8 @@ class ShareASale extends \Oara\Network
         $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
 
         $json = json_encode($xml);
-        return json_decode($json, true);
 
-//        return str_getcsv($returnResult, "\r\n"); //$exportData
-//        $num = count($exportData);
-//        for ($i = 1; $i < $num; $i++) {
-//            $merchantArray = str_getcsv($exportData[$i], "|");
-//            if (count($merchantArray) > 1) {
-//                $obj = array();
-//                $obj['cid'] = (int)$merchantArray[0];
-//                $obj['name'] = $merchantArray[1];
-//                $obj['url'] = $merchantArray[2];
-//                //Partnership Status: Declined, Yes, Pending
-//                $obj['status'] = $merchantArray[8];
-//                $merchants[] = $obj;
-//            }
-//        }
-//
-//        return $merchants;
+        return json_decode($json, true);
     }
 
     /**

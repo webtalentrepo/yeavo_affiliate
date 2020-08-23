@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         //
         \App\Console\Commands\ScoutsDataInsert::class,
         \App\Console\Commands\ChildProductsInsert::class,
+        \App\Console\Commands\ShareASaleInsert::class,
     ];
 
     /**
@@ -32,6 +33,10 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('childproduct:insert')
             ->daily()
+            ->runInBackground();
+
+        $schedule->command('shareasale:insert')
+            ->weekly()
             ->runInBackground();
     }
 

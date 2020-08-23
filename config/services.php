@@ -41,6 +41,10 @@ return [
         'token' => env('LINKSHARE_TOKEN')
     ],
 
-    'jvzoo_key' => env('JVZOO_KEY')
+    'jvzoo_key' => env('JVZOO_KEY'),
+    'share_a_sale' => [
+        'key' => env('SHARE_A_SALE_KEY'),
+        'sec' => env('SHARE_A_SALE_SEC')
+    ]
 
 ];

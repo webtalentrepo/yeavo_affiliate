@@ -3,6 +3,8 @@
 
 namespace App\Http\Repositories;
 
+use App\Models\Product;
+
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
 class ShareSale
@@ -21,8 +23,8 @@ class ShareSale
     public function __construct()
     {
         $this->_network = new \Oara\Network\Publisher\ShareASale;
-        $this->_username = '6QSm2r7tTJdB7r0P';
-        $this->_password = 'MVg7mf1a0DEtbc0rNHy4nc3k7XThtd2l';
+        $this->_username = config('services.share_a_sale.key');
+        $this->_password = config('services.share_a_sale.sec');
         $this->_idSite = '1142939';
 
         $this->login($this->_username, $this->_password, $this->_idSite);
@@ -63,8 +65,99 @@ class ShareSale
 
     public function getMerchants($params)
     {
-        $parameter = '&Category=hea';
+        $parameter = '&Category=' . $params['category'];
 
         return $this->_network->getMerchantList($parameter);
+    }
+
+    public function dataInsertFromAPI($link) {
+        $cat = [
+            'acc', 'art', 'auction', 'bus', 'car', 'clo', 'com', 'cpu', 'dating', 'domain', 'edu', 'fam', 'fin', 'free',
+            'fud', 'gif', 'gourmet', 'green', 'hea', 'hom', 'hosting', 'ins', 'job', 'legal', 'lotto', 'mal', 'mar', 'med',
+            'military', 'mov', 'rec', 'res', 'search', 'spf', 'toy', 'tvl', 'web', 'webmaster', 'weddings'
+        ];
+
+        for ($i = 0; $i < count($cat); $i ++) {
+            $parameter = '&Category=' . $cat[$i];
+
+            $data = $this->_network->getMerchantList($parameter);
+
+            if ($data && isset($data['merchantSearchrecord'])) {
+                if (count($data['merchantSearchrecord']) > 0) {
+                    $re = $data['merchantSearchrecord'];
+                    foreach ($re as $row) {
+                        if (!isset($row['merchantid']) || $row['merchantid'] == '') {
+                            continue;
+                        }
+
+                        $scout = Product::where('site_id', $row['merchantid'])
+                            ->where('network', $link)
+                            ->first();
+
+                        if ($scout) {
+                            if ($scout->deleted_flag || $scout->edited_flag) {
+                                continue;
+                            }
+                        } else {
+                            $scout = new Product();
+                        }
+
+                        $name = '';
+                        if (isset($row['organization'])) {
+                            $name = $row['organization'];
+                        }
+
+                        if (isset($row['www'])) {
+                            $name .= ($name != '' ? ' - ' : '') . $row['www'];
+                        }
+
+                        $comm = 0;
+                        if (isset($row['salecomm'])) {
+                            $comm = $row['salecomm'];
+                        } elseif (isset($row['leadcomm'])) {
+                            $comm = $row['leadcomm'];
+                        } elseif (isset($row['hitcomm'])) {
+                            $comm = $row['hitcomm'];
+                        }
+
+                        $c_unit = '';
+                        if (isset($row['commissiontext']) && strpos($row['commissiontext'], '$') !== false) {
+                            $c_unit = 'USD';
+                        }
+
+                        if (isset($row['commissiontext']) && strpos($row['commissiontext'], '%') !== false) {
+                            $c_unit = '%';
+                        }
+
+                        $p_lank = 0;
+                        if (isset($row['powerranktop100'])) {
+                            if ($row['powerranktop100'] != 'No') {
+                                $p_lank = 1;
+                            }
+                        }
+
+                        $scout->network = $link;
+                        $scout->category = isset($row['category']) ? $row['category'] : '';
+                        $scout->child_category = isset($row['avecomm7day']) ? $row['avecomm7day'] : '';
+                        $scout->full_category = isset($row['category']) ? $row['category'] : '';
+                        $scout->site_id = $row['merchantid'];
+                        $scout->popular_rank = isset($row['avecomm30day']) ? $row['avecomm30day'] : 0;
+                        $scout->p_title = $name;
+                        $scout->p_description = isset($row['commissiontext']) ? $row['commissiontext'] : 0;
+                        $scout->p_commission = $comm;
+                        $scout->p_commission_unit = $c_unit;
+                        $scout->p_gravity = $p_lank;
+                        $scout->seven_day_epc = isset($row['epc7day']) ? $row['epc7day'] : '';
+                        $scout->three_month_epc = isset($row['epc30day']) ? $row['epc30day'] : '';
+                        $scout->earning_uint = 'USD';
+                        $scout->p_percent_sale = isset($row['avesale30day']) ? $row['avesale30day'] : '';
+                        $scout->deleted_flag = 0;
+                        $scout->edited_flag = 0;
+
+                        $scout->save();
+                    }
+                }
+            }
+        }
     }
 }

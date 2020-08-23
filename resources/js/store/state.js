@@ -6,7 +6,7 @@ const state = {
         // 'Rakuten Linkshare',
         // 'maxbounty.com',
         // 'jvzoo.com',
-        // 'shareasale.com',
+        'shareasale.com',
     ]
 }
 
