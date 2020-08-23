@@ -15,7 +15,7 @@
             </v-row>
 
             <v-row>
-                <v-col cols="12" md="3" sm="12" v-if="!disableMin[sel_network]">
+                <v-col cols="12" md="4" sm="12" v-if="!disableMin[sel_network][0]">
                     <div>Sale $Amount</div>
                     <div class="d-flex align-center">
                         <v-text-field
@@ -23,7 +23,7 @@
                             label="Min"
                             type="number"
                             clearable
-                            :disabled="disableMin[sel_network]"
+                            :disabled="disableMin[sel_network][0]"
                             @keyup.enter="searchData"
                         ></v-text-field>
                         <div class="pl-2 pr-2">-</div>
@@ -31,21 +31,22 @@
                             v-model="sale_max"
                             label="Max"
                             type="number"
-                            :disabled="disableMin[sel_network]"
+                            :disabled="disableMin[sel_network][0]"
                             @keyup.enter="searchData"
                             clearable
                         ></v-text-field>
                     </div>
                 </v-col>
 
-                <v-col cols="12" md="3" sm="12" v-if="!disableMin[sel_network]">
-                    <div>Popularity</div>
-                    <div class="d-flex align-center">
+                <v-col cols="12" md="4" sm="12" v-if="!disableMin[sel_network][1]">
+                    <div v-if="sel_network !== 'shareasale.com'">Popularity</div>
+                    <div v-if="sel_network === 'shareasale.com'">Powerrank Top 100</div>
+                    <div class="d-flex align-center" v-if="sel_network !== 'shareasale.com'">
                         <v-text-field
                             v-model="pop_min"
                             label="Min"
                             type="number"
-                            :disabled="disableMin[sel_network]"
+                            :disabled="disableMin[sel_network][1]"
                             @keyup.enter="searchData"
                             clearable
                         ></v-text-field>
@@ -54,10 +55,17 @@
                             v-model="pop_max"
                             label="Max"
                             type="number"
-                            :disabled="disableMin[sel_network]"
+                            :disabled="disableMin[sel_network][1]"
                             @keyup.enter="searchData"
                             clearable
                         ></v-text-field>
+                    </div>
+                    <div class="d-flex align-center" v-if="sel_network === 'shareasale.com'">
+                        <v-select
+                            v-model="pop_max"
+                            :items="['', 'Yes', 'No']"
+                            @change="getSalesData()"
+                        ></v-select>
                     </div>
                 </v-col>
 
@@ -98,26 +106,23 @@
                         </template>
                         <template v-slot:item.sale="{ item }">
                             <div class="py-2 cursor-pointer" @click="showDialog(item.network, item.id)">
-                                <div v-if="item.network === 'cj.com'">
-                                    3 month EPC: {{ item.three_month_epc }}
-                                </div>
-                                <div v-if="item.network === 'cj.com'">
-                                    7 day EPC: {{ item.seven_day_epc }}
-                                </div>
-                                <div v-if="item.network === 'clickbank.com'">
-                                    Initial $/Sale: ${{ item.three_month_epc }}
-                                </div>
-                                <div v-if="item.network === 'clickbank.com'">
-                                    Avg $/Sale: ${{ item.seven_day_epc }}
-                                </div>
-                                <div class="mt-2">
-                                    <span v-if="item.network === 'clickbank.com'">Avg %/</span>Sale: {{ (item.seven_day_epc === 0 ? 0 : item.sale) }}
-                                </div>
+                                <SaleCJComponent v-if="item.network === 'cj.com'" :item="item"/>
+
+                                <SaleCBComponent v-if="item.network === 'clickbank.com'" :item="item"/>
+
+                                <SaleSSComponent v-if="item.network === 'shareasale.com'" :item="item"/>
                             </div>
                         </template>
                         <template v-slot:item.popularity="{ item }">
                             <div class="py-2 cursor-pointer" @click="showDialog(item.network, item.id)">
-                                {{ item.popularity }}
+                                <span v-if="item.network !== 'shareasale.com'">
+                                    {{ item.popularity }}
+                                </span>
+                                <span v-if="item.network === 'shareasale.com'">
+                                    Powerrank TOP 100: {{ item.popularity ? 'Yes' : 'No' }}<br/>
+                                    Average Commission: ${{ item.popular_rank }}<br/>
+                                    Reversal Rate: {{ item.child_category }}%
+                                </span>
                             </div>
                         </template>
                         <template v-slot:item.network="{ item }">
@@ -126,7 +131,7 @@
                             </div>
                         </template>
                         <template v-slot:item.sign_up="{ item }">
-                            <a v-if="!disableMin[sel_network]" :href="item.sign_up" target="_blank">Sign Up</a>
+                            <a v-if="!disableMin[sel_network][2]" :href="item.sign_up" target="_blank">Sign Up</a>
                         </template>
                     </v-data-table>
                     <v-row>
@@ -210,9 +215,13 @@
 
 <script>
     import {mapGetters} from 'vuex'
+    import SaleCJComponent from "../components/SaleCJComponent";
+    import SaleCBComponent from "../components/SaleCBComponent";
+    import SaleSSComponent from "../components/SaleSSComponent";
 
     export default {
         name: "offer-scout",
+        components: {SaleSSComponent, SaleCBComponent, SaleCJComponent},
         data() {
             return {
                 search_str: '',
@@ -223,12 +232,13 @@
                 sel_network: 'All Networks',
                 searchStart: false,
                 disableMin: {
-                    'clickbank.com': false,
-                    'cj.com': false,
-                    'Rakuten Linkshare': false,
-                    'maxbounty.com': false,
-                    'jvzoo.com': false,
-                    'shareasale.com': false,
+                    'All Networks': [false, false, false],
+                    'clickbank.com': [false, false, false],
+                    'cj.com': [false, false, false],
+                    'Rakuten Linkshare': [false, false, false],
+                    'maxbounty.com': [false, false, false],
+                    'jvzoo.com': [false, false, false],
+                    'shareasale.com': [false, false, false],
                 },
                 page: 1,
                 pageCount: 0,
@@ -236,9 +246,9 @@
                 headers: [
                     {text: 'Offer Name', value: 'name', width: '35%'},
                     {text: '$ Sale', value: 'sale', width: '25%'},
-                    {text: 'Popularity(Is it selling well)', value: 'popularity', align: 'center', width: '15%'},
+                    {text: 'Popularity(Is it selling well)', value: 'popularity', align: 'center', width: '20%'},
                     {text: 'Network', value: 'network', sortable: false, width: '12%'},
-                    {text: 'Sign Up', value: 'sign_up', sortable: false, width: '12%'},
+                    {text: 'Sign Up', value: 'sign_up', sortable: false, width: '8%'},
                 ],
                 desserts: [],
                 cj_dialog: false,

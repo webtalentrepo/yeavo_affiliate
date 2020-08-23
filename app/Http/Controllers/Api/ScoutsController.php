@@ -45,6 +45,7 @@ class ScoutsController extends Controller
                 } else {
                     $el->name = $el->p_title;
                 }
+
                 $el->popularity = round($el->p_gravity, 2);
                 $el->seven_day_epc = round($el->seven_day_epc, 2);
                 $el->three_month_epc = round($el->three_month_epc, 2);
@@ -52,9 +53,10 @@ class ScoutsController extends Controller
 
                 if ($el->network == 'cj.com') {
                     $el->sign_up = 'https://members.cj.com/member/2536227/publisher/links/search/#!advertiserIds=' . $el->site_id;
-//                    $el->sign_up = 'https://members.cj.com/member/accounts/publisher/affiliations/joinprograms.do?onJoin=clickSearch&advertiserId=' . $el->site_id;
                 } elseif ($el->network == 'clickbank.com') {
                     $el->sign_up = 'https://accounts.clickbank.com/info/hoplinkGenerator.htm?vendor=' . $el->site_id;
+                } elseif ($el->network == 'shareasale.com') {
+                    $el->sign_up = 'https://account.shareasale.com/a-joinprogram.cfm?storeId=0&merchantID=' . $el->site_id;
                 } else {
                     $el->sign_up = 'https://yeavo.com';
                 }

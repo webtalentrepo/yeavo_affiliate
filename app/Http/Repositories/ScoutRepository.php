@@ -166,22 +166,28 @@ class ScoutRepository
             $qry = $qry->where('p_commission', '<=', $s_max);
         }
 
-        $p_min = 0;
-        $p_max = 0;
-        if (isset($params['popular_min']) && !is_null($params['popular_min']) && $params['popular_min'] != '') {
-            $p_min = $params['popular_min'] * 1;
-        }
+        if ($sel_network != 'shareasale.com') {
+            $p_min = 0;
+            $p_max = 0;
+            if (isset($params['popular_min']) && !is_null($params['popular_min']) && $params['popular_min'] != '') {
+                $p_min = $params['popular_min'] * 1;
+            }
 
-        if (isset($params['popular_max']) && !is_null($params['popular_max']) && $params['popular_max'] != '') {
-            $p_max = $params['popular_max'] * 1;
-        }
+            if (isset($params['popular_max']) && !is_null($params['popular_max']) && $params['popular_max'] != '') {
+                $p_max = $params['popular_max'] * 1;
+            }
 
-        if ($p_min != 0) {
-            $qry = $qry->where('p_gravity', '>=', $p_min);
-        }
+            if ($p_min != 0) {
+                $qry = $qry->where('p_gravity', '>=', $p_min);
+            }
 
-        if ($p_max != 0) {
-            $qry = $qry->where('p_gravity', '<=', $p_max);
+            if ($p_max != 0) {
+                $qry = $qry->where('p_gravity', '<=', $p_max);
+            }
+        } else {
+            if (isset($params['popular_max']) && !is_null($params['popular_max']) && $params['popular_max'] != '') {
+                $qry = $qry->where('p_gravity', $params['popular_max'] == 'Yes' ? 1 : 0);
+            }
         }
 
         $qry = $qry->orderBy('network')
