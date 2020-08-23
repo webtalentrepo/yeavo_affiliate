@@ -104,28 +104,33 @@ class ShareSale
 
                         $name = '';
                         if (isset($row['organization'])) {
-                            $name = $row['organization'];
+                            $name = is_array($row['organization']) ? json_encode($row['organization']) : $row['organization'];
                         }
 
                         if (isset($row['www'])) {
-                            $name .= ($name != '' ? ' - ' : '') . $row['www'];
+                            $name .= ($name != '' ? ' - ' : '') . (is_array($row['www']) ? json_encode($row['www']) : $row['www']);
                         }
 
                         $comm = 0;
                         if (isset($row['salecomm'])) {
-                            $comm = $row['salecomm'];
+                            $comm = is_array($row['salecomm']) ? json_encode($row['salecomm']) : $row['salecomm'];
                         } elseif (isset($row['leadcomm'])) {
-                            $comm = $row['leadcomm'];
+                            $comm = is_array($row['leadcomm']) ? json_encode($row['leadcomm']) : $row['leadcomm'];
                         } elseif (isset($row['hitcomm'])) {
-                            $comm = $row['hitcomm'];
+                            $comm = is_array($row['hitcomm']) ? json_encode($row['hitcomm']) : $row['hitcomm'];
+                        }
+
+                        $comm_text = '';
+                        if (isset($row['commissiontext'])) {
+                            $comm_text = is_array($row['commissiontext']) ? json_encode($row['commissiontext']) : $row['commissiontext'];
                         }
 
                         $c_unit = '';
-                        if (isset($row['commissiontext']) && strpos($row['commissiontext'], '$') !== false) {
+                        if (isset($comm_text) && strpos($comm_text, '$') !== false) {
                             $c_unit = 'USD';
                         }
 
-                        if (isset($row['commissiontext']) && strpos($row['commissiontext'], '%') !== false) {
+                        if (isset($comm_text) && strpos($comm_text, '%') !== false) {
                             $c_unit = '%';
                         }
 
@@ -137,20 +142,20 @@ class ShareSale
                         }
 
                         $scout->network = $link;
-                        $scout->category = isset($row['category']) ? $row['category'] : '';
-                        $scout->child_category = isset($row['avecomm7day']) ? $row['avecomm7day'] : '';
-                        $scout->full_category = isset($row['category']) ? $row['category'] : '';
-                        $scout->site_id = $row['merchantid'];
-                        $scout->popular_rank = isset($row['avecomm30day']) ? $row['avecomm30day'] : 0;
+                        $scout->category = isset($row['category']) ? (is_array($row['category']) ? json_encode($row['category']) : $row['category']) : '';
+                        $scout->child_category = isset($row['avecomm7day']) ? (is_array($row['avecomm7day']) ? json_encode($row['avecomm7day']) : $row['avecomm7day']) : '';
+                        $scout->full_category = isset($row['category']) ? (is_array($row['category']) ? json_encode($row['category']) : $row['category']) : '';
+                        $scout->site_id = (is_array($row['merchantid']) ? json_encode($row['merchantid']) : $row['merchantid']);
+                        $scout->popular_rank = isset($row['avecomm30day']) ? (is_array($row['avecomm30day']) ? json_encode($row['avecomm30day']) : $row['avecomm30day']) : 0;
                         $scout->p_title = $name;
-                        $scout->p_description = isset($row['commissiontext']) ? $row['commissiontext'] : 0;
+                        $scout->p_description = $comm_text;
                         $scout->p_commission = $comm;
                         $scout->p_commission_unit = $c_unit;
                         $scout->p_gravity = $p_lank;
-                        $scout->seven_day_epc = isset($row['epc7day']) ? $row['epc7day'] : '';
-                        $scout->three_month_epc = isset($row['epc30day']) ? $row['epc30day'] : '';
+                        $scout->seven_day_epc = isset($row['epc7day']) ? (is_array($row['epc7day']) ? json_encode($row['epc7day']) : $row['epc7day']) : '';
+                        $scout->three_month_epc = isset($row['epc30day']) ? (is_array($row['epc30day']) ? json_encode($row['epc30day']) : $row['epc30day']) : '';
                         $scout->earning_uint = 'USD';
-                        $scout->p_percent_sale = isset($row['avesale30day']) ? $row['avesale30day'] : '';
+                        $scout->p_percent_sale = isset($row['avesale30day']) ? (is_array($row['avesale30day']) ? json_encode($row['avesale30day']) : $row['avesale30day']) : '';
                         $scout->deleted_flag = 0;
                         $scout->edited_flag = 0;
 
