@@ -41,7 +41,7 @@ class ScoutsDataInsert extends Command
      */
     public function handle()
     {
-        $links = ['clickbank.com', 'cj.com'];
+        $links = ['clickbank.com', 'cj.com', 'shareasale.com'];
 
         for ($i = 0; $i < count($links); $i++) {
             if ($links[$i] == 'cj.com') {

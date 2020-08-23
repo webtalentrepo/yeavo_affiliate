@@ -93,6 +93,8 @@ class ScoutsController extends Controller
             $reData = $re->map(function ($el) {
                 $el->sign_up = 'https://members.cj.com/member/accounts/publisher/affiliations/joinprograms.do?onJoin=clickSearch&advertiserId=' . $el->advertiser_id;
 
+                $el->network = 'cj.com';
+
                 return $el;
             });
         }
