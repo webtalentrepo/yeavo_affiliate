@@ -12,8 +12,29 @@ import VueAxios from 'vue-axios'
 import router from './router';
 import store from './store/store.js';
 import App from './App.vue'
+import VEvent from "./utils/VEvent";
+import Ls from "./utils/Ls";
+import BCookie from "./utils/BCookie";
 
 Vue.use(VueAxios, axios);
+/**
+ * Vue Event Bus.
+ * @type {VEvent}
+ */
+window.vEvent = new VEvent();
+
+/**
+ * Window Localstorage
+ * @type {{set, get, remove}}
+ */
+window.Ls = Ls;
+
+/**
+ * Cookie
+ * @type {{set, get, check, remove}}
+ */
+window.BCookie = BCookie;
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -31,9 +52,10 @@ Vue.use(VueAxios, axios);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 const app = new Vue({
-    vuetify,
+    el: '#app',
     router,
     store,
+    axios,
+    vuetify,
     render: h => h(App),
-    el: '#app',
 });

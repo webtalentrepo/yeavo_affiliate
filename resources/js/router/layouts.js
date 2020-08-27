@@ -1,9 +1,11 @@
-const layout = [{
-    path: '/',
-    component: resolve => require(['../pages/offer-scout'], resolve),
+const layouts = [{
+    path: "/",
+    name: "Dashboard",
+    component: resolve => require(['../layout/users/index'], resolve),
     meta: {
-        title: "Offer Scout",
-    }
+        title: "Deadbeat Affiliate Scout",
+        auth: true,
+    },
 }];
 
-export default layout
+export default layouts

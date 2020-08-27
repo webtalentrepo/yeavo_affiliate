@@ -8,6 +8,6 @@ class IndexController extends Controller
 {
     public function index()
     {
-        return view('users.offer-scout');
+        return view('layouts.app');
     }
 }
