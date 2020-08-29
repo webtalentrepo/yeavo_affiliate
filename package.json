@@ -29,6 +29,7 @@
         "vuetifyjs-mix-extension": "0.0.11"
     },
     "dependencies": {
+        "@mdi/js": "^5.5.55",
         "es6-promise": "^4.2.8",
         "material-design-icons-iconfont": "^5.0.1",
         "vue-axios": "^2.1.5",
