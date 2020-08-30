@@ -52,10 +52,11 @@
                             justify="center"
                         >
                             <span>Don't have an account,</span>
-                            <a
+                            <router-link
                                 class="ml-1 blue-grey--text text-decoration-underline"
-                                >Sign Up Here</a
-                            >
+                                to="/register"
+                                >Sign Up Here
+                            </router-link>
                         </v-row>
                     </form>
                 </v-col>

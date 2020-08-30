@@ -21,7 +21,12 @@
             <!--            <v-divider></v-divider>-->
 
             <v-list dense class="pt-10">
-                <v-list-item v-for="item in items" :key="item.title" link>
+                <v-list-item
+                    v-for="item in items"
+                    :key="item.title"
+                    link
+                    :to="item.link"
+                >
                     <v-list-item-icon>
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-item-icon>
@@ -42,13 +47,17 @@ export default {
         mini: false,
         drawer: true,
         items: [
-            { title: 'Home', icon: 'mdi-home-outline' },
-            { title: 'Domain Ideas', icon: 'mdi-lightbulb-on-outline' },
-            { title: 'Domain Sniper', icon: 'mdi-target' },
-            { title: 'Offer Scout', icon: 'mdi-tag-outline' },
-            { title: '? Keyword', icon: 'mdi-search-web' },
-            { title: 'Viral Content', icon: 'mdi-bomb' },
-            { title: 'Competitor Spy', icon: 'mdi-incognito' },
+            { title: 'Home', icon: 'mdi-home-outline', link: '/' },
+            {
+                title: 'Domain Ideas',
+                icon: 'mdi-lightbulb-on-outline',
+                link: '/',
+            },
+            { title: 'Domain Sniper', icon: 'mdi-target', link: '/' },
+            { title: 'Offer Scout', icon: 'mdi-tag-outline', link: '/' },
+            { title: '? Keyword', icon: 'mdi-search-web', link: '/' },
+            { title: 'Viral Content', icon: 'mdi-bomb', link: '/' },
+            { title: 'Competitor Spy', icon: 'mdi-incognito', link: '/' },
         ],
         color: 'primary',
         colors: ['primary', 'blue', 'success', 'red', 'teal'],

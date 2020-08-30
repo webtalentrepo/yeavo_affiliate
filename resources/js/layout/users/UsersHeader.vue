@@ -12,15 +12,17 @@
 
             <v-spacer></v-spacer>
 
-            <div class="px-10">Home</div>
+            <div class="px-10">
+                <router-link class="header-link" to="/">Home</router-link>
+            </div>
             <div class="px-10">Billing Settings</div>
             <div class="px-10">Customer Support</div>
             <div class="px-10">Video Tutorials</div>
 
             <v-list-item-avatar>
                 <v-icon large color="#f0f0f0"
-                    >mdi-account-circle-outline</v-icon
-                >
+                    >mdi-account-circle-outline
+                </v-icon>
             </v-list-item-avatar>
         </v-app-bar>
     </div>
@@ -32,4 +34,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+.header-link {
+    color: #f0f0f0;
+    text-decoration: none;
+}
+</style>
