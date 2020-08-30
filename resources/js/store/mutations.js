@@ -1,5 +1,5 @@
-import Ls from "../utils/Ls";
-import BCookie from "../utils/BCookie";
+import Ls from '../utils/Ls';
+import BCookie from '../utils/BCookie';
 
 let mutations = {
     /**
@@ -9,8 +9,8 @@ let mutations = {
      * @param token
      * @param expires
      */
-    setAccessToken: (state, {token, expires}) => {
-        BCookie.set("BCAccessToken", token, expires);
+    setAccessToken: (state, { token, expires }) => {
+        BCookie.set('DBAccessToken', token, expires);
 
         state.accessToken = token;
     },
@@ -23,8 +23,8 @@ let mutations = {
      */
     changePageTitle(state, title) {
         state.pageTitle = title;
-        
-        document.title = title + " | " + state.siteName
+
+        document.title = title + ' | ' + state.siteName;
     },
 
     /**
@@ -42,13 +42,13 @@ let mutations = {
      * @param state
      */
     destroyAccessToken(state) {
-        BCookie.remove("BCAccessToken");
+        BCookie.remove('DBAccessToken');
 
-        Ls.remove("BC-Auth-Remember");
+        Ls.remove('DB-Auth-Remember');
 
         state.userData = null;
         state.accessToken = null;
-    }
+    },
 };
 
-export default mutations
+export default mutations;

@@ -1,14 +1,14 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import routes from './routes.js'
-import store from "../store/store";
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import routes from './routes.js';
+import store from '../store/store';
 
 Vue.use(VueRouter);
 
 const router = new VueRouter({
     mode: 'history',
     routes,
-    linkActiveClass: "active"
+    linkActiveClass: 'active',
 });
 
 /**
@@ -18,7 +18,7 @@ router.beforeEach((to, from, next) => {
     if (!store.getters.isAuthenticated) {
         if (to.meta.auth) {
             next({
-                name: "Login",
+                name: 'Login',
             });
         } else {
             next();
@@ -28,14 +28,14 @@ router.beforeEach((to, from, next) => {
     }
 });
 
-
 //====change page title after route changed.
+// eslint-disable-next-line no-unused-vars
 router.afterEach((to, from) => {
     if (to.meta.title) {
-        document.title = to.meta.title + " - " + store.state.siteName;
+        document.title = to.meta.title + ' - ' + store.state.siteName;
 
-        store.commit("changePageTitle", to.meta.title);
+        store.commit('changePageTitle', to.meta.title);
     }
 });
 
-export default router
+export default router;

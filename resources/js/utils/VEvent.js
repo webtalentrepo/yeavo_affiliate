@@ -13,11 +13,9 @@ const VEvent = class {
      */
     listen(event, callback) {
         if (Array.isArray(event)) {
-            event.forEach(
-                eventName => this.vue.$on(eventName, (callback))
-            );
+            event.forEach((eventName) => this.vue.$on(eventName, callback));
         } else {
-            this.vue.$on(event, (callback));
+            this.vue.$on(event, callback);
         }
 
         return this;
@@ -43,11 +41,9 @@ const VEvent = class {
      */
     stop(event, callback) {
         if (Array.isArray(event)) {
-            event.forEach(
-                eventName => this.vue.$off(eventName, (callback))
-            );
+            event.forEach((eventName) => this.vue.$off(eventName, callback));
         } else {
-            this.vue.$off(event, (callback));
+            this.vue.$off(event, callback);
         }
 
         return this;

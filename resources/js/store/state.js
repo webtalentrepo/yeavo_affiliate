@@ -1,9 +1,11 @@
-import BCookie from "../utils/BCookie";
+import BCookie from '../utils/BCookie';
 
 const state = {
     siteName: 'Deadbeat Affiliate Scout',
-    accessToken: (BCookie.check("BCAccessToken") ? BCookie.get("BCAccessToken") : null),
-    forgot_email: "",
+    accessToken: BCookie.check('DBAccessToken')
+        ? BCookie.get('DBAccessToken')
+        : null,
+    forgot_email: '',
     isAdmin: false,
     isLoggedIn: false,
     userData: null,
@@ -12,7 +14,7 @@ const state = {
         'cj.com',
         'clickbank.com',
         'shareasale.com',
-    ]
-}
+    ],
+};
 
 export default state;

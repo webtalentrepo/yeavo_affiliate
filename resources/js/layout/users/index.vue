@@ -1,11 +1,9 @@
 <template>
-    <div>
-        Users Area
-    </div>
+    <div>Users Area</div>
 </template>
 
 <script>
-    export default {
-        name: "index",
-    }
+export default {
+    name: 'Index',
+};
 </script>

@@ -6,7 +6,7 @@ export default {
      * @returns {any}
      */
     get(key) {
-        return sessionStorage.getItem(key) ? sessionStorage.getItem(key) : null
+        return sessionStorage.getItem(key) ? sessionStorage.getItem(key) : null;
     },
 
     /**
@@ -16,7 +16,7 @@ export default {
      * @param val
      */
     set(key, val) {
-        sessionStorage.setItem(key, val)
+        sessionStorage.setItem(key, val);
     },
 
     /**
@@ -25,6 +25,6 @@ export default {
      * @param key
      */
     remove(key) {
-        sessionStorage.removeItem(key)
-    }
-}
+        sessionStorage.removeItem(key);
+    },
+};

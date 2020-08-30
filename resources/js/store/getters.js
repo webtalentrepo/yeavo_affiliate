@@ -1,6 +1,8 @@
+import BCookie from '../utils/BCookie';
+
 const getters = {
     getNetworkList(state) {
-        return state.scout_network
+        return state.scout_network;
     },
     adminCheck(state) {
         return state.isAdmin;
@@ -12,7 +14,13 @@ const getters = {
      * @returns {null|string|boolean}
      */
     isAuthenticated: (state) => {
-        return (state.accessToken && state.accessToken !== "null" && state.accessToken !== "" && state.accessToken !== null && state.accessToken === BCookie.get("BCAccessToken"));
+        return (
+            state.accessToken &&
+            state.accessToken !== 'null' &&
+            state.accessToken !== '' &&
+            state.accessToken !== null &&
+            state.accessToken === BCookie.get('DBAccessToken')
+        );
     },
 
     /**
@@ -23,7 +31,7 @@ const getters = {
      */
     userInfo: (state) => {
         return state.authInfo;
-    }
-}
+    },
+};
 
 export default getters;

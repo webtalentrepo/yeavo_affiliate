@@ -6,28 +6,22 @@
             permanent
         >
             <v-list-item class="px-2">
-                <v-list-item-avatar>
-                    <v-icon>{{ icons.mdiAccountCircleOutline }}</v-icon>
-                </v-list-item-avatar>
+                <v-spacer></v-spacer>
+                <!--                <v-list-item-avatar>-->
+                <!--                    <v-icon>mdi-account-circle-outline</v-icon>-->
+                <!--                </v-list-item-avatar>-->
 
-                <v-list-item-title>John Leider</v-list-item-title>
+                <!--                <v-list-item-title>John Leider</v-list-item-title>-->
 
-                <v-btn
-                    icon
-                    @click.stop="mini = !mini"
-                >
+                <v-btn icon @click.stop="mini = !mini">
                     <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
             </v-list-item>
 
-            <v-divider></v-divider>
+            <!--            <v-divider></v-divider>-->
 
             <v-list dense class="pt-10">
-                <v-list-item
-                    v-for="item in items"
-                    :key="item.title"
-                    link
-                >
+                <v-list-item v-for="item in items" :key="item.title" link>
                     <v-list-item-icon>
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-item-icon>
@@ -42,36 +36,23 @@
 </template>
 
 <script>
-    import {mdiAccountCircleOutline} from '@mdi/js'
-
-    export default {
-        name: "UsersSidebar",
-        data: () => ({
-            icons: {mdiAccountCircleOutline},
-            mini: false,
-            drawer: true,
-            items: [
-                {title: 'Home', icon: 'mdi-view-dashboard'},
-                {title: 'Domain Ideas', icon: 'mdi-image'},
-                {title: 'Domain Sniper', icon: 'mdi-image'},
-                {title: 'Offer Scout', icon: 'mdi-image'},
-                {title: '? Keyword', icon: 'mdi-image'},
-                {title: 'Viral Content', icon: 'mdi-image'},
-                {title: 'Competitor Spy', icon: 'mdi-image'},
-            ],
-            color: 'primary',
-            colors: [
-                'primary',
-                'blue',
-                'success',
-                'red',
-                'teal',
-            ],
-            permanent: true,
-        })
-    }
+export default {
+    name: 'UsersSidebar',
+    data: () => ({
+        mini: false,
+        drawer: true,
+        items: [
+            { title: 'Home', icon: 'mdi-home-outline' },
+            { title: 'Domain Ideas', icon: 'mdi-lightbulb-on-outline' },
+            { title: 'Domain Sniper', icon: 'mdi-target' },
+            { title: 'Offer Scout', icon: 'mdi-tag-outline' },
+            { title: '? Keyword', icon: 'mdi-search-web' },
+            { title: 'Viral Content', icon: 'mdi-bomb' },
+            { title: 'Competitor Spy', icon: 'mdi-incognito' },
+        ],
+        color: 'primary',
+        colors: ['primary', 'blue', 'success', 'red', 'teal'],
+        permanent: true,
+    }),
+};
 </script>
-
-<style scoped>
-
-</style>

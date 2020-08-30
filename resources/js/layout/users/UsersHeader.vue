@@ -18,23 +18,18 @@
             <div class="px-10">Video Tutorials</div>
 
             <v-list-item-avatar>
-                <v-icon>{{ icons.mdiAccountCircleOutline }}</v-icon>
+                <v-icon large color="#f0f0f0"
+                    >mdi-account-circle-outline</v-icon
+                >
             </v-list-item-avatar>
         </v-app-bar>
     </div>
 </template>
 
 <script>
-    import {mdiAccountCircleOutline} from '@mdi/js'
-
-    export default {
-        name: "UsersHeader",
-        data: () => ({
-            icons: {mdiAccountCircleOutline},
-        })
-    }
+export default {
+    name: 'UsersHeader',
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

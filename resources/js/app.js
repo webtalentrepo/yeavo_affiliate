@@ -6,15 +6,16 @@
 
 window.Vue = require('vue');
 
-import vuetify from './vuetify'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
+import vuetify from './vuetify';
+import axios from 'axios';
+import VueAxios from 'vue-axios';
+import './utils/vee-validate';
 import router from './router';
 import store from './store/store.js';
-import App from './App.vue'
-import VEvent from "./utils/VEvent";
-import Ls from "./utils/Ls";
-import BCookie from "./utils/BCookie";
+import App from './App.vue';
+import VEvent from './utils/VEvent';
+import Ls from './utils/Ls';
+import BCookie from './utils/BCookie';
 
 Vue.use(VueAxios, axios);
 /**
@@ -57,5 +58,5 @@ const app = new Vue({
     store,
     axios,
     vuetify,
-    render: h => h(App),
+    render: (h) => h(App),
 });

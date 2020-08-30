@@ -46,7 +46,7 @@ export default {
     check(cName) {
         let cookie_data = this.get(cName);
 
-        return (cookie_data && cookie_data !== '');
+        return cookie_data && cookie_data !== '';
     },
 
     /**
@@ -56,5 +56,5 @@ export default {
      */
     remove(cName) {
         document.cookie = `${cName}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-    }
-}
+    },
+};

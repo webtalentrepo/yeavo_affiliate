@@ -23,13 +23,13 @@
 </template>
 
 <script>
-    export default {
-        name: "UsersFooter"
-    }
+export default {
+    name: 'UsersFooter',
+};
 </script>
 
 <style scoped lang="scss">
-    .app-footer {
-        align-items: center;
-    }
+.app-footer {
+    align-items: center;
+}
 </style>

@@ -1,9 +1,11 @@
-import axios from "axios";
+import axios from 'axios';
 
 const actions = {
-    post({commit}, post_data) {
+    // eslint-disable-next-line no-unused-vars
+    post({ commit }, post_data) {
         return new Promise((resolve, reject) => {
-            axios.post(post_data.url, post_data.data)
+            axios
+                .post(post_data.url, post_data.data)
                 .then((response) => {
                     resolve(response);
                 })
@@ -13,9 +15,11 @@ const actions = {
         });
     },
 
-    getData({commit}, params) {
+    // eslint-disable-next-line no-unused-vars
+    getData({ commit }, params) {
         return new Promise((resolve, reject) => {
-            axios.get(params.url, params.config)
+            axios
+                .get(params.url, params.config)
                 .then((response) => {
                     resolve(response);
                 })
@@ -25,9 +29,11 @@ const actions = {
         });
     },
 
-    putData({commit}, put_data) {
+    // eslint-disable-next-line no-unused-vars
+    putData({ commit }, put_data) {
         return new Promise((resolve, reject) => {
-            axios.put(put_data.url, put_data.data)
+            axios
+                .put(put_data.url, put_data.data)
                 .then((response) => {
                     resolve(response);
                 })
@@ -37,9 +43,11 @@ const actions = {
         });
     },
 
-    delete({commit}, url) {
+    // eslint-disable-next-line no-unused-vars
+    delete({ commit }, url) {
         return new Promise((resolve, reject) => {
-            axios.delete(url)
+            axios
+                .delete(url)
                 .then((response) => {
                     resolve(response);
                 })
@@ -58,18 +66,19 @@ const actions = {
      * @param credentials.remember_me {boolean} Remember me
      * @returns {Promise<unknown>}
      */
-    retrieveToken({commit}, credentials) {
+    retrieveToken({ commit }, credentials) {
         return new Promise((resolve, reject) => {
-            axios.post("/login", credentials)
+            axios
+                .post('/login', credentials)
                 .then((response) => {
                     const {
                         access_token: accessToken,
                         expires_in: tokenExpired,
                     } = response.data;
 
-                    commit("setAccessToken", {
+                    commit('setAccessToken', {
                         token: accessToken,
-                        expires: tokenExpired
+                        expires: tokenExpired,
                     });
 
                     resolve(response);
@@ -84,17 +93,18 @@ const actions = {
      * Logout a user
      * @param context {Object}
      */
-    destroyToken({getters, commit}) {
-        if (getters["isAuthenticated"]) {
+    destroyToken({ getters, commit }) {
+        if (getters['isAuthenticated']) {
             return new Promise((resolve, reject) => {
-                axios.post("/logout")
+                axios
+                    .post('/logout')
                     .then((response) => {
-                        commit("destroyAccessToken");
+                        commit('destroyAccessToken');
 
                         resolve(response);
                     })
                     .catch((error) => {
-                        commit("destroyAccessToken");
+                        commit('destroyAccessToken');
 
                         reject(error);
                     });
@@ -107,12 +117,13 @@ const actions = {
      * @param context
      * @returns {Promise<unknown>}
      */
-    async getUserData({getters, commit}) {
-        if (getters["isAuthenticated"]) {
+    async getUserData({ getters, commit }) {
+        if (getters['isAuthenticated']) {
             return new Promise((resolve, reject) => {
-                axios.get("/users/me")
+                axios
+                    .get('/users/me')
                     .then((response) => {
-                        commit("setUserInfo", response.data);
+                        commit('setUserInfo', response.data);
 
                         resolve(response);
                     })
@@ -130,9 +141,11 @@ const actions = {
      * @param credentials
      * @returns {Promise<unknown>}
      */
-    registerUser({commit}, credentials) {
+    // eslint-disable-next-line no-unused-vars
+    registerUser({ commit }, credentials) {
         return new Promise((resolve, reject) => {
-            axios.post("/register", credentials)
+            axios
+                .post('/register', credentials)
                 .then((response) => {
                     resolve(response);
                 })
@@ -149,9 +162,11 @@ const actions = {
      * @param credentials
      * @returns {Promise}
      */
-    resetPasswordByToken({commit}, credentials) {
+    // eslint-disable-next-line no-unused-vars
+    resetPasswordByToken({ commit }, credentials) {
         return new Promise((resolve, reject) => {
-            axios.post('/reset-password-by-token', credentials)
+            axios
+                .post('/reset-password-by-token', credentials)
                 .then((response) => {
                     resolve(response);
                 })
@@ -160,7 +175,6 @@ const actions = {
                 });
         });
     },
-
 };
 
 export default actions;
