@@ -63,7 +63,7 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from 'vee-validate';
-import { mapMutations } from 'vuex';
+import { mapActions, mapMutations } from 'vuex';
 
 export default {
     name: 'ResetPassword',
@@ -90,36 +90,38 @@ export default {
             setAccessToken: 'setAccessToken',
         }),
 
+        ...mapActions({
+            resetPasswordByToken: 'resetPasswordByToken',
+        }),
+
         submit() {
             this.$refs.observer.validate().then((r) => {
-                this.$http
-                    .post('/reset-password-by-token', {
-                        token: this.credentials.token,
-                        password: this.credentials.password,
-                    })
-                    .then((response) => {
-                        if (response.data.result === 'success') {
-                            // set access token and user role in store and cookie
-                            const {
-                                accessToken,
-                                expiresIn,
-                                isAdmin,
-                            } = response.data;
+                if (r) {
+                    this.resetPasswordByToken({ ...this.credentials })
+                        .then((response) => {
+                            if (response.data.result === 'success') {
+                                // set access token and user role in store and cookie
+                                const {
+                                    accessToken,
+                                    expiresIn,
+                                    isAdmin,
+                                } = response.data;
 
-                            this.setAccessToken({
-                                token: accessToken,
-                                expires: expiresIn,
-                                isAdmin: isAdmin,
-                            });
+                                this.setAccessToken({
+                                    token: accessToken,
+                                    expires: expiresIn,
+                                    isAdmin: isAdmin,
+                                });
 
-                            this.$nextTick(() => {
-                                this.$router.push('/');
-                            });
-                        }
-                    })
-                    .catch((error) => {
-                        alert(error.response.data.message);
-                    });
+                                this.$nextTick(() => {
+                                    this.$router.push('/');
+                                });
+                            }
+                        })
+                        .catch((error) => {
+                            alert(error.response.data.message);
+                        });
+                }
             });
         },
     },
