@@ -15,7 +15,7 @@
 
                         <v-row
                             v-if="sent_email"
-                            class="mt-md-10 mt-sm-8 pb-4 green--text"
+                            class="mt-md-10 mt-sm-8 pb-4 green--text text-center"
                             justify="center"
                         >
                             Success!<br />
