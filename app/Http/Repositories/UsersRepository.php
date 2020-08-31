@@ -67,7 +67,7 @@ class UsersRepository extends Repository
 
         $user->user_profile()->create($ins_data);
 
-//        $user->notify(new WelcomeToOurSoftware($user, $request['password']));
+        $user->notify(new WelcomeToOurSoftware($user, $request['password']));
     }
 
     public function model()
@@ -112,7 +112,7 @@ class UsersRepository extends Repository
 
         $user->user_profile()->create($ins_data);
 
-//        $user->notify(new WelcomeToOurSoftware($user, $password));
+        $user->notify(new WelcomeToOurSoftware($user, $password));
     }
 
     /**
