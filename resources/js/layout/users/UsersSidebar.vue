@@ -22,8 +22,6 @@
                 </v-btn>
             </v-list-item>
 
-            <!--            <v-divider></v-divider>-->
-
             <v-list dense class="pt-10">
                 <v-list-item
                     v-for="item in items"
