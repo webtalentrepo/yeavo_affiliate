@@ -1,24 +1,39 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use DOMDocument;
+use DOMXPath;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function count;
+use function json_decode;
+use function json_encode;
+use function simplexml_load_string;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Export Class
  *
@@ -28,7 +43,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class RentalCars extends \Oara\Network
+class RentalCars extends Network
 {
     private $_credentials = null;
     private $_client = null;
@@ -39,16 +54,16 @@ class RentalCars extends \Oara\Network
     public function login($credentials)
     {
         $this->_credentials = $credentials;
-        $this->_client = new \Oara\Curl\Access ($this->_credentials);
+        $this->_client = new Access ($this->_credentials);
 
-        $valuesLogin = array(
-            new \Oara\Curl\Parameter ('login_username', $this->_credentials ['user']),
-            new \Oara\Curl\Parameter ('login_password', $this->_credentials ['password'])
-        );
+        $valuesLogin = [
+            new Parameter ('login_username', $this->_credentials ['user']),
+            new Parameter ('login_password', $this->_credentials ['password'])
+        ];
 
         $loginUrl = 'https://secure.rentalcars.com/affiliates/access?commit=true';
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($loginUrl, $valuesLogin);
+        $urls = [];
+        $urls[] = new Request($loginUrl, $valuesLogin);
         $this->_client->post($urls);
     }
 
@@ -58,15 +73,15 @@ class RentalCars extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -82,13 +97,13 @@ class RentalCars extends \Oara\Network
     {
         // If not login properly the construct launch an exception
         $connection = false;
-        $urls = array();
-        $urls [] = new \Oara\Curl\Request ('https://secure.rentalcars.com/affiliates/?master=1', array());
+        $urls = [];
+        $urls [] = new Request ('https://secure.rentalcars.com/affiliates/?master=1', []);
         $exportReport = $this->_client->get($urls);
 
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         @$doc->loadHTML($exportReport[0]);
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $results = $xpath->query('//*[contains(concat(" ", normalize-space(@id), " "), " header_logout ")]');
         if ($results->length > 0) {
             $connection = true;
@@ -101,9 +116,9 @@ class RentalCars extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = array();
+        $merchants = [];
 
-        $obj = array();
+        $obj = [];
         $obj ['cid'] = "1";
         $obj ['name'] = "RentalCars";
         $obj ['url'] = "https://secure.rentalcars.com";
@@ -114,33 +129,33 @@ class RentalCars extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
 
 
-        $cancelledMap = array();
-        $valuesFormExport = array();
-        $valuesFormExport [] = new \Oara\Curl\Parameter ('cancelled', 'cancelled');
+        $cancelledMap = [];
+        $valuesFormExport = [];
+        $valuesFormExport [] = new Parameter ('cancelled', 'cancelled');
 
-        $urls = array();
-        $urls [] = new \Oara\Curl\Request ('https://secure.rentalcars.com/affiliates/booked_excel?date_start=' . $dStartDate->format("Y-m-d") . '&date_end=' . $dEndDate->format("Y-m-d"), $valuesFormExport);
+        $urls = [];
+        $urls [] = new Request ('https://secure.rentalcars.com/affiliates/booked_excel?date_start=' . $dStartDate->format("Y-m-d") . '&date_end=' . $dEndDate->format("Y-m-d"), $valuesFormExport);
         $exportReport = $this->_client->post($urls);
 
-        $xml = \simplexml_load_string($exportReport [0]);
-        $json = \json_encode($xml);
-        $array = \json_decode($json, TRUE);
+        $xml = simplexml_load_string($exportReport [0]);
+        $json = json_encode($xml);
+        $array = json_decode($json, TRUE);
 
-        $headerIndex = array();
+        $headerIndex = [];
         for ($i = 0; $i < count($array["Worksheet"]["Table"]["Row"][2]["Cell"]); $i++) {
             $headerIndex[$i] = $array["Worksheet"]["Table"]["Row"][2]["Cell"][$i]["Data"];
         }
         for ($z = 3; $z < count($array["Worksheet"]["Table"]["Row"]) - 2; $z++) {
-            $transactionDetails = array();
+            $transactionDetails = [];
             for ($i = 0; $i < count($array["Worksheet"]["Table"]["Row"][$z]["Cell"]); $i++) {
                 if (isset($array["Worksheet"]["Table"]["Row"][$z]["Cell"][$i]["Data"])) {
                     $transactionDetails[$headerIndex[$i]] = $array["Worksheet"]["Table"]["Row"][$z]["Cell"][$i]["Data"];
@@ -148,39 +163,39 @@ class RentalCars extends \Oara\Network
             }
             $cancelledMap[$transactionDetails["Res. Number"]] = true;
         }
-        $valuesFormExport = array();
-        $valuesFormExport [] = new \Oara\Curl\Parameter ('booking', 'booking');
+        $valuesFormExport = [];
+        $valuesFormExport [] = new Parameter ('booking', 'booking');
 
-        $urls = array();
-        $urls [] = new \Oara\Curl\Request ('https://secure.rentalcars.com/affiliates/booked_excel?date_start=' . $dStartDate->format("Y-m-d") . '&date_end=' . $dEndDate->format("Y-m-d"), $valuesFormExport);
+        $urls = [];
+        $urls [] = new Request ('https://secure.rentalcars.com/affiliates/booked_excel?date_start=' . $dStartDate->format("Y-m-d") . '&date_end=' . $dEndDate->format("Y-m-d"), $valuesFormExport);
         $exportReport = $this->_client->post($urls);
 
-        $xml = \simplexml_load_string($exportReport [0]);
-        $json = \json_encode($xml);
-        $array = \json_decode($json, TRUE);
+        $xml = simplexml_load_string($exportReport [0]);
+        $json = json_encode($xml);
+        $array = json_decode($json, TRUE);
 
-        $headerIndex = array();
-        for ($i = 0; $i < \count($array["Worksheet"]["Table"]["Row"][2]["Cell"]); $i++) {
+        $headerIndex = [];
+        for ($i = 0; $i < count($array["Worksheet"]["Table"]["Row"][2]["Cell"]); $i++) {
             if (isset($array["Worksheet"]["Table"]["Row"][2]["Cell"][$i]["Data"])) {
                 $headerIndex[$i] = $array["Worksheet"]["Table"]["Row"][2]["Cell"][$i]["Data"];
             }
         }
 
 
-        for ($z = 3; $z < \count($array["Worksheet"]["Table"]["Row"]) - 2; $z++) {
-            $transactionDetails = array();
-            for ($i = 0; $i < \count($array["Worksheet"]["Table"]["Row"][$z]["Cell"]); $i++) {
+        for ($z = 3; $z < count($array["Worksheet"]["Table"]["Row"]) - 2; $z++) {
+            $transactionDetails = [];
+            for ($i = 0; $i < count($array["Worksheet"]["Table"]["Row"][$z]["Cell"]); $i++) {
                 if (isset($array["Worksheet"]["Table"]["Row"][$z]["Cell"][$i]["Data"])) {
                     $transactionDetails[$headerIndex[$i]] = $array["Worksheet"]["Table"]["Row"][$z]["Cell"][$i]["Data"];
                 }
             }
-            $transaction = Array();
+            $transaction = [];
             $transaction ['merchantId'] = "1";
             $transaction ['unique_id'] = $transactionDetails["Res. Number"];
             if (isset($transactionDetails["Payment Date"]) && $transactionDetails["Payment Date"] != null) {
-                $date = \DateTime::createFromFormat("d M Y - H:i", $transactionDetails["Payment Date"]);
+                $date = DateTime::createFromFormat("d M Y - H:i", $transactionDetails["Payment Date"]);
             } else {
-                $date = \DateTime::createFromFormat("d M Y - H:i", $transactionDetails["Book Date"]);
+                $date = DateTime::createFromFormat("d M Y - H:i", $transactionDetails["Book Date"]);
             }
 
 
@@ -191,14 +206,14 @@ class RentalCars extends \Oara\Network
 
             $transaction ['date'] = $date->format("Y-m-d H:i:00");
             if (isset($transactionDetails["Payment Date"]) && $transactionDetails["Payment Date"] != null) {
-                $transaction ['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                $transaction ['status'] = Utilities::STATUS_CONFIRMED;
             } else {
-                $transaction ['status'] = \Oara\Utilities::STATUS_PENDING;
+                $transaction ['status'] = Utilities::STATUS_PENDING;
             }
 
 
             if (isset($cancelledMap[$transaction ['unique_id']])) {
-                $transaction ['status'] = \Oara\Utilities::STATUS_DECLINED;
+                $transaction ['status'] = Utilities::STATUS_DECLINED;
             }
             $rate = 0;
             if (isset($transactionDetails["Total Commission"]) && !is_array($transactionDetails["Total Commission"]) && $transactionDetails["Total Commission"] != 0) {

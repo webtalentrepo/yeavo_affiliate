@@ -8,9 +8,9 @@ date_default_timezone_set('Europe/London');
 ?>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-<title>PHPExcel Reader Example #17</title>
+    <title>PHPExcel Reader Example #17</title>
 
 </head>
 <body>
@@ -33,7 +33,7 @@ $inputFileType = 'Excel5';
 //	$inputFileType = 'Gnumeric';
 $inputFileName = './sampleData/example1.xls';
 
-echo 'Loading file ',pathinfo($inputFileName,PATHINFO_BASENAME),' using IOFactory with a defined reader type of ',$inputFileType,'<br />';
+echo 'Loading file ', pathinfo($inputFileName, PATHINFO_BASENAME), ' using IOFactory with a defined reader type of ', $inputFileType, '<br />';
 $objReader = PHPExcel_IOFactory::createReader($inputFileType);
 
 
@@ -41,9 +41,9 @@ $objReader = PHPExcel_IOFactory::createReader($inputFileType);
 echo 'Read the list of Worksheets in the WorkBook<br />';
 $worksheetNames = $objReader->listWorksheetNames($inputFileName);
 
-echo 'There are ',count($worksheetNames),' worksheet',((count($worksheetNames) == 1) ? '' : 's'),' in the workbook<br /><br />';
-foreach($worksheetNames as $worksheetName) {
-	echo $worksheetName,'<br />';
+echo 'There are ', count($worksheetNames), ' worksheet', ((count($worksheetNames) == 1) ? '' : 's'), ' in the workbook<br /><br />';
+foreach ($worksheetNames as $worksheetName) {
+    echo $worksheetName, '<br />';
 }
 
 

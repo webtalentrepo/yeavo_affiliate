@@ -55,11 +55,11 @@ class PHPExcel_Shared_OLE_ChainedBlockStream
      * Implements support for fopen().
      * For creating streams using this wrapper, use OLE_PPS_File::getStream().
      *
-     * @param    string    $path            resource name including scheme, e.g.
+     * @param string $path resource name including scheme, e.g.
      *                                    ole-chainedblockstream://oleInstanceId=1
-     * @param    string    $mode            only "r" is supported
-     * @param    int        $options        mask of STREAM_REPORT_ERRORS and STREAM_USE_PATH
-     * @param    string  &$openedPath    absolute path of the opened stream (out parameter)
+     * @param string $mode only "r" is supported
+     * @param int $options mask of STREAM_REPORT_ERRORS and STREAM_USE_PATH
+     * @param string  &$openedPath absolute path of the opened stream (out parameter)
      * @return    bool    true on success
      */
     public function stream_open($path, $mode, $options, &$openedPath)
@@ -125,7 +125,7 @@ class PHPExcel_Shared_OLE_ChainedBlockStream
     /**
      * Implements support for fread(), fgets() etc.
      *
-     * @param   int        $count    maximum number of bytes to read
+     * @param int $count maximum number of bytes to read
      * @return  string
      */
     public function stream_read($count)
@@ -162,8 +162,8 @@ class PHPExcel_Shared_OLE_ChainedBlockStream
     /**
      * Implements support for fseek().
      *
-     * @param    int        $offset    byte offset
-     * @param    int        $whence    SEEK_SET, SEEK_CUR or SEEK_END
+     * @param int $offset byte offset
+     * @param int $whence SEEK_SET, SEEK_CUR or SEEK_END
      * @return    bool
      */
     public function stream_seek($offset, $whence)
@@ -187,9 +187,9 @@ class PHPExcel_Shared_OLE_ChainedBlockStream
      */
     public function stream_stat()
     {
-        return array(
+        return [
             'size' => strlen($this->data),
-            );
+        ];
     }
 
     // Methods used by stream_wrapper_register() that are not implemented:

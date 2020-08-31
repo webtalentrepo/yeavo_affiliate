@@ -1,24 +1,38 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateInterval;
+use DateTime;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function count;
+use function preg_match;
+use function str_getcsv;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Export Class
  *
@@ -28,7 +42,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class PepperJam extends \Oara\Network
+class PepperJam extends Network
 {
     private $_client = null;
 
@@ -39,17 +53,18 @@ class PepperJam extends \Oara\Network
     {
         $user = $credentials['user'];
         $password = $credentials['password'];
-        $this->_client = new \Oara\Curl\Access($credentials);
+        $this->_client = new Access($credentials);
 
         $loginUrl = 'https://www.pepperjamnetwork.com/login.php';
 
-        $valuesLogin = array(new \Oara\Curl\Parameter('email', $user),
-            new \Oara\Curl\Parameter('passwd', $password),
-            new \Oara\Curl\Parameter('hideid', '')
-        );
+        $valuesLogin = [
+            new Parameter('email', $user),
+            new Parameter('passwd', $password),
+            new Parameter('hideid', '')
+        ];
 
-        $urls = array();
-        $urls [] = new \Oara\Curl\Request ($loginUrl, $valuesLogin);
+        $urls = [];
+        $urls [] = new Request ($loginUrl, $valuesLogin);
         $this->_client->post($urls);
 
     }
@@ -60,11 +75,11 @@ class PepperJam extends \Oara\Network
     public function checkConnection()
     {
         $connection = false;
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.pepperjamnetwork.com/affiliate/transactionrep.php', array());
+        $urls = [];
+        $urls[] = new Request('http://www.pepperjamnetwork.com/affiliate/transactionrep.php', []);
         $exportReport = $this->_client->get($urls);
 
-        if (\preg_match('/\/logout\.php/', $exportReport[0], $matches)) {
+        if (preg_match('/\/logout\.php/', $exportReport[0], $matches)) {
             $connection = true;
         }
         return $connection;
@@ -75,15 +90,15 @@ class PepperJam extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -97,16 +112,16 @@ class PepperJam extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = Array();
+        $merchants = [];
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.pepperjamnetwork.com/affiliate/program/manage?statuses[]=1&csv=1', array());
+        $urls = [];
+        $urls[] = new Request('http://www.pepperjamnetwork.com/affiliate/program/manage?statuses[]=1&csv=1', []);
         $exportReport = $this->_client->get($urls);
 
-        $merchantList = \str_getcsv($exportReport[0], "\n");
-        for ($i = 1; $i < \count($merchantList); $i++) {
-            $merchant = \str_getcsv($merchantList[$i], ",");
-            $obj = Array();
+        $merchantList = str_getcsv($exportReport[0], "\n");
+        for ($i = 1; $i < count($merchantList); $i++) {
+            $merchant = str_getcsv($merchantList[$i], ",");
+            $obj = [];
             $obj['cid'] = $merchant[0];
             $obj['name'] = $merchant[1];
             $obj['url'] = $merchant[9];
@@ -117,41 +132,41 @@ class PepperJam extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      * @throws Exception
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = Array();
+        $totalTransactions = [];
 
-        $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $merchantIdList = Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
-        $valuesFormExport = array();
-        $valuesFormExport[] = new \Oara\Curl\Parameter('csv', 'csv');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('ajax', 'ajax');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('type', 'csv');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('sortColumn', 'transid');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('sortType', 'ASC');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('startdate', $dStartDate->format("Y-m-d"));
-        $valuesFormExport[] = new \Oara\Curl\Parameter('enddate', $dEndDate->format("Y-m-d"));
-        $valuesFormExport[] = new \Oara\Curl\Parameter('programName', 'all');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('website', '');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('transactionType', '0');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('creativeType', 'all');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('advancedSubType', '');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('saleIdSearch', '');
+        $valuesFormExport = [];
+        $valuesFormExport[] = new Parameter('csv', 'csv');
+        $valuesFormExport[] = new Parameter('ajax', 'ajax');
+        $valuesFormExport[] = new Parameter('type', 'csv');
+        $valuesFormExport[] = new Parameter('sortColumn', 'transid');
+        $valuesFormExport[] = new Parameter('sortType', 'ASC');
+        $valuesFormExport[] = new Parameter('startdate', $dStartDate->format("Y-m-d"));
+        $valuesFormExport[] = new Parameter('enddate', $dEndDate->format("Y-m-d"));
+        $valuesFormExport[] = new Parameter('programName', 'all');
+        $valuesFormExport[] = new Parameter('website', '');
+        $valuesFormExport[] = new Parameter('transactionType', '0');
+        $valuesFormExport[] = new Parameter('creativeType', 'all');
+        $valuesFormExport[] = new Parameter('advancedSubType', '');
+        $valuesFormExport[] = new Parameter('saleIdSearch', '');
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.pepperjamnetwork.com/affiliate/report_transaction_detail.php?', $valuesFormExport);
+        $urls = [];
+        $urls[] = new Request('http://www.pepperjamnetwork.com/affiliate/report_transaction_detail.php?', $valuesFormExport);
         $exportReport = $this->_client->get($urls);
-        $exportData = \str_getcsv($exportReport[0], "\n");
-        $num = \count($exportData);
+        $exportData = str_getcsv($exportReport[0], "\n");
+        $num = count($exportData);
         for ($i = 1; $i < $num; $i++) {
-            $transactionExportArray = \str_getcsv($exportData[$i], ",");
+            $transactionExportArray = str_getcsv($exportData[$i], ",");
             if (isset($merchantIdList[(int)$transactionExportArray[1]])) {
-                $transaction = Array();
+                $transaction = [];
                 $merchantId = (int)$transactionExportArray[1];
                 $transaction['merchantId'] = $merchantId;
                 $transaction['date'] = $transactionExportArray[9];
@@ -161,16 +176,16 @@ class PepperJam extends \Oara\Network
                 }
                 $status = $transactionExportArray[11];
                 if ($status == 'Pending' || $status == 'Delayed' || $status == 'Updated Pending Commission') {
-                    $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                    $transaction['status'] = Utilities::STATUS_PENDING;
                 } elseif ($status == 'Locked') {
-                    $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                    $transaction['status'] = Utilities::STATUS_DECLINED;
                 } elseif ($status == 'Paid') {
-                    $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                    $transaction['status'] = Utilities::STATUS_CONFIRMED;
                 } else {
-                    throw new \Exception("Status {$status} unknown");
+                    throw new Exception("Status {$status} unknown");
                 }
-                $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[7]);
-                $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[8]);
+                $transaction['amount'] = Utilities::parseDouble($transactionExportArray[7]);
+                $transaction['amount'] = Utilities::parseDouble($transactionExportArray[8]);
                 $totalTransactions[] = $transaction;
             }
         }
@@ -182,36 +197,36 @@ class PepperJam extends \Oara\Network
      */
     public function getPaymentHistory()
     {
-        $paymentHistory = array();
-        $pointer = new \DateTime("2010-01-01");
-        $now = new \DateTime();
+        $paymentHistory = [];
+        $pointer = new DateTime("2010-01-01");
+        $now = new DateTime();
         while ($now->format("Y") >= $pointer->format("Y")) {
-            $valuesFormExport = array();
-            $valuesFormExport[] = new \Oara\Curl\Parameter('csv', 'csv');
-            $valuesFormExport[] = new \Oara\Curl\Parameter('ajax', 'ajax');
-            $valuesFormExport[] = new \Oara\Curl\Parameter('type', 'csv');
-            $valuesFormExport[] = new \Oara\Curl\Parameter('sortColumn', 'paymentid');
-            $valuesFormExport[] = new \Oara\Curl\Parameter('sortType', 'ASC');
-            $valuesFormExport[] = new \Oara\Curl\Parameter('startdate', $pointer->format("Y") . "-01-01");
-            $valuesFormExport[] = new \Oara\Curl\Parameter('enddate', $pointer->format("Y") . "-12-31");
-            $valuesFormExport[] = new \Oara\Curl\Parameter('payid_search', '');
+            $valuesFormExport = [];
+            $valuesFormExport[] = new Parameter('csv', 'csv');
+            $valuesFormExport[] = new Parameter('ajax', 'ajax');
+            $valuesFormExport[] = new Parameter('type', 'csv');
+            $valuesFormExport[] = new Parameter('sortColumn', 'paymentid');
+            $valuesFormExport[] = new Parameter('sortType', 'ASC');
+            $valuesFormExport[] = new Parameter('startdate', $pointer->format("Y") . "-01-01");
+            $valuesFormExport[] = new Parameter('enddate', $pointer->format("Y") . "-12-31");
+            $valuesFormExport[] = new Parameter('payid_search', '');
 
-            $urls = array();
-            $urls[] = new \Oara\Curl\Request('http://www.pepperjamnetwork.com/affiliate/report_payment_history.php?', $valuesFormExport);
+            $urls = [];
+            $urls[] = new Request('http://www.pepperjamnetwork.com/affiliate/report_payment_history.php?', $valuesFormExport);
             $exportReport = $this->_client->get($urls);
 
-            $exportData = \str_getcsv($exportReport[0], "\n");
-            $num = \count($exportData);
+            $exportData = str_getcsv($exportReport[0], "\n");
+            $num = count($exportData);
             for ($i = 1; $i < $num; $i++) {
-                $paymentExportArray = \str_getcsv($exportData[$i], ",");
-                $obj = array();
+                $paymentExportArray = str_getcsv($exportData[$i], ",");
+                $obj = [];
                 $obj['date'] = $paymentExportArray[5];
                 $obj['pid'] = $paymentExportArray[0];
-                $obj['value'] = \Oara\Utilities::parseDouble($paymentExportArray[4]);
+                $obj['value'] = Utilities::parseDouble($paymentExportArray[4]);
                 $obj['method'] = $paymentExportArray[2];
                 $paymentHistory[] = $obj;
             }
-            $pointer->add(new \DateInterval('P1Y'));
+            $pointer->add(new DateInterval('P1Y'));
         }
 
         return $paymentHistory;
@@ -223,26 +238,26 @@ class PepperJam extends \Oara\Network
      */
     public function paymentTransactions($paymentId)
     {
-        $transactionList = array();
+        $transactionList = [];
 
-        $valuesFormExport = array();
-        $valuesFormExport[] = new \Oara\Curl\Parameter('csv', 'csv');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('ajax', 'ajax');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('type', 'csv');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('sortColumn', '');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('sortType', '');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('startdate', '');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('enddate', '');
-        $valuesFormExport[] = new \Oara\Curl\Parameter('paymentid', $paymentId);
+        $valuesFormExport = [];
+        $valuesFormExport[] = new Parameter('csv', 'csv');
+        $valuesFormExport[] = new Parameter('ajax', 'ajax');
+        $valuesFormExport[] = new Parameter('type', 'csv');
+        $valuesFormExport[] = new Parameter('sortColumn', '');
+        $valuesFormExport[] = new Parameter('sortType', '');
+        $valuesFormExport[] = new Parameter('startdate', '');
+        $valuesFormExport[] = new Parameter('enddate', '');
+        $valuesFormExport[] = new Parameter('paymentid', $paymentId);
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.pepperjamnetwork.com/affiliate/report_payment_history_detail.php?', $valuesFormExport);
+        $urls = [];
+        $urls[] = new Request('http://www.pepperjamnetwork.com/affiliate/report_payment_history_detail.php?', $valuesFormExport);
         $exportReport = $this->_client->get($urls);
 
-        $exportData = \str_getcsv($exportReport[0], "\n");
-        $num = \count($exportData);
+        $exportData = str_getcsv($exportReport[0], "\n");
+        $num = count($exportData);
         for ($i = 1; $i < $num; $i++) {
-            $transactionArray = \str_getcsv($exportData[$i], ",");
+            $transactionArray = str_getcsv($exportData[$i], ",");
             $transactionList[] = $transactionArray[1];
         }
 

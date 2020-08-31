@@ -4,11 +4,13 @@
 namespace App\Http\Repositories;
 
 use App\Models\Product;
+use Oara\Network\Publisher\ShareASale;
 
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
 class ShareSale
 {
+    protected $_tracking_parameter = 'afftrack';
     /**
      * @var object
      */
@@ -16,13 +18,12 @@ class ShareSale
     private $_username = '';
     private $_password = '';
     private $_apiClient = null;
-    protected $_tracking_parameter = 'afftrack';
     private $_idSite = '';
     private $_logged = false;
 
     public function __construct()
     {
-        $this->_network = new \Oara\Network\Publisher\ShareASale;
+        $this->_network = new ShareASale;
         $this->_username = config('services.share_a_sale.key');
         $this->_password = config('services.share_a_sale.sec');
         $this->_idSite = '1142939';
@@ -42,7 +43,7 @@ class ShareSale
         $this->_username = $username;
         $this->_password = $password;
         $this->_idSite = $idSite;
-        $credentials = array();
+        $credentials = [];
         $credentials["apiToken"] = $this->_username;
         $credentials["apiSecret"] = $this->_password;
         $credentials["affiliateId"] = $this->_idSite;
@@ -70,14 +71,15 @@ class ShareSale
         return $this->_network->getMerchantList($parameter);
     }
 
-    public function dataInsertFromAPI($link) {
+    public function dataInsertFromAPI($link)
+    {
         $cat = [
             'acc', 'art', 'auction', 'bus', 'car', 'clo', 'com', 'cpu', 'dating', 'domain', 'edu', 'fam', 'fin', 'free',
             'fud', 'gif', 'gourmet', 'green', 'hea', 'hom', 'hosting', 'ins', 'job', 'legal', 'lotto', 'mal', 'mar', 'med',
             'military', 'mov', 'rec', 'res', 'search', 'spf', 'toy', 'tvl', 'web', 'webmaster', 'weddings'
         ];
 
-        for ($i = 0; $i < count($cat); $i ++) {
+        for ($i = 0; $i < count($cat); $i++) {
             $parameter = '&Category=' . $cat[$i];
 
             $data = $this->_network->getMerchantList($parameter);

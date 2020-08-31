@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="users-header">
         <v-app-bar
             color="#f5f5f5 accent-4"
             dense
@@ -8,7 +8,9 @@
             absolute
             background-color="#363636"
         >
-            <v-toolbar-title>{{ $store.state.siteName }}</v-toolbar-title>
+            <v-toolbar-title class="app-logo"
+                >{{ $store.state.siteName }}
+            </v-toolbar-title>
 
             <v-spacer></v-spacer>
 
@@ -38,5 +40,13 @@ export default {
 .header-link {
     color: #f0f0f0;
     text-decoration: none;
+}
+
+.users-header {
+    font-size: 85%;
+
+    .v-toolbar__title {
+        font-size: 1rem;
+    }
 }
 </style>

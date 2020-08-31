@@ -1,24 +1,38 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function json_decode;
+use function json_encode;
+use function simplexml_load_string;
+use function substr;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Export Class
  *
@@ -28,7 +42,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class Simpl extends \Oara\Network
+class Simpl extends Network
 {
     /**
      * Private API Key
@@ -45,7 +59,7 @@ class Simpl extends \Oara\Network
     public function login($credentials)
     {
         $this->_credentials = $credentials;
-        $this->_client = new \Oara\Curl\Access($credentials);
+        $this->_client = new Access($credentials);
 
     }
 
@@ -54,15 +68,15 @@ class Simpl extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -81,7 +95,7 @@ class Simpl extends \Oara\Network
         try {
             self::getMerchantList();
             $connection = true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
         }
 
@@ -94,15 +108,15 @@ class Simpl extends \Oara\Network
     public function getMerchantList()
     {
 
-        $merchants = Array();
+        $merchants = [];
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request("https://export.net.simpl.ie/{$this->_credentials['apiPassword']}/mlist_12807.xml?", array());
+        $urls = [];
+        $urls[] = new Request("https://export.net.simpl.ie/{$this->_credentials['apiPassword']}/mlist_12807.xml?", []);
         $exportReport = $this->_client->get($urls);
 
-        $merchantArray = \json_decode(\json_encode((array)\simplexml_load_string($exportReport[0])), 1);
+        $merchantArray = json_decode(json_encode((array)simplexml_load_string($exportReport[0])), 1);
         foreach ($merchantArray["merchant"] as $merchant) {
-            $obj = Array();
+            $obj = [];
             $obj['cid'] = $merchant["mid"];
             $obj['name'] = $merchant["title"];
             $merchants[] = $obj;
@@ -114,33 +128,33 @@ class Simpl extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      * @throws Exception
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
 
-        $totalTransactions = array();
+        $totalTransactions = [];
 
-        $valuesFromExport = array(
-            new \Oara\Curl\Parameter('filter[zeitraumAuswahl]', "absolute"),
-            new \Oara\Curl\Parameter('filter[zeitraumvon]', $dStartDate->format("d.m.Y")),
-            new \Oara\Curl\Parameter('filter[zeitraumbis]', $dEndDate->format("d.m.Y")),
-            new \Oara\Curl\Parameter('filter[currencycode]', 'EUR')
-        );
+        $valuesFromExport = [
+            new Parameter('filter[zeitraumAuswahl]', "absolute"),
+            new Parameter('filter[zeitraumvon]', $dStartDate->format("d.m.Y")),
+            new Parameter('filter[zeitraumbis]', $dEndDate->format("d.m.Y")),
+            new Parameter('filter[currencycode]', 'EUR')
+        ];
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request( "https://export.net.simpl.ie/{$this->_credentials['apiPassword']}/statstransaction_12807.xml?", $valuesFromExport);
+        $urls = [];
+        $urls[] = new Request("https://export.net.simpl.ie/{$this->_credentials['apiPassword']}/statstransaction_12807.xml?", $valuesFromExport);
         $exportReport = $this->_client->get($urls);
 
-        $transactionArray = \json_decode(\json_encode((array)\simplexml_load_string($exportReport[0])), 1);
+        $transactionArray = json_decode(json_encode((array)simplexml_load_string($exportReport[0])), 1);
         foreach ($transactionArray["transaction"] as $trans) {
-            $transaction = Array();
+            $transaction = [];
             $transaction['merchantId'] = $trans["merchant_id"];
             $transaction['unique_id'] = $trans["conversionid"];
-            $transaction['date'] = \substr($trans["trackingtime"], 0, 19);
+            $transaction['date'] = substr($trans["trackingtime"], 0, 19);
             $transaction['amount'] = (double)$trans["revenue"];
             $transaction['commission'] = (double)$trans["commissionvalue"];
             if ($trans["subid"] != null) {
@@ -149,15 +163,15 @@ class Simpl extends \Oara\Network
 
             $transactionStatus = $trans["status"];
             if ($transactionStatus == "open") {
-                $transaction ['status'] = \Oara\Utilities::STATUS_PENDING;
-            } else if ($transactionStatus == "cancelled") {
-                $transaction ['status'] = \Oara\Utilities::STATUS_DECLINED;
-            } else if ($transactionStatus == "paid") {
-                $transaction ['status'] = \Oara\Utilities::STATUS_PAID;
-            } else if ($transactionStatus == "confirmed") {
-                $transaction ['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                $transaction ['status'] = Utilities::STATUS_PENDING;
+            } elseif ($transactionStatus == "cancelled") {
+                $transaction ['status'] = Utilities::STATUS_DECLINED;
+            } elseif ($transactionStatus == "paid") {
+                $transaction ['status'] = Utilities::STATUS_PAID;
+            } elseif ($transactionStatus == "confirmed") {
+                $transaction ['status'] = Utilities::STATUS_CONFIRMED;
             } else {
-                throw new \Exception ("New status found {$transactionStatus}");
+                throw new Exception ("New status found {$transactionStatus}");
             }
             $totalTransactions[] = $transaction;
 

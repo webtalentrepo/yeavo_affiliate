@@ -29,7 +29,7 @@ class PHPExcel_Style_Borders extends PHPExcel_Style_Supervisor implements PHPExc
 {
     /* Diagonal directions */
     const DIAGONAL_NONE = 0;
-    const DIAGONAL_UP   = 1;
+    const DIAGONAL_UP = 1;
     const DIAGONAL_DOWN = 2;
     const DIAGONAL_BOTH = 3;
 
@@ -113,10 +113,10 @@ class PHPExcel_Style_Borders extends PHPExcel_Style_Supervisor implements PHPExc
     /**
      * Create a new PHPExcel_Style_Borders
      *
-     * @param    boolean    $isSupervisor    Flag indicating if this is a supervisor or not
+     * @param boolean $isSupervisor Flag indicating if this is a supervisor or not
      *                                    Leave this value at default unless you understand exactly what
      *                                        its ramifications are
-     * @param    boolean    $isConditional    Flag indicating if this is a conditional style or not
+     * @param boolean $isConditional Flag indicating if this is a conditional style or not
      *                                    Leave this value at default unless you understand exactly what
      *                                        its ramifications are
      */
@@ -157,28 +157,6 @@ class PHPExcel_Style_Borders extends PHPExcel_Style_Supervisor implements PHPExc
     }
 
     /**
-     * Get the shared style component for the currently active cell in currently active sheet.
-     * Only used for style supervisor
-     *
-     * @return PHPExcel_Style_Borders
-     */
-    public function getSharedComponent()
-    {
-        return $this->parent->getSharedComponent()->getBorders();
-    }
-
-    /**
-     * Build style array from subcomponents
-     *
-     * @param array $array
-     * @return array
-     */
-    public function getStyleArray($array)
-    {
-        return array('borders' => $array);
-    }
-
-    /**
      * Apply styles from array
      *
      * <code>
@@ -212,9 +190,9 @@ class PHPExcel_Style_Borders extends PHPExcel_Style_Supervisor implements PHPExc
      * );
      * </code>
      *
-     * @param    array    $pStyles    Array containing style information
-     * @throws    PHPExcel_Exception
+     * @param array $pStyles Array containing style information
      * @return PHPExcel_Style_Borders
+     * @throws    PHPExcel_Exception
      */
     public function applyFromArray($pStyles = null)
     {
@@ -251,6 +229,17 @@ class PHPExcel_Style_Borders extends PHPExcel_Style_Supervisor implements PHPExc
             throw new PHPExcel_Exception("Invalid style array passed.");
         }
         return $this;
+    }
+
+    /**
+     * Build style array from subcomponents
+     *
+     * @param array $array
+     * @return array
+     */
+    public function getStyleArray($array)
+    {
+        return ['borders' => $array];
     }
 
     /**
@@ -374,6 +363,38 @@ class PHPExcel_Style_Borders extends PHPExcel_Style_Supervisor implements PHPExc
     }
 
     /**
+     * Get hash code
+     *
+     * @return string    Hash code
+     */
+    public function getHashCode()
+    {
+        if ($this->isSupervisor) {
+            return $this->getSharedComponent()->getHashcode();
+        }
+        return md5(
+            $this->getLeft()->getHashCode() .
+            $this->getRight()->getHashCode() .
+            $this->getTop()->getHashCode() .
+            $this->getBottom()->getHashCode() .
+            $this->getDiagonal()->getHashCode() .
+            $this->getDiagonalDirection() .
+            __CLASS__
+        );
+    }
+
+    /**
+     * Get the shared style component for the currently active cell in currently active sheet.
+     * Only used for style supervisor
+     *
+     * @return PHPExcel_Style_Borders
+     */
+    public function getSharedComponent()
+    {
+        return $this->parent->getSharedComponent()->getBorders();
+    }
+
+    /**
      * Get DiagonalDirection
      *
      * @return int
@@ -398,32 +419,11 @@ class PHPExcel_Style_Borders extends PHPExcel_Style_Supervisor implements PHPExc
             $pValue = PHPExcel_Style_Borders::DIAGONAL_NONE;
         }
         if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(array('diagonaldirection' => $pValue));
+            $styleArray = $this->getStyleArray(['diagonaldirection' => $pValue]);
             $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
         } else {
             $this->diagonalDirection = $pValue;
         }
         return $this;
-    }
-
-    /**
-     * Get hash code
-     *
-     * @return string    Hash code
-     */
-    public function getHashCode()
-    {
-        if ($this->isSupervisor) {
-            return $this->getSharedComponent()->getHashcode();
-        }
-        return md5(
-            $this->getLeft()->getHashCode() .
-            $this->getRight()->getHashCode() .
-            $this->getTop()->getHashCode() .
-            $this->getBottom()->getHashCode() .
-            $this->getDiagonal()->getHashCode() .
-            $this->getDiagonalDirection() .
-            __CLASS__
-        );
     }
 }

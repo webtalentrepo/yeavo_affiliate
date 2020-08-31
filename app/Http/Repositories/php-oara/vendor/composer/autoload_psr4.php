@@ -5,6 +5,6 @@
 $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
-return array(
-    'Zend\\Dom\\' => array($vendorDir . '/zendframework/zend-dom/src'),
-);
+return [
+    'Zend\\Dom\\' => [$vendorDir . '/zendframework/zend-dom/src'],
+];

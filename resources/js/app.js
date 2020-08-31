@@ -4,11 +4,11 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+// eslint-disable-next-line no-undef
 window.Vue = require('vue');
 
 import vuetify from './vuetify';
-import axios from 'axios';
-import VueAxios from 'vue-axios';
+import axios from './utils/axios';
 import './utils/vee-validate';
 import router from './router';
 import store from './store/store.js';
@@ -17,7 +17,6 @@ import VEvent from './utils/VEvent';
 import Ls from './utils/Ls';
 import BCookie from './utils/BCookie';
 
-Vue.use(VueAxios, axios);
 /**
  * Vue Event Bus.
  * @type {VEvent}
@@ -52,6 +51,7 @@ window.BCookie = BCookie;
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
+// eslint-disable-next-line no-undef,no-unused-vars
 const app = new Vue({
     el: '#app',
     router,

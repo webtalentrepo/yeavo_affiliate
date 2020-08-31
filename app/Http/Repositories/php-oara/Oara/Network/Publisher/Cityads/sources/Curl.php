@@ -6,44 +6,21 @@ class CityAds_Curl
     private $_userAgent;
     private $_timeout;
 
-    /**
-     * @param string $timeout
-     * @return $this
-     */
-    public function setTimeOut($timeout)
-    {
-        $this->_timeout = $timeout;
-        return $this;
-    }
-
-    public function getTimeOut()
-    {
-        if (!isset($this->_timeout))
-            $this->_timeout = 100;
-        return $this->_timeout;
-    }
-
-    /**
-     * @param string $userAgent
-     * @return $this
-     */
-    public function setUserAgent($userAgent)
-    {
-        $this->_userAgent = $userAgent;
-        return $this;
-    }
-
-    public function getUserAgent()
-    {
-        if (!isset($this->_userAgent))
-            $this->_userAgent = null;
-        return $this->_userAgent;
-    }
-
     public function login($timeout = 100)
     {
         $this->setTimeOut($timeout);
         $this->setUserAgent('CityAds Api version 1.2');
+    }
+
+    /**
+     * @param string $url
+     * @return mixed
+     */
+    public function get($url)
+    {
+        $curl = $this->initCurl($url);
+        $return = $this->send($curl);
+        return $return;
     }
 
     private function initCurl($url)
@@ -57,6 +34,40 @@ class CityAds_Curl
         return $curl;
     }
 
+    public function getUserAgent()
+    {
+        if (!isset($this->_userAgent))
+            $this->_userAgent = null;
+        return $this->_userAgent;
+    }
+
+    /**
+     * @param string $userAgent
+     * @return $this
+     */
+    public function setUserAgent($userAgent)
+    {
+        $this->_userAgent = $userAgent;
+        return $this;
+    }
+
+    public function getTimeOut()
+    {
+        if (!isset($this->_timeout))
+            $this->_timeout = 100;
+        return $this->_timeout;
+    }
+
+    /**
+     * @param string $timeout
+     * @return $this
+     */
+    public function setTimeOut($timeout)
+    {
+        $this->_timeout = $timeout;
+        return $this;
+    }
+
     private function send($curl)
     {
         $return = curl_exec($curl);
@@ -65,17 +76,6 @@ class CityAds_Curl
             throw new Exception('Request error: ' . curl_error($curl), $httpCode);
         }
         curl_close($curl);
-        return $return;
-    }
-
-    /**
-     * @param string $url
-     * @return mixed
-     */
-    public function get($url)
-    {
-        $curl = $this->initCurl($url);
-        $return = $this->send($curl);
         return $return;
     }
 

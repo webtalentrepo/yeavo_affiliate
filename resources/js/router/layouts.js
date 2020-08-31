@@ -1,11 +1,21 @@
 const layouts = [
     {
         path: '/',
-        name: 'Dashboard',
+        name: 'Home',
         // eslint-disable-next-line no-undef
         component: (resolve) => require(['../layout/users/index'], resolve),
         meta: {
-            title: 'Deadbeat Affiliate Scout',
+            title: 'Home',
+            auth: true,
+        },
+    },
+    {
+        path: '/offer-scout',
+        name: 'Offer Scout',
+        // eslint-disable-next-line no-undef
+        component: (resolve) => require(['../pages/offer-scout'], resolve),
+        meta: {
+            title: 'Offer Scout',
             auth: true,
         },
     },

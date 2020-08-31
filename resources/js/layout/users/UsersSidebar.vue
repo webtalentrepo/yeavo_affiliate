@@ -4,14 +4,18 @@
             v-model="drawer"
             :mini-variant.sync="mini"
             permanent
+            width="245px"
         >
             <v-list-item class="px-2">
-                <v-spacer></v-spacer>
-                <!--                <v-list-item-avatar>-->
-                <!--                    <v-icon>mdi-account-circle-outline</v-icon>-->
-                <!--                </v-list-item-avatar>-->
+                <v-spacer v-if="!userInfo"></v-spacer>
 
-                <!--                <v-list-item-title>John Leider</v-list-item-title>-->
+                <v-list-item-avatar v-if="userInfo">
+                    <v-icon large>mdi-account-circle-outline</v-icon>
+                </v-list-item-avatar>
+
+                <v-list-item-title v-if="userInfo"
+                    >{{ userInfo.name }}
+                </v-list-item-title>
 
                 <v-btn icon @click.stop="mini = !mini">
                     <v-icon>mdi-chevron-left</v-icon>
@@ -44,6 +48,7 @@
 export default {
     name: 'UsersSidebar',
     data: () => ({
+        userInfo: null,
         mini: false,
         drawer: true,
         items: [
@@ -51,17 +56,63 @@ export default {
             {
                 title: 'Domain Ideas',
                 icon: 'mdi-lightbulb-on-outline',
-                link: '/',
+                link: '/domain-ideas',
             },
-            { title: 'Domain Sniper', icon: 'mdi-target', link: '/' },
-            { title: 'Offer Scout', icon: 'mdi-tag-outline', link: '/' },
-            { title: '? Keyword', icon: 'mdi-search-web', link: '/' },
-            { title: 'Viral Content', icon: 'mdi-bomb', link: '/' },
-            { title: 'Competitor Spy', icon: 'mdi-incognito', link: '/' },
+            {
+                title: 'Domain Sniper',
+                icon: 'mdi-target',
+                link: '/domain-sniper',
+            },
+            {
+                title: 'Offer Scout',
+                icon: 'mdi-tag-outline',
+                link: '/offer-scout',
+            },
+            {
+                title: '? Keyword',
+                icon: 'mdi-search-web',
+                link: '/keyword-tool',
+            },
+            {
+                title: 'Viral Content',
+                icon: 'mdi-bomb',
+                link: '/viral-content',
+            },
+            {
+                title: 'Competitor Spy',
+                icon: 'mdi-incognito',
+                link: '/competitor-spy',
+            },
         ],
         color: 'primary',
         colors: ['primary', 'blue', 'success', 'red', 'teal'],
         permanent: true,
     }),
+    computed: {
+        user: {
+            get() {
+                return this.$store.state.userData;
+            },
+        },
+    },
+    watch: {
+        user(newUser, oldUser) {
+            if (newUser) {
+                this.setUserData(newUser);
+                this.$nextTick(() => {
+                    if (!oldUser || newUser !== oldUser) {
+                        this.$forceUpdate();
+                    }
+                });
+            }
+        },
+    },
+    methods: {
+        setUserData(newUser) {
+            if (newUser && newUser.userInfo) {
+                this.userInfo = newUser.userInfo;
+            }
+        },
+    },
 };
 </script>

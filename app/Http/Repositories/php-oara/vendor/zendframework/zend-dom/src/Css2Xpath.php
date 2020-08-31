@@ -20,10 +20,10 @@ class Css2Xpath
     /**
      * Transform CSS expression to XPath
      *
+     * @param string $path
+     * @return string
      * @deprecated
      * @see Document\Query
-     * @param  string $path
-     * @return string
      */
     public static function transform($path)
     {

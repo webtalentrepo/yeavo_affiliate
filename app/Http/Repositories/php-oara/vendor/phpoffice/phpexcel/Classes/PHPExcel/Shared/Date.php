@@ -38,7 +38,7 @@ class PHPExcel_Shared_Date
      * @public
      * @var    string[]
      */
-    public static $monthNames = array(
+    public static $monthNames = [
         'Jan' => 'January',
         'Feb' => 'February',
         'Mar' => 'March',
@@ -51,7 +51,7 @@ class PHPExcel_Shared_Date
         'Oct' => 'October',
         'Nov' => 'November',
         'Dec' => 'December',
-    );
+    ];
 
     /*
      * Names of the months of the year, indexed by shortname
@@ -60,12 +60,12 @@ class PHPExcel_Shared_Date
      * @public
      * @var    string[]
      */
-    public static $numberSuffixes = array(
+    public static $numberSuffixes = [
         'st',
         'nd',
         'rd',
         'th',
-    );
+    ];
 
     /*
      * Base calendar year to use for calculations
@@ -74,11 +74,12 @@ class PHPExcel_Shared_Date
      * @var    int
      */
     protected static $excelBaseDate = self::CALENDAR_WINDOWS_1900;
+    private static $possibleDateFormatCharacters = 'eymdHs';
 
     /**
      * Set the Excel calendar (Windows 1900 or Mac 1904)
      *
-     * @param     integer    $baseDate           Excel base date (1900 or 1904)
+     * @param integer $baseDate Excel base date (1900 or 1904)
      * @return    boolean                        Success or failure
      */
     public static function setExcelCalendar($baseDate)
@@ -91,7 +92,6 @@ class PHPExcel_Shared_Date
         return false;
     }
 
-
     /**
      * Return the Excel calendar (Windows 1900 or Mac 1904)
      *
@@ -102,15 +102,35 @@ class PHPExcel_Shared_Date
         return self::$excelBaseDate;
     }
 
+    /**
+     * Convert a date from Excel to a PHP Date/Time object
+     *
+     * @param integer $dateValue Excel date/time value
+     * @return    DateTime                    PHP date/time object
+     */
+    public static function ExcelToPHPObject($dateValue = 0)
+    {
+        $dateTime = self::ExcelToPHP($dateValue);
+        $days = floor($dateTime / 86400);
+        $time = round((($dateTime / 86400) - $days) * 86400);
+        $hours = round($time / 3600);
+        $minutes = round($time / 60) - ($hours * 60);
+        $seconds = round($time) - ($hours * 3600) - ($minutes * 60);
+
+        $dateObj = date_create('1-Jan-1970+' . $days . ' days');
+        $dateObj->setTime($hours, $minutes, $seconds);
+
+        return $dateObj;
+    }
 
     /**
      *    Convert a date from Excel to PHP
      *
-     *    @param        integer        $dateValue            Excel date/time value
-     *    @param        boolean        $adjustToTimezone    Flag indicating whether $dateValue should be treated as
+     * @param integer $dateValue Excel date/time value
+     * @param boolean $adjustToTimezone Flag indicating whether $dateValue should be treated as
      *                                                    a UST timestamp, or adjusted to UST
-     *    @param        string         $timezone            The timezone for finding the adjustment from UST
-     *    @return       integer        PHP serialized date/time
+     * @param string $timezone The timezone for finding the adjustment from UST
+     * @return       integer        PHP serialized date/time
      */
     public static function ExcelToPHP($dateValue = 0, $adjustToTimezone = false, $timezone = null)
     {
@@ -129,13 +149,13 @@ class PHPExcel_Shared_Date
             $utcDays = $dateValue - $myexcelBaseDate;
             $returnValue = round($utcDays * 86400);
             if (($returnValue <= PHP_INT_MAX) && ($returnValue >= -PHP_INT_MAX)) {
-                $returnValue = (integer) $returnValue;
+                $returnValue = (integer)$returnValue;
             }
         } else {
             $hours = round($dateValue * 24);
             $mins = round($dateValue * 1440) - round($hours * 60);
             $secs = round($dateValue * 86400) - round($hours * 3600) - round($mins * 60);
-            $returnValue = (integer) gmmktime($hours, $mins, $secs);
+            $returnValue = (integer)gmmktime($hours, $mins, $secs);
         }
 
         $timezoneAdjustment = ($adjustToTimezone) ?
@@ -145,37 +165,14 @@ class PHPExcel_Shared_Date
         return $returnValue + $timezoneAdjustment;
     }
 
-
-    /**
-     * Convert a date from Excel to a PHP Date/Time object
-     *
-     * @param    integer        $dateValue        Excel date/time value
-     * @return    DateTime                    PHP date/time object
-     */
-    public static function ExcelToPHPObject($dateValue = 0)
-    {
-        $dateTime = self::ExcelToPHP($dateValue);
-        $days = floor($dateTime / 86400);
-        $time = round((($dateTime / 86400) - $days) * 86400);
-        $hours = round($time / 3600);
-        $minutes = round($time / 60) - ($hours * 60);
-        $seconds = round($time) - ($hours * 3600) - ($minutes * 60);
-
-        $dateObj = date_create('1-Jan-1970+'.$days.' days');
-        $dateObj->setTime($hours, $minutes, $seconds);
-
-        return $dateObj;
-    }
-
-
     /**
      *    Convert a date from PHP to Excel
      *
-     *    @param    mixed        $dateValue            PHP serialized date/time or date object
-     *    @param    boolean        $adjustToTimezone    Flag indicating whether $dateValue should be treated as
+     * @param mixed $dateValue PHP serialized date/time or date object
+     * @param boolean $adjustToTimezone Flag indicating whether $dateValue should be treated as
      *                                                    a UST timestamp, or adjusted to UST
-     *    @param    string         $timezone            The timezone for finding the adjustment from UST
-     *    @return    mixed        Excel date/time value
+     * @param string $timezone The timezone for finding the adjustment from UST
+     * @return    mixed        Excel date/time value
      *                            or boolean FALSE on failure
      */
     public static function PHPToExcel($dateValue = 0, $adjustToTimezone = false, $timezone = null)
@@ -202,16 +199,15 @@ class PHPExcel_Shared_Date
         return $retValue;
     }
 
-
     /**
      * FormattedPHPToExcel
      *
-     * @param    integer    $year
-     * @param    integer    $month
-     * @param    integer    $day
-     * @param    integer    $hours
-     * @param    integer    $minutes
-     * @param    integer    $seconds
+     * @param integer $year
+     * @param integer $month
+     * @param integer $day
+     * @param integer $hours
+     * @param integer $minutes
+     * @param integer $seconds
      * @return   integer    Excel date/time value
      */
     public static function FormattedPHPToExcel($year, $month, $day, $hours = 0, $minutes = 0, $seconds = 0)
@@ -246,14 +242,44 @@ class PHPExcel_Shared_Date
 
         $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
 
-        return (float) $excelDate + $excelTime;
+        return (float)$excelDate + $excelTime;
     }
 
+    /**
+     * Convert a date/time string to Excel time
+     *
+     * @param string $dateValue Examples: '2009-12-31', '2009-12-31 15:59', '2009-12-31 15:59:10'
+     * @return    float|FALSE        Excel date/time serial value
+     */
+    public static function stringToExcel($dateValue = '')
+    {
+        if (strlen($dateValue) < 2) {
+            return false;
+        }
+        if (!preg_match('/^(\d{1,4}[ \.\/\-][A-Z]{3,9}([ \.\/\-]\d{1,4})?|[A-Z]{3,9}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?|\d{1,4}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?)( \d{1,2}:\d{1,2}(:\d{1,2})?)?$/iu', $dateValue)) {
+            return false;
+        }
+
+        $dateValueNew = PHPExcel_Calculation_DateTime::DATEVALUE($dateValue);
+
+        if ($dateValueNew === PHPExcel_Calculation_Functions::VALUE()) {
+            return false;
+        }
+
+        if (strpos($dateValue, ':') !== false) {
+            $timeValue = PHPExcel_Calculation_DateTime::TIMEVALUE($dateValue);
+            if ($timeValue === PHPExcel_Calculation_Functions::VALUE()) {
+                return false;
+            }
+            $dateValueNew += $timeValue;
+        }
+        return $dateValueNew;
+    }
 
     /**
      * Is a given cell a date/time?
      *
-     * @param     PHPExcel_Cell    $pCell
+     * @param PHPExcel_Cell $pCell
      * @return     boolean
      */
     public static function isDateTime(PHPExcel_Cell $pCell)
@@ -265,11 +291,10 @@ class PHPExcel_Shared_Date
         );
     }
 
-
     /**
      * Is a given number format a date/time?
      *
-     * @param     PHPExcel_Style_NumberFormat    $pFormat
+     * @param PHPExcel_Style_NumberFormat $pFormat
      * @return     boolean
      */
     public static function isDateTimeFormat(PHPExcel_Style_NumberFormat $pFormat)
@@ -277,13 +302,10 @@ class PHPExcel_Shared_Date
         return self::isDateTimeFormatCode($pFormat->getFormatCode());
     }
 
-
-    private static $possibleDateFormatCharacters = 'eymdHs';
-
     /**
      * Is a given number format code a date/time?
      *
-     * @param     string    $pFormatCode
+     * @param string $pFormatCode
      * @return     boolean
      */
     public static function isDateTimeFormatCode($pFormatCode = '')
@@ -330,7 +352,7 @@ class PHPExcel_Shared_Date
             return false;
         }
         // Try checking for any of the date formatting characters that don't appear within square braces
-        if (preg_match('/(^|\])[^\[]*['.self::$possibleDateFormatCharacters.']/i', $pFormatCode)) {
+        if (preg_match('/(^|\])[^\[]*[' . self::$possibleDateFormatCharacters . ']/i', $pFormatCode)) {
             //    We might also have a format mask containing quoted strings...
             //        we don't want to test for any of our characters within the quoted blocks
             if (strpos($pFormatCode, '"') !== false) {
@@ -338,7 +360,7 @@ class PHPExcel_Shared_Date
                 foreach (explode('"', $pFormatCode) as $subVal) {
                     //    Only test in alternate array entries (the non-quoted blocks)
                     if (($segMatcher = !$segMatcher) &&
-                        (preg_match('/(^|\])[^\[]*['.self::$possibleDateFormatCharacters.']/i', $subVal))) {
+                        (preg_match('/(^|\])[^\[]*[' . self::$possibleDateFormatCharacters . ']/i', $subVal))) {
                         return true;
                     }
                 }
@@ -351,42 +373,10 @@ class PHPExcel_Shared_Date
         return false;
     }
 
-
-    /**
-     * Convert a date/time string to Excel time
-     *
-     * @param    string    $dateValue        Examples: '2009-12-31', '2009-12-31 15:59', '2009-12-31 15:59:10'
-     * @return    float|FALSE        Excel date/time serial value
-     */
-    public static function stringToExcel($dateValue = '')
-    {
-        if (strlen($dateValue) < 2) {
-            return false;
-        }
-        if (!preg_match('/^(\d{1,4}[ \.\/\-][A-Z]{3,9}([ \.\/\-]\d{1,4})?|[A-Z]{3,9}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?|\d{1,4}[ \.\/\-]\d{1,4}([ \.\/\-]\d{1,4})?)( \d{1,2}:\d{1,2}(:\d{1,2})?)?$/iu', $dateValue)) {
-            return false;
-        }
-
-        $dateValueNew = PHPExcel_Calculation_DateTime::DATEVALUE($dateValue);
-
-        if ($dateValueNew === PHPExcel_Calculation_Functions::VALUE()) {
-            return false;
-        }
-
-        if (strpos($dateValue, ':') !== false) {
-            $timeValue = PHPExcel_Calculation_DateTime::TIMEVALUE($dateValue);
-            if ($timeValue === PHPExcel_Calculation_Functions::VALUE()) {
-                return false;
-            }
-            $dateValueNew += $timeValue;
-        }
-        return $dateValueNew;
-    }
-
     /**
      * Converts a month name (either a long or a short name) to a month number
      *
-     * @param     string    $month    Month name or abbreviation
+     * @param string $month Month name or abbreviation
      * @return    integer|string     Month number (1 - 12), or the original string argument if it isn't a valid month name
      */
     public static function monthStringToNumber($month)
@@ -404,14 +394,14 @@ class PHPExcel_Shared_Date
     /**
      * Strips an ordinal froma numeric value
      *
-     * @param     string    $day      Day number with an ordinal
+     * @param string $day Day number with an ordinal
      * @return    integer|string      The integer value with any ordinal stripped, or the original string argument if it isn't a valid numeric
      */
     public static function dayStringToNumber($day)
     {
         $strippedDayValue = (str_replace(self::$numberSuffixes, '', $day));
         if (is_numeric($strippedDayValue)) {
-            return (integer) $strippedDayValue;
+            return (integer)$strippedDayValue;
         }
         return $day;
     }

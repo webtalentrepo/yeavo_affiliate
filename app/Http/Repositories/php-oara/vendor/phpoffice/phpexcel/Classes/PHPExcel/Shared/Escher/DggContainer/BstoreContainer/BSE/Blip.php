@@ -62,16 +62,6 @@ class PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE_Blip
     }
 
     /**
-     * Set parent BSE
-     *
-     * @param PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $parent
-     */
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-    }
-
-    /**
      * Get parent BSE
      *
      * @return PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $parent
@@ -79,5 +69,15 @@ class PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE_Blip
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Set parent BSE
+     *
+     * @param PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $parent
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
     }
 }

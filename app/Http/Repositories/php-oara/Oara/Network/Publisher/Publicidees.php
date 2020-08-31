@@ -1,5 +1,14 @@
 <?php
+
 namespace Oara\Network\Publisher;
+use DateTime;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Network;
+use Oara\Utilities;
+use function simplexml_load_string;
+use const LIBXML_NOCDATA;
+
 /**
  * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
  * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
@@ -29,7 +38,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class Publicidees extends \Oara\Network
+class Publicidees extends Network
 {
     private $_client = null;
     private $_user = null;
@@ -43,7 +52,7 @@ class Publicidees extends \Oara\Network
 
         $this->_user = $credentials['user'];
         $this->_password = $credentials['password'];
-        $this->_client = new \Oara\Curl\Access($credentials);
+        $this->_client = new Access($credentials);
         /*
                 $loginUrl = 'http://es.publicideas.com/logmein.php';
                 $valuesLogin = array(new \Oara\Curl\Parameter('loginAff', $user),
@@ -72,15 +81,15 @@ class Publicidees extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -106,9 +115,9 @@ class Publicidees extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = array();
+        $merchants = [];
 
-        $obj = array();
+        $obj = [];
         $obj['cid'] = 1;
         $obj['name'] = "Publicidees";
         $merchants[] = $obj;
@@ -127,14 +136,14 @@ class Publicidees extends \Oara\Network
      * See: https://performance.timeonegroup.com/PDF/en_US/TimeOne_APISUBID_EN.pdf
      *
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
         try {
 
             //$response = file_get_contents ('http://api.publicidees.com/subid.php5?p=51238&k=c534b0f5dcdddb5f56caa70e4ff3ec3b');
@@ -146,7 +155,7 @@ class Publicidees extends \Oara\Network
             //$response = file_get_contents ('http://api.publicidees.com/subid.php5?p='.$this->_user.'&k='.$this->_password.'&dd='.$dStartDate->format('Y-m-d').'&df='.$dEndDate->format('Y-m-d'));
             //$response = file_get_contents ('http://api.publicidees.com/subid.php5?p='.$this->_user.'&k='.$this->_password.'&dd=2019-09-01&df='.$dEndDate->format('Y-m-d'));
 
-            $url = 'http://api.publicidees.com/subid.php5?p='.$this->_user.'&k='.$this->_password.'&dd='.$dStartDate->format('Y-m-d').'&df='.$dEndDate->format('Y-m-d');
+            $url = 'http://api.publicidees.com/subid.php5?p=' . $this->_user . '&k=' . $this->_password . '&dd=' . $dStartDate->format('Y-m-d') . '&df=' . $dEndDate->format('Y-m-d');
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -161,12 +170,12 @@ class Publicidees extends \Oara\Network
 
             if (strpos($response, 'reached the limit') !== false ||
                 strpos($response, 'Wrong') !== false)
-                throw new \Exception($response);
+                throw new Exception($response);
 
             $xml_encode = utf8_encode($response);
 
             //Convert the XML string into an SimpleXMLElement object.
-            $ids = \simplexml_load_string($xml_encode, "SimpleXMLElement", \LIBXML_NOCDATA);
+            $ids = simplexml_load_string($xml_encode, "SimpleXMLElement", LIBXML_NOCDATA);
 
             //echo "<br><br>RESPONSE<br><br>";
             //var_dump($response);
@@ -235,7 +244,7 @@ class Publicidees extends \Oara\Network
                     if ($i<6)
                         echo "action[ActionDate]: ".$action['ActionDate']."<br>";
                     */
-                    $transaction = Array();
+                    $transaction = [];
                     $transaction['merchantId'] = $program[0]['id'];
                     //Order number
                     $transaction['unique_id'] = $action['id'];
@@ -246,17 +255,17 @@ class Publicidees extends \Oara\Network
                     $transaction['amount'] = $action['CartAmount'];
                     $transaction['program_commission'] = $action['ProgramCommission'];  // format "5.000%" or "0.000EUR" - Future use
                     $transaction['commission'] = $action['ActionCommission'];
-                    $transaction['title'] = urldecode($action['Title']) ;
+                    $transaction['title'] = urldecode($action['Title']);
                     $transaction['currency'] = $action['ProgramCurrency'];
                     $transaction['custom_id'] = $action['SubID'];
                     $transaction['approved'] = false;
                     $transaction['status'] = null;
                     if ($action['ActionStatus'] == 0) {
-                        $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                    } else if  ($action['ActionStatus'] == 1) {
-                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                    } else  if ($action['ActionStatus'] == 2) {
-                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                        $transaction['status'] = Utilities::STATUS_DECLINED;
+                    } elseif ($action['ActionStatus'] == 1) {
+                        $transaction['status'] = Utilities::STATUS_PENDING;
+                    } elseif ($action['ActionStatus'] == 2) {
+                        $transaction['status'] = Utilities::STATUS_CONFIRMED;
                         $transaction['approved'] = true;
                     }
                     $totalTransactions[] = $transaction;
@@ -264,9 +273,9 @@ class Publicidees extends \Oara\Network
             }
 
 
-        } catch (\Exception $e) {
-            echo PHP_EOL . "Publicidees - getTransactionList err: ".$e->getMessage().PHP_EOL;
-            throw new \Exception($e->getMessage());
+        } catch (Exception $e) {
+            echo PHP_EOL . "Publicidees - getTransactionList err: " . $e->getMessage() . PHP_EOL;
+            throw new Exception($e->getMessage());
         }
         return $totalTransactions;
 

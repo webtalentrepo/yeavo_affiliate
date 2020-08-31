@@ -43,8 +43,13 @@
                             ></v-text-field>
                         </ValidationProvider>
 
-                        <v-row justify="center">
+                        <v-row justify="center" align="center">
                             <v-btn class="mr-4" @click="submit">Log In</v-btn>
+                            <router-link
+                                class="ml-1 blue-grey--text text-decoration-underline"
+                                to="/forgot-password"
+                                >Forgot Password?
+                            </router-link>
                         </v-row>
 
                         <v-row
@@ -110,27 +115,25 @@ export default {
                 .validate()
                 .then((r) => {
                     if (r) {
-                        this.retrieveToken({ ...this.credentials }).then(
-                            (response) => {
-                                console.log(response);
-                                this.$nextTick(() => {
-                                    this.getUserData()
-                                        .then((re) => {
-                                            console.log(re);
-                                            window.Ls.remove(
-                                                'DB-Auth-Remember',
-                                            );
-                                            this.$router.push('/');
-                                            this.$forceUpdate();
-                                        })
-                                        .catch((e) => {
-                                            this.destroyAccessToken();
-                                            this.$router.push('/login');
-                                            console.log(e);
+                        this.retrieveToken({ ...this.credentials }).then(() => {
+                            // console.log(response);
+                            this.$nextTick(() => {
+                                this.getUserData()
+                                    .then(() => {
+                                        window.Ls.remove('DB-Auth-Remember');
+                                        // alert('done');
+                                        // window.location.href = '/home';
+                                        this.$router.push({
+                                            name: 'Home',
                                         });
-                                });
-                            },
-                        );
+                                        this.$forceUpdate();
+                                    })
+                                    .catch((e) => {
+                                        // this.destroyAccessToken();
+                                        console.log(e);
+                                    });
+                            });
+                        });
                     }
                 })
                 .catch((e) => {

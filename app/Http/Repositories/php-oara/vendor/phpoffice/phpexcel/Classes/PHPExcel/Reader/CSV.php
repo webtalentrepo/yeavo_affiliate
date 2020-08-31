@@ -93,13 +93,13 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     }
 
     /**
-     * Validate that the current file is a CSV file
+     * Get input encoding
      *
-     * @return boolean
+     * @return string
      */
-    protected function isValidFormat()
+    public function getInputEncoding()
     {
-        return true;
+        return $this->inputEncoding;
     }
 
     /**
@@ -114,13 +114,57 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     }
 
     /**
-     * Get input encoding
+     * Return worksheet info (Name, Last Column Letter, Last Column Index, Total Rows, Total Columns)
      *
-     * @return string
+     * @param string $pFilename
+     * @throws    PHPExcel_Reader_Exception
      */
-    public function getInputEncoding()
+    public function listWorksheetInfo($pFilename)
     {
-        return $this->inputEncoding;
+        // Open file
+        $this->openFile($pFilename);
+        if (!$this->isValidFormat()) {
+            fclose($this->fileHandle);
+            throw new PHPExcel_Reader_Exception($pFilename . " is an Invalid Spreadsheet file.");
+        }
+        $fileHandle = $this->fileHandle;
+
+        // Skip BOM, if any
+        $this->skipBOM();
+        $this->checkSeparator();
+
+        $escapeEnclosures = ["\\" . $this->enclosure, $this->enclosure . $this->enclosure];
+
+        $worksheetInfo = [];
+        $worksheetInfo[0]['worksheetName'] = 'Worksheet';
+        $worksheetInfo[0]['lastColumnLetter'] = 'A';
+        $worksheetInfo[0]['lastColumnIndex'] = 0;
+        $worksheetInfo[0]['totalRows'] = 0;
+        $worksheetInfo[0]['totalColumns'] = 0;
+
+        // Loop through each line of the file in turn
+        while (($rowData = fgetcsv($fileHandle, 0, $this->delimiter, $this->enclosure)) !== false) {
+            $worksheetInfo[0]['totalRows']++;
+            $worksheetInfo[0]['lastColumnIndex'] = max($worksheetInfo[0]['lastColumnIndex'], count($rowData) - 1);
+        }
+
+        $worksheetInfo[0]['lastColumnLetter'] = PHPExcel_Cell::stringFromColumnIndex($worksheetInfo[0]['lastColumnIndex']);
+        $worksheetInfo[0]['totalColumns'] = $worksheetInfo[0]['lastColumnIndex'] + 1;
+
+        // Close file
+        fclose($fileHandle);
+
+        return $worksheetInfo;
+    }
+
+    /**
+     * Validate that the current file is a CSV file
+     *
+     * @return boolean
+     */
+    protected function isValidFormat()
+    {
+        return true;
     }
 
     /**
@@ -176,53 +220,9 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     }
 
     /**
-     * Return worksheet info (Name, Last Column Letter, Last Column Index, Total Rows, Total Columns)
-     *
-     * @param     string         $pFilename
-     * @throws    PHPExcel_Reader_Exception
-     */
-    public function listWorksheetInfo($pFilename)
-    {
-        // Open file
-        $this->openFile($pFilename);
-        if (!$this->isValidFormat()) {
-            fclose($this->fileHandle);
-            throw new PHPExcel_Reader_Exception($pFilename . " is an Invalid Spreadsheet file.");
-        }
-        $fileHandle = $this->fileHandle;
-
-        // Skip BOM, if any
-        $this->skipBOM();
-        $this->checkSeparator();
-
-        $escapeEnclosures = array( "\\" . $this->enclosure, $this->enclosure . $this->enclosure );
-
-        $worksheetInfo = array();
-        $worksheetInfo[0]['worksheetName'] = 'Worksheet';
-        $worksheetInfo[0]['lastColumnLetter'] = 'A';
-        $worksheetInfo[0]['lastColumnIndex'] = 0;
-        $worksheetInfo[0]['totalRows'] = 0;
-        $worksheetInfo[0]['totalColumns'] = 0;
-
-        // Loop through each line of the file in turn
-        while (($rowData = fgetcsv($fileHandle, 0, $this->delimiter, $this->enclosure)) !== false) {
-            $worksheetInfo[0]['totalRows']++;
-            $worksheetInfo[0]['lastColumnIndex'] = max($worksheetInfo[0]['lastColumnIndex'], count($rowData) - 1);
-        }
-
-        $worksheetInfo[0]['lastColumnLetter'] = PHPExcel_Cell::stringFromColumnIndex($worksheetInfo[0]['lastColumnIndex']);
-        $worksheetInfo[0]['totalColumns'] = $worksheetInfo[0]['lastColumnIndex'] + 1;
-
-        // Close file
-        fclose($fileHandle);
-
-        return $worksheetInfo;
-    }
-
-    /**
      * Loads PHPExcel from file
      *
-     * @param     string         $pFilename
+     * @param string $pFilename
      * @return PHPExcel
      * @throws PHPExcel_Reader_Exception
      */
@@ -238,8 +238,8 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     /**
      * Loads PHPExcel from file into PHPExcel instance
      *
-     * @param     string         $pFilename
-     * @param    PHPExcel    $objPHPExcel
+     * @param string $pFilename
+     * @param PHPExcel $objPHPExcel
      * @return     PHPExcel
      * @throws     PHPExcel_Reader_Exception
      */
@@ -266,14 +266,15 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
         }
         $sheet = $objPHPExcel->setActiveSheetIndex($this->sheetIndex);
 
-        $escapeEnclosures = array( "\\" . $this->enclosure,
-                                   $this->enclosure . $this->enclosure
-                                 );
+        $escapeEnclosures = [
+            "\\" . $this->enclosure,
+            $this->enclosure . $this->enclosure
+        ];
 
         // Set our starting row based on whether we're in contiguous mode or not
         $currentRow = 1;
         if ($this->contiguous) {
-            $currentRow = ($this->contiguousRow == -1) ? $sheet->getHighestRow(): $this->contiguousRow;
+            $currentRow = ($this->contiguousRow == -1) ? $sheet->getHighestRow() : $this->contiguousRow;
         }
 
         // Loop through each line of the file in turn
@@ -323,7 +324,7 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     /**
      * Set delimiter
      *
-     * @param    string    $pValue        Delimiter, defaults to ,
+     * @param string $pValue Delimiter, defaults to ,
      * @return    PHPExcel_Reader_CSV
      */
     public function setDelimiter($pValue = ',')
@@ -345,7 +346,7 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     /**
      * Set enclosure
      *
-     * @param    string    $pValue        Enclosure, defaults to "
+     * @param string $pValue Enclosure, defaults to "
      * @return PHPExcel_Reader_CSV
      */
     public function setEnclosure($pValue = '"')
@@ -370,27 +371,12 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     /**
      * Set sheet index
      *
-     * @param    integer        $pValue        Sheet index
+     * @param integer $pValue Sheet index
      * @return PHPExcel_Reader_CSV
      */
     public function setSheetIndex($pValue = 0)
     {
         $this->sheetIndex = $pValue;
-        return $this;
-    }
-
-    /**
-     * Set Contiguous
-     *
-     * @param boolean $contiguous
-     */
-    public function setContiguous($contiguous = false)
-    {
-        $this->contiguous = (bool) $contiguous;
-        if (!$contiguous) {
-            $this->contiguousRow = -1;
-        }
-
         return $this;
     }
 
@@ -402,5 +388,20 @@ class PHPExcel_Reader_CSV extends PHPExcel_Reader_Abstract implements PHPExcel_R
     public function getContiguous()
     {
         return $this->contiguous;
+    }
+
+    /**
+     * Set Contiguous
+     *
+     * @param boolean $contiguous
+     */
+    public function setContiguous($contiguous = false)
+    {
+        $this->contiguous = (bool)$contiguous;
+        if (!$contiguous) {
+            $this->contiguousRow = -1;
+        }
+
+        return $this;
     }
 }

@@ -29,15 +29,15 @@ class PHPExcel_Worksheet_SheetView
 {
 
     /* Sheet View types */
-    const SHEETVIEW_NORMAL             = 'normal';
-    const SHEETVIEW_PAGE_LAYOUT        = 'pageLayout';
+    const SHEETVIEW_NORMAL = 'normal';
+    const SHEETVIEW_PAGE_LAYOUT = 'pageLayout';
     const SHEETVIEW_PAGE_BREAK_PREVIEW = 'pageBreakPreview';
 
-    private static $sheetViewTypes = array(
+    private static $sheetViewTypes = [
         self::SHEETVIEW_NORMAL,
         self::SHEETVIEW_PAGE_LAYOUT,
         self::SHEETVIEW_PAGE_BREAK_PREVIEW,
-    );
+    ];
 
     /**
      * ZoomScale
@@ -88,9 +88,9 @@ class PHPExcel_Worksheet_SheetView
      *
      * Valid values range from 10 to 400.
      *
-     * @param     int     $pValue
-     * @throws     PHPExcel_Exception
+     * @param int $pValue
      * @return PHPExcel_Worksheet_SheetView
+     * @throws     PHPExcel_Exception
      */
     public function setZoomScale($pValue = 100)
     {
@@ -119,9 +119,9 @@ class PHPExcel_Worksheet_SheetView
      *
      * Valid values range from 10 to 400.
      *
-     * @param     int     $pValue
-     * @throws     PHPExcel_Exception
+     * @param int $pValue
      * @return PHPExcel_Worksheet_SheetView
+     * @throws     PHPExcel_Exception
      */
     public function setZoomScaleNormal($pValue = 100)
     {
@@ -151,9 +151,9 @@ class PHPExcel_Worksheet_SheetView
      *        'pageLayout'        self::SHEETVIEW_PAGE_LAYOUT
      *        'pageBreakPreview'  self::SHEETVIEW_PAGE_BREAK_PREVIEW
      *
-     * @param     string     $pValue
-     * @throws     PHPExcel_Exception
+     * @param string $pValue
      * @return PHPExcel_Worksheet_SheetView
+     * @throws     PHPExcel_Exception
      */
     public function setView($pValue = null)
     {

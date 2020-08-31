@@ -1,24 +1,36 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function count;
+use function str_getcsv;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Export Class
  *
@@ -28,7 +40,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class Affiliate4You extends \Oara\Network
+class Affiliate4You extends Network
 {
 
     private $_user = null;
@@ -42,7 +54,7 @@ class Affiliate4You extends \Oara\Network
     {
         $this->_user = $credentials['user'];
         $this->_pass = $credentials['apipassword'];
-        $this->_client = new \Oara\Curl\Access($credentials);
+        $this->_client = new Access($credentials);
     }
 
     /**
@@ -50,15 +62,15 @@ class Affiliate4You extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "API password";
         $parameter["required"] = true;
         $parameter["name"] = "API password";
@@ -74,16 +86,16 @@ class Affiliate4You extends \Oara\Network
     {
         //If not login properly the construct launch an exception
         $connection = true;
-        $urls = array();
-        $valuesFromExport = array();
-        $valuesFromExport[] = new \Oara\Curl\Parameter('email', $this->_user);
-        $valuesFromExport[] = new \Oara\Curl\Parameter('apikey', $this->_pass);
-        $valuesFromExport[] = new \Oara\Curl\Parameter('limit', "1");
-        $urls[] = new \Oara\Curl\Request("http://api.affiliate4you.nl/1.0/campagnes/all.csv?", $valuesFromExport);
+        $urls = [];
+        $valuesFromExport = [];
+        $valuesFromExport[] = new Parameter('email', $this->_user);
+        $valuesFromExport[] = new Parameter('apikey', $this->_pass);
+        $valuesFromExport[] = new Parameter('limit', "1");
+        $urls[] = new Request("http://api.affiliate4you.nl/1.0/campagnes/all.csv?", $valuesFromExport);
 
         try {
             $this->_client->get($urls);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $connection = false;
         }
         return $connection;
@@ -94,7 +106,7 @@ class Affiliate4You extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = Array();
+        $merchants = [];
 
         $page = 1;
         $import = true;
@@ -102,25 +114,25 @@ class Affiliate4You extends \Oara\Network
 
             $totalRows = ($page * 100);
 
-            $urls = array();
-            $valuesFromExport = array();
-            $valuesFromExport[] = new \Oara\Curl\Parameter('email', $this->_user);
-            $valuesFromExport[] = new \Oara\Curl\Parameter('apikey', $this->_pass);
-            $valuesFromExport[] = new \Oara\Curl\Parameter('limit', 100);
-            $valuesFromExport[] = new \Oara\Curl\Parameter('page', $page);
-            $urls[] = new \Oara\Curl\Request("http://api.affiliate4you.nl/1.0/campagnes/all.csv?", $valuesFromExport);
+            $urls = [];
+            $valuesFromExport = [];
+            $valuesFromExport[] = new Parameter('email', $this->_user);
+            $valuesFromExport[] = new Parameter('apikey', $this->_pass);
+            $valuesFromExport[] = new Parameter('limit', 100);
+            $valuesFromExport[] = new Parameter('page', $page);
+            $urls[] = new Request("http://api.affiliate4you.nl/1.0/campagnes/all.csv?", $valuesFromExport);
             $result = $this->_client->get($urls);
-            $exportData = \str_getcsv($result[0], "\n");
+            $exportData = str_getcsv($result[0], "\n");
 
-            for ($i = 1; $i < \count($exportData); $i++) {
-                $merchantExportArray = \str_getcsv($exportData[$i], ";");
-                $obj = Array();
+            for ($i = 1; $i < count($exportData); $i++) {
+                $merchantExportArray = str_getcsv($exportData[$i], ";");
+                $obj = [];
                 $obj['cid'] = $merchantExportArray[1];
                 $obj['name'] = $merchantExportArray[2];
                 $merchants[] = $obj;
             }
 
-            if (\count($exportData) != ($totalRows + 1)) {
+            if (count($exportData) != ($totalRows + 1)) {
                 $import = false;
             }
             $page++;
@@ -133,44 +145,44 @@ class Affiliate4You extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $transactions = array();
+        $transactions = [];
         $page = 1;
         $import = true;
 
-        $merchantIdMap = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $merchantIdMap = Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
         while ($import) {
 
             $totalRows = ($page * 300);
 
-            $urls = array();
-            $valuesFromExport = array();
-            $valuesFromExport[] = new \Oara\Curl\Parameter('email', $this->_user);
-            $valuesFromExport[] = new \Oara\Curl\Parameter('apikey', $this->_pass);
-            $valuesFromExport[] = new \Oara\Curl\Parameter('from', $dStartDate->format("Y-m-d"));
-            $valuesFromExport[] = new \Oara\Curl\Parameter('to', $dEndDate->format("Y-m-d"));
-            $valuesFromExport[] = new \Oara\Curl\Parameter('limit', 300);
-            $valuesFromExport[] = new \Oara\Curl\Parameter('page', $page);
-            $urls[] = new \Oara\Curl\Request("http://api.affiliate4you.nl/1.0/orders.csv?", $valuesFromExport);
+            $urls = [];
+            $valuesFromExport = [];
+            $valuesFromExport[] = new Parameter('email', $this->_user);
+            $valuesFromExport[] = new Parameter('apikey', $this->_pass);
+            $valuesFromExport[] = new Parameter('from', $dStartDate->format("Y-m-d"));
+            $valuesFromExport[] = new Parameter('to', $dEndDate->format("Y-m-d"));
+            $valuesFromExport[] = new Parameter('limit', 300);
+            $valuesFromExport[] = new Parameter('page', $page);
+            $urls[] = new Request("http://api.affiliate4you.nl/1.0/orders.csv?", $valuesFromExport);
             try {
                 $result = $this->_client->get($urls);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return $transactions;
             }
 
-            $exportData = \str_getcsv($result[0], "\n");
+            $exportData = str_getcsv($result[0], "\n");
 
-            for ($i = 1; $i < \count($exportData); $i++) {
+            for ($i = 1; $i < count($exportData); $i++) {
 
-                $transactionExportArray = \str_getcsv($exportData[$i], ";");
+                $transactionExportArray = str_getcsv($exportData[$i], ";");
                 if (isset($merchantIdMap[$transactionExportArray[12]])) {
-                    $transaction = Array();
+                    $transaction = [];
                     $transaction['unique_id'] = $transactionExportArray[3];
                     $transaction['merchantId'] = $transactionExportArray[12];
                     $transaction['date'] = $transactionExportArray[0];
@@ -180,14 +192,12 @@ class Affiliate4You extends \Oara\Network
                     }
 
                     if ($transactionExportArray[5] == 'approved') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else
-                        if ($transactionExportArray[5] == 'new' || $transactionExportArray[5] == 'onhold') {
-                            $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                        } else
-                            if ($transactionExportArray[5] == 'declined') {
-                                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                            }
+                        $transaction['status'] = Utilities::STATUS_CONFIRMED;
+                    } elseif ($transactionExportArray[5] == 'new' || $transactionExportArray[5] == 'onhold') {
+                        $transaction['status'] = Utilities::STATUS_PENDING;
+                    } elseif ($transactionExportArray[5] == 'declined') {
+                        $transaction['status'] = Utilities::STATUS_DECLINED;
+                    }
 
                     $transaction['amount'] = $transactionExportArray[4];
                     $transaction['commission'] = $transactionExportArray[1];
@@ -196,7 +206,7 @@ class Affiliate4You extends \Oara\Network
             }
 
 
-            if (\count($exportData) != ($totalRows + 1)) {
+            if (count($exportData) != ($totalRows + 1)) {
                 $import = false;
             }
             $page++;

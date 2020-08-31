@@ -4,42 +4,44 @@
 
 namespace Composer\Autoload;
 
+use Closure;
+
 class ComposerStaticInitb6044ea3093411a9442f0882dc811449
 {
-    public static $prefixLengthsPsr4 = array (
-        'Z' => 
-        array (
-            'Zend\\Dom\\' => 9,
-        ),
-    );
+    public static $prefixLengthsPsr4 = [
+        'Z' =>
+            [
+                'Zend\\Dom\\' => 9,
+            ],
+    ];
 
-    public static $prefixDirsPsr4 = array (
-        'Zend\\Dom\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/zendframework/zend-dom/src',
-        ),
-    );
+    public static $prefixDirsPsr4 = [
+        'Zend\\Dom\\' =>
+            [
+                0 => __DIR__ . '/..' . '/zendframework/zend-dom/src',
+            ],
+    ];
 
-    public static $prefixesPsr0 = array (
-        'P' => 
-        array (
-            'PHPExcel' => 
-            array (
-                0 => __DIR__ . '/..' . '/phpoffice/phpexcel/Classes',
-            ),
-        ),
-        'O' => 
-        array (
-            'Oara' => 
-            array (
-                0 => __DIR__ . '/../..' . '/',
-            ),
-        ),
-    );
+    public static $prefixesPsr0 = [
+        'P' =>
+            [
+                'PHPExcel' =>
+                    [
+                        0 => __DIR__ . '/..' . '/phpoffice/phpexcel/Classes',
+                    ],
+            ],
+        'O' =>
+            [
+                'Oara' =>
+                    [
+                        0 => __DIR__ . '/../..' . '/',
+                    ],
+            ],
+    ];
 
     public static function getInitializer(ClassLoader $loader)
     {
-        return \Closure::bind(function () use ($loader) {
+        return Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitb6044ea3093411a9442f0882dc811449::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitb6044ea3093411a9442f0882dc811449::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInitb6044ea3093411a9442f0882dc811449::$prefixesPsr0;

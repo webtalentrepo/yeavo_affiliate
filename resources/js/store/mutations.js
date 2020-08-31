@@ -7,12 +7,17 @@ let mutations = {
      *
      * @param state
      * @param token
+     * @param isAdmin
      * @param expires
      */
-    setAccessToken: (state, { token, expires }) => {
+    setAccessToken: (state, { token, expires, isAdmin }) => {
         BCookie.set('DBAccessToken', token, expires);
 
         state.accessToken = token;
+
+        state.isLoggedIn = true;
+
+        state.isAdmin = isAdmin;
     },
 
     /**

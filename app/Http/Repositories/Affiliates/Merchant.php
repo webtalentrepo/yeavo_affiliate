@@ -2,6 +2,8 @@
 
 namespace App\Http\Repositories\Affiliates;
 
+use Exception;
+
 /**
  * Class Merchant
  * @package Padosoft\AffiliateNetwork
@@ -57,8 +59,8 @@ class Merchant
         $obj = null;
         try {
             $obj = new Merchant();
-        } catch (\Exception $e) {
-            throw new \Exception('Error creating instance Merchant - ' . $e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception('Error creating instance Merchant - ' . $e->getMessage());
         }
 
         return $obj;

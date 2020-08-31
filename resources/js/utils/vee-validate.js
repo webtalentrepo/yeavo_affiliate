@@ -1,4 +1,4 @@
-import { required, email, max } from 'vee-validate/dist/rules';
+import { required, email, max, min, confirmed } from 'vee-validate/dist/rules';
 import { extend, setInteractionMode } from 'vee-validate';
 
 extend('required', {
@@ -14,6 +14,21 @@ extend('max', {
 extend('email', {
     ...email,
     message: 'Email must be valid',
+});
+
+extend('min', {
+    ...min,
+    message: 'The {_field_} field must have at least {length} characters',
+});
+
+extend('password_confirmed', {
+    ...confirmed,
+    message: 'Password confirmation does not match.',
+});
+
+extend('agree_tos', {
+    ...required,
+    message: 'You must agree to continue.',
 });
 
 setInteractionMode('eager');

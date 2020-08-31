@@ -51,7 +51,7 @@ class PHPExcel_CalcEngine_Logger
      *
      * @var string[]
      */
-    private $debugLog = array();
+    private $debugLog = [];
 
     /**
      * The calculation engine cell reference stack
@@ -63,21 +63,11 @@ class PHPExcel_CalcEngine_Logger
     /**
      * Instantiate a Calculation engine logger
      *
-     * @param  PHPExcel_CalcEngine_CyclicReferenceStack $stack
+     * @param PHPExcel_CalcEngine_CyclicReferenceStack $stack
      */
     public function __construct(PHPExcel_CalcEngine_CyclicReferenceStack $stack)
     {
         $this->cellStack = $stack;
-    }
-
-    /**
-     * Enable/Disable Calculation engine logging
-     *
-     * @param  boolean $pValue
-     */
-    public function setWriteDebugLog($pValue = false)
-    {
-        $this->writeDebugLog = $pValue;
     }
 
     /**
@@ -91,13 +81,13 @@ class PHPExcel_CalcEngine_Logger
     }
 
     /**
-     * Enable/Disable echoing of debug log information
+     * Enable/Disable Calculation engine logging
      *
-     * @param  boolean $pValue
+     * @param boolean $pValue
      */
-    public function setEchoDebugLog($pValue = false)
+    public function setWriteDebugLog($pValue = false)
     {
-        $this->echoDebugLog = $pValue;
+        $this->writeDebugLog = $pValue;
     }
 
     /**
@@ -111,6 +101,16 @@ class PHPExcel_CalcEngine_Logger
     }
 
     /**
+     * Enable/Disable echoing of debug log information
+     *
+     * @param boolean $pValue
+     */
+    public function setEchoDebugLog($pValue = false)
+    {
+        $this->echoDebugLog = $pValue;
+    }
+
+    /**
      * Write an entry to the calculation engine debug log
      */
     public function writeDebugLog()
@@ -121,9 +121,9 @@ class PHPExcel_CalcEngine_Logger
             $cellReference = implode(' -> ', $this->cellStack->showStack());
             if ($this->echoDebugLog) {
                 echo $cellReference,
-                    ($this->cellStack->count() > 0 ? ' => ' : ''),
-                    $message,
-                    PHP_EOL;
+                ($this->cellStack->count() > 0 ? ' => ' : ''),
+                $message,
+                PHP_EOL;
             }
             $this->debugLog[] = $cellReference .
                 ($this->cellStack->count() > 0 ? ' => ' : '') .
@@ -136,7 +136,7 @@ class PHPExcel_CalcEngine_Logger
      */
     public function clearLog()
     {
-        $this->debugLog = array();
+        $this->debugLog = [];
     }
 
     /**

@@ -38,81 +38,14 @@ class RakuteAPI
         $this->api_key = $this->getToken();
     }
 
-    /**
-     * Convenience method to access Product Catalog Search Service
-     *
-     * @param array $parameters GET request parameters to be appended to the url
-     * @return array Commission Junction API response, converted to a PHP array
-     * @throws Exception on cURL failure or http status code greater than or equal to 400
-     */
-    public function productSearch($parameters = array())
-    {
-        return $this->api("productsearch", "productsearch", $parameters);
-    }
-
-    public function linkSearch($parameters = array())
-    {
-        return $this->api("linklocator", "getMerchByAppStatus/approved", $parameters);
-    }
-
     public function getToken()
     {
-        return $this->apiToken("token", "token", $parameters = array());
+        return $this->apiToken("token", "token", $parameters = []);
     }
 
-    /**
-     * Convenience method to access Commission Detail Service
-     *
-     * @param array $parameters GET request parameters to be appended to the url
-     * @return array Commission Junction API response, converted to a PHP array
-     * @throws Exception on cURL failure or http status code greater than or equal to 400
-     */
-    private function commissionDetailLookup(array $parameters = array())
+    public function apiToken($subdomain, $resource, $parameters = [], $version = '1.0')
     {
-        throw new Exception("Not implemented");
-    }
-
-    /**
-     * Generic method to fire API requests at Commission Junctions servers
-     *
-     * @param string $subdomain The subomdain portion of the REST API url
-     * @param string $resource The resource portion of the REST API url (e.g. /v2/RESOURCE)
-     * @param array $parameters GET request parameters to be appended to the url
-     * @param string $version The version portion of the REST API url, defaults to v2
-     * @return array Commission Junction API response, converted to a PHP array
-     * @throws Exception on cURL failure or http status code greater than or equal to 400
-     */
-    public function api($subdomain, $resource, $parameters = [], $version = '1.0')
-    {
-        $ch = $this->getCurl();
-        $url = sprintf($this->domain, $subdomain, $version, $resource);
-
-        if (!empty($parameters))
-            $url .= "?" . http_build_query($parameters);
-        curl_setopt_array($ch, array(
-            CURLOPT_URL => $url,
-            CURLOPT_HTTPHEADER => array(
-                'Accept: application/xml',
-                'Authorization: Bearer ' . $this->api_key,
-            )
-        ));
-        $body = curl_exec($ch);
-        $errno = curl_errno($ch);
-        if ($errno !== 0) {
-            throw new Exception(sprintf("Error connecting to CommissionJunction: [%s] %s", $errno, curl_error($ch)), $errno);
-        }
-
-        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        if ($http_status >= 400) {
-            throw new Exception(sprintf("CommissionJunction Error [%s] %s", $http_status, strip_tags($body)), $http_status);
-        }
-
-        return json_decode(json_encode((array)simplexml_load_string($body)), true);
-    }
-
-    public function apiToken($subdomain, $resource, $parameters = array(), $version = '1.0')
-    {
-        $data = array("grant_type" => "password", "username" => "deadbeat", 'password' => '2m1K2i4oel!#', 'scope' => '3706879');
+        $data = ["grant_type" => "password", "username" => "deadbeat", 'password' => '2m1K2i4oel!#', 'scope' => '3706879'];
 
         $data_string = json_encode($data);
 
@@ -120,11 +53,11 @@ class RakuteAPI
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=password&username=deadbeat&password=2m1K2i4oel!#&scope=3706879");
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Accept: */*',
             'Content-Type: application/x-www-form-urlencoded',
             'Authorization: Basic ' . config('services.rakuten.token'),
-        ));
+        ]);
         $body = curl_exec($ch);
         $errno = curl_errno($ch);
         if ($errno !== 0) {
@@ -144,11 +77,53 @@ class RakuteAPI
     }
 
     /**
-     * @param resource $curl
+     * Convenience method to access Product Catalog Search Service
+     *
+     * @param array $parameters GET request parameters to be appended to the url
+     * @return array Commission Junction API response, converted to a PHP array
+     * @throws Exception on cURL failure or http status code greater than or equal to 400
      */
-    public function setCurl($curl)
+    public function productSearch($parameters = [])
     {
-        $this->curl = $curl;
+        return $this->api("productsearch", "productsearch", $parameters);
+    }
+
+    /**
+     * Generic method to fire API requests at Commission Junctions servers
+     *
+     * @param string $subdomain The subomdain portion of the REST API url
+     * @param string $resource The resource portion of the REST API url (e.g. /v2/RESOURCE)
+     * @param array $parameters GET request parameters to be appended to the url
+     * @param string $version The version portion of the REST API url, defaults to v2
+     * @return array Commission Junction API response, converted to a PHP array
+     * @throws Exception on cURL failure or http status code greater than or equal to 400
+     */
+    public function api($subdomain, $resource, $parameters = [], $version = '1.0')
+    {
+        $ch = $this->getCurl();
+        $url = sprintf($this->domain, $subdomain, $version, $resource);
+
+        if (!empty($parameters))
+            $url .= "?" . http_build_query($parameters);
+        curl_setopt_array($ch, [
+            CURLOPT_URL        => $url,
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/xml',
+                'Authorization: Bearer ' . $this->api_key,
+            ]
+        ]);
+        $body = curl_exec($ch);
+        $errno = curl_errno($ch);
+        if ($errno !== 0) {
+            throw new Exception(sprintf("Error connecting to CommissionJunction: [%s] %s", $errno, curl_error($ch)), $errno);
+        }
+
+        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($http_status >= 400) {
+            throw new Exception(sprintf("CommissionJunction Error [%s] %s", $http_status, strip_tags($body)), $http_status);
+        }
+
+        return json_decode(json_encode((array)simplexml_load_string($body)), true);
     }
 
     /**
@@ -158,17 +133,42 @@ class RakuteAPI
     {
         if (!is_resource($this->curl)) {
             $this->curl = curl_init();
-            curl_setopt_array($this->curl, array(
+            curl_setopt_array($this->curl, [
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_FOLLOWLOCATION => false,
-                CURLOPT_MAXREDIRS => 1,
+                CURLOPT_MAXREDIRS      => 1,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_CONNECTTIMEOUT => 100,
-                CURLOPT_TIMEOUT => 3000,
-            ));
+                CURLOPT_TIMEOUT        => 3000,
+            ]);
         }
 
         return $this->curl;
+    }
+
+    /**
+     * @param resource $curl
+     */
+    public function setCurl($curl)
+    {
+        $this->curl = $curl;
+    }
+
+    public function linkSearch($parameters = [])
+    {
+        return $this->api("linklocator", "getMerchByAppStatus/approved", $parameters);
+    }
+
+    /**
+     * Convenience method to access Commission Detail Service
+     *
+     * @param array $parameters GET request parameters to be appended to the url
+     * @return array Commission Junction API response, converted to a PHP array
+     * @throws Exception on cURL failure or http status code greater than or equal to 400
+     */
+    private function commissionDetailLookup(array $parameters = [])
+    {
+        throw new Exception("Not implemented");
     }
 }

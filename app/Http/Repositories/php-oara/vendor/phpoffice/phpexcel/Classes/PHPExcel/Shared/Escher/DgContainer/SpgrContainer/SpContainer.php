@@ -112,23 +112,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     private $endOffsetY;
 
     /**
-     * Set parent Shape Group Container
+     * Get whether this is a group shape
      *
-     * @param PHPExcel_Shared_Escher_DgContainer_SpgrContainer $parent
+     * @return boolean
      */
-    public function setParent($parent)
+    public function getSpgr()
     {
-        $this->parent = $parent;
-    }
-
-    /**
-     * Get the parent Shape Group Container
-     *
-     * @return PHPExcel_Shared_Escher_DgContainer_SpgrContainer
-     */
-    public function getParent()
-    {
-        return $this->parent;
+        return $this->spgr;
     }
 
     /**
@@ -142,13 +132,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Get whether this is a group shape
+     * Get the shape type
      *
-     * @return boolean
+     * @return int
      */
-    public function getSpgr()
+    public function getSpType()
     {
-        return $this->spgr;
+        return $this->spType;
     }
 
     /**
@@ -162,13 +152,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Get the shape type
+     * Get the shape flag
      *
      * @return int
      */
-    public function getSpType()
+    public function getSpFlag()
     {
-        return $this->spType;
+        return $this->spFlag;
     }
 
     /**
@@ -182,26 +172,6 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Get the shape flag
-     *
-     * @return int
-     */
-    public function getSpFlag()
-    {
-        return $this->spFlag;
-    }
-
-    /**
-     * Set the shape index
-     *
-     * @param int $value
-     */
-    public function setSpId($value)
-    {
-        $this->spId = $value;
-    }
-
-    /**
      * Get the shape index
      *
      * @return int
@@ -212,14 +182,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Set an option for the Shape Group Container
+     * Set the shape index
      *
-     * @param int $property The number specifies the option
-     * @param mixed $value
+     * @param int $value
      */
-    public function setOPT($property, $value)
+    public function setSpId($value)
     {
-        $this->OPT[$property] = $value;
+        $this->spId = $value;
     }
 
     /**
@@ -237,6 +206,17 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
+     * Set an option for the Shape Group Container
+     *
+     * @param int $property The number specifies the option
+     * @param mixed $value
+     */
+    public function setOPT($property, $value)
+    {
+        $this->OPT[$property] = $value;
+    }
+
+    /**
      * Get the collection of options
      *
      * @return array
@@ -244,16 +224,6 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     public function getOPTCollection()
     {
         return $this->OPT;
-    }
-
-    /**
-     * Set cell coordinates of upper-left corner of shape
-     *
-     * @param string $value
-     */
-    public function setStartCoordinates($value = 'A1')
-    {
-        $this->startCoordinates = $value;
     }
 
     /**
@@ -267,13 +237,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Set offset in x-direction of upper-left corner of shape measured in 1/1024 of column width
+     * Set cell coordinates of upper-left corner of shape
      *
-     * @param int $startOffsetX
+     * @param string $value
      */
-    public function setStartOffsetX($startOffsetX = 0)
+    public function setStartCoordinates($value = 'A1')
     {
-        $this->startOffsetX = $startOffsetX;
+        $this->startCoordinates = $value;
     }
 
     /**
@@ -287,13 +257,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Set offset in y-direction of upper-left corner of shape measured in 1/256 of row height
+     * Set offset in x-direction of upper-left corner of shape measured in 1/1024 of column width
      *
-     * @param int $startOffsetY
+     * @param int $startOffsetX
      */
-    public function setStartOffsetY($startOffsetY = 0)
+    public function setStartOffsetX($startOffsetX = 0)
     {
-        $this->startOffsetY = $startOffsetY;
+        $this->startOffsetX = $startOffsetX;
     }
 
     /**
@@ -307,13 +277,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Set cell coordinates of bottom-right corner of shape
+     * Set offset in y-direction of upper-left corner of shape measured in 1/256 of row height
      *
-     * @param string $value
+     * @param int $startOffsetY
      */
-    public function setEndCoordinates($value = 'A1')
+    public function setStartOffsetY($startOffsetY = 0)
     {
-        $this->endCoordinates = $value;
+        $this->startOffsetY = $startOffsetY;
     }
 
     /**
@@ -327,13 +297,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Set offset in x-direction of bottom-right corner of shape measured in 1/1024 of column width
+     * Set cell coordinates of bottom-right corner of shape
      *
-     * @param int $startOffsetX
+     * @param string $value
      */
-    public function setEndOffsetX($endOffsetX = 0)
+    public function setEndCoordinates($value = 'A1')
     {
-        $this->endOffsetX = $endOffsetX;
+        $this->endCoordinates = $value;
     }
 
     /**
@@ -347,13 +317,13 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     }
 
     /**
-     * Set offset in y-direction of bottom-right corner of shape measured in 1/256 of row height
+     * Set offset in x-direction of bottom-right corner of shape measured in 1/1024 of column width
      *
-     * @param int $endOffsetY
+     * @param int $startOffsetX
      */
-    public function setEndOffsetY($endOffsetY = 0)
+    public function setEndOffsetX($endOffsetX = 0)
     {
-        $this->endOffsetY = $endOffsetY;
+        $this->endOffsetX = $endOffsetX;
     }
 
     /**
@@ -364,6 +334,16 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
     public function getEndOffsetY()
     {
         return $this->endOffsetY;
+    }
+
+    /**
+     * Set offset in y-direction of bottom-right corner of shape measured in 1/256 of row height
+     *
+     * @param int $endOffsetY
+     */
+    public function setEndOffsetY($endOffsetY = 0)
+    {
+        $this->endOffsetY = $endOffsetY;
     }
 
     /**
@@ -384,5 +364,25 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer_SpContainer
         }
 
         return $nestingLevel;
+    }
+
+    /**
+     * Get the parent Shape Group Container
+     *
+     * @return PHPExcel_Shared_Escher_DgContainer_SpgrContainer
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Set parent Shape Group Container
+     *
+     * @param PHPExcel_Shared_Escher_DgContainer_SpgrContainer $parent
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
     }
 }

@@ -1,24 +1,43 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use DOMDocument;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function count;
+use function explode;
+use function libxml_use_internal_errors;
+use function md5;
+use function parse_url;
+use function preg_match;
+use function preg_replace;
+use function str_getcsv;
+use function trim;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
 
 /**
  * Export Class
@@ -29,7 +48,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class SilverTap extends \Oara\Network
+class SilverTap extends Network
 {
     private $_client = null;
     private $_serverUrl = null;
@@ -37,7 +56,7 @@ class SilverTap extends \Oara\Network
     /**
      * @param $credentials
      * @throws Exception
-     * @throws \Exception
+     * @throws Exception
      */
     public function login($credentials)
     {
@@ -45,20 +64,61 @@ class SilverTap extends \Oara\Network
         $password = $credentials['password'];
 
         $this->_serverUrl = "https://mats.silvertap.com/";
-        $this->_client = new \Oara\Curl\Access ($credentials);
+        $this->_client = new Access ($credentials);
 
         $loginUrl = $this->_serverUrl . 'Login.aspx?ReturnUrl=/';
-        $valuesLogin = array(new \Oara\Curl\Parameter('txtUsername', $user),
-            new \Oara\Curl\Parameter('txtPassword', $password),
-            new \Oara\Curl\Parameter('cmdSubmit', 'Login'),
-            new \Oara\Curl\Parameter('__EVENTTARGET', ''),
-            new \Oara\Curl\Parameter('__EVENTARGUMENT', '')
-        );
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($loginUrl, $valuesLogin);
+        $valuesLogin = [
+            new Parameter('txtUsername', $user),
+            new Parameter('txtPassword', $password),
+            new Parameter('cmdSubmit', 'Login'),
+            new Parameter('__EVENTTARGET', ''),
+            new Parameter('__EVENTARGUMENT', '')
+        ];
+        $urls = [];
+        $urls[] = new Request($loginUrl, $valuesLogin);
         $this->_client->post($urls);
-        $this->_exportPassword = \md5($password);
+        $this->_exportPassword = md5($password);
         $this->_exportUser = self::getExportUser();
+    }
+
+    /**
+     * @return null
+     * @throws Exception
+     */
+    private function getExportUser()
+    {
+        $exporUser = null;
+
+        $urls = [];
+        $urls[] = new Request($this->_serverUrl . 'Reports/Default.aspx?', [new Parameter('report', 'Performance')]);
+        $this->_client->get($urls);
+
+        $urls = [];
+        $urls[] = new Request($this->_serverUrl . '/Reports/RemoteHelp.aspx?', []);
+        $result = $this->_client->get($urls);
+
+        /*** load the html into the object ***/
+        $doc = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $doc->validateOnParse = true;
+        $doc->loadHTML($result[0]);
+        $textareaList = $doc->getElementsByTagName('textarea');
+
+        $messageNode = $textareaList->item(0);
+        if (!isset($messageNode->firstChild)) {
+            throw new Exception('Error getting the User');
+        }
+        $messageStr = $messageNode->firstChild->nodeValue;
+
+        $parseUrl = parse_url(trim($messageStr));
+        $parameters = explode('&', $parseUrl['query']);
+        foreach ($parameters as $parameter) {
+            $parameterValue = explode('=', $parameter);
+            if ($parameterValue[0] == 'user') {
+                $exporUser = $parameterValue[1];
+            }
+        }
+        return $exporUser;
     }
 
     /**
@@ -66,61 +126,21 @@ class SilverTap extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
         $credentials["password"] = $parameter;
 
         return $credentials;
-    }
-
-    /**
-     * @return null
-     * @throws \Exception
-     */
-    private function getExportUser()
-    {
-        $exporUser = null;
-
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($this->_serverUrl . 'Reports/Default.aspx?', array(new \Oara\Curl\Parameter('report', 'Performance')));
-        $this->_client->get($urls);
-
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($this->_serverUrl . '/Reports/RemoteHelp.aspx?', array());
-        $result = $this->_client->get($urls);
-
-        /*** load the html into the object ***/
-        $doc = new \DOMDocument();
-        \libxml_use_internal_errors(true);
-        $doc->validateOnParse = true;
-        $doc->loadHTML($result[0]);
-        $textareaList = $doc->getElementsByTagName('textarea');
-
-        $messageNode = $textareaList->item(0);
-        if (!isset($messageNode->firstChild)) {
-            throw new \Exception('Error getting the User');
-        }
-        $messageStr = $messageNode->firstChild->nodeValue;
-
-        $parseUrl = \parse_url(\trim($messageStr));
-        $parameters = \explode('&', $parseUrl['query']);
-        foreach ($parameters as $parameter) {
-            $parameterValue = \explode('=', $parameter);
-            if ($parameterValue[0] == 'user') {
-                $exporUser = $parameterValue[1];
-            }
-        }
-        return $exporUser;
     }
 
     /**
@@ -137,22 +157,23 @@ class SilverTap extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = Array();
+        $merchants = [];
 
-        $exportMerchantParameters = array(new \Oara\Curl\Parameter('user', $this->_exportUser),
-            new \Oara\Curl\Parameter('pwd', $this->_exportPassword),
-            new \Oara\Curl\Parameter('type', 'csv'),
-        );
+        $exportMerchantParameters = [
+            new Parameter('user', $this->_exportUser),
+            new Parameter('pwd', $this->_exportPassword),
+            new Parameter('type', 'csv'),
+        ];
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($this->_serverUrl . 'Feeds/Merchantfeed.aspx?', $exportMerchantParameters);
+        $urls = [];
+        $urls[] = new Request($this->_serverUrl . 'Feeds/Merchantfeed.aspx?', $exportMerchantParameters);
         $result = $this->_client->get($urls);
 
-        $exportData = \str_getcsv($result[0], "\n");
-        $num = \count($exportData);
+        $exportData = str_getcsv($result[0], "\n");
+        $num = count($exportData);
         for ($i = 1; $i < $num; $i++) {
-            $transactionMerchantArray = \str_getcsv($exportData[$i], ",");
-            $obj = Array();
+            $transactionMerchantArray = str_getcsv($exportData[$i], ",");
+            $obj = [];
             $obj['cid'] = $transactionMerchantArray[4];
             $obj['name'] = "$transactionMerchantArray[1] ($transactionMerchantArray[5])";
             $merchants[] = $obj;
@@ -162,74 +183,73 @@ class SilverTap extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      * @throws Exception
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
 
-        $totalTransactions = Array();
+        $totalTransactions = [];
         $startDate = $dStartDate->format('d/m/Y');
         $endDate = $dEndDate->format('d/m/Y');
 
-        $marchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $marchantIdList = Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
         $valueIndex = 9;
         $commissionIndex = 16;
         $statusIndex = 17;
 
 
-        $valuesFormExport = array(new \Oara\Curl\Parameter('user', $this->_exportUser),
-            new \Oara\Curl\Parameter('pwd', $this->_exportPassword),
-            new \Oara\Curl\Parameter('report', 'AMSCommission_Breakdown'),
-            new \Oara\Curl\Parameter('groupby', 'Programme'),
-            new \Oara\Curl\Parameter('groupdate', 'Day'),
-            new \Oara\Curl\Parameter('creative', ''),
-            new \Oara\Curl\Parameter('CommOnly', '1'),
-            new \Oara\Curl\Parameter('showimpressions', 'True'),
-            new \Oara\Curl\Parameter('showclicks', 'True'),
-            new \Oara\Curl\Parameter('showreferrals', 'True'),
-            new \Oara\Curl\Parameter('showtransactionvalues', 'True'),
-            new \Oara\Curl\Parameter('sort', 'Date asc'),
-            new \Oara\Curl\Parameter('format', 'csv'),
-        );
-        $valuesFormExport[] = new \Oara\Curl\Parameter('datefrom', $startDate);
-        $valuesFormExport[] = new \Oara\Curl\Parameter('dateto', $endDate);
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($this->_serverUrl . 'reports/remote.aspx?', $valuesFormExport);
+        $valuesFormExport = [
+            new Parameter('user', $this->_exportUser),
+            new Parameter('pwd', $this->_exportPassword),
+            new Parameter('report', 'AMSCommission_Breakdown'),
+            new Parameter('groupby', 'Programme'),
+            new Parameter('groupdate', 'Day'),
+            new Parameter('creative', ''),
+            new Parameter('CommOnly', '1'),
+            new Parameter('showimpressions', 'True'),
+            new Parameter('showclicks', 'True'),
+            new Parameter('showreferrals', 'True'),
+            new Parameter('showtransactionvalues', 'True'),
+            new Parameter('sort', 'Date asc'),
+            new Parameter('format', 'csv'),
+        ];
+        $valuesFormExport[] = new Parameter('datefrom', $startDate);
+        $valuesFormExport[] = new Parameter('dateto', $endDate);
+        $urls = [];
+        $urls[] = new Request($this->_serverUrl . 'reports/remote.aspx?', $valuesFormExport);
         $exportReport = $this->_client->get($urls);
-        $exportData = \str_getcsv($exportReport[0], "\r\n");
-        $num = \count($exportData);
+        $exportData = str_getcsv($exportReport[0], "\r\n");
+        $num = count($exportData);
         for ($i = 1; $i < $num; $i++) {
-            $transactionExportArray = \str_getcsv($exportData[$i], ",");
+            $transactionExportArray = str_getcsv($exportData[$i], ",");
             if (isset($marchantIdList[$transactionExportArray[4]])) {
-                $transaction = Array();
-                $transaction['unique_id'] = \preg_replace('/\D/', '', $transactionExportArray[0]);
+                $transaction = [];
+                $transaction['unique_id'] = preg_replace('/\D/', '', $transactionExportArray[0]);
                 $transaction['merchantId'] = $transactionExportArray[4];
 
-                $transactionDate = \DateTime::createFromFormat("d/m/Y H:i:s", $transactionExportArray[2]);
+                $transactionDate = DateTime::createFromFormat("d/m/Y H:i:s", $transactionExportArray[2]);
                 $transaction['date'] = $transactionDate->format("Y-m-d H:i:s");
 
                 if ($transactionExportArray[7] != null) {
                     $transaction['custom_id'] = $transactionExportArray[7];
                 }
 
-                if (\preg_match('/Unpaid Confirmed/', $transactionExportArray[$statusIndex]) || \preg_match('/Paid Confirmed/', $transactionExportArray[$statusIndex])) {
-                    $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                } else
-                    if (\preg_match('/Unpaid Unconfirmed/', $transactionExportArray[$statusIndex])) {
-                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                    } else
-                        if (\preg_match('/Unpaid Rejected/', $transactionExportArray[$statusIndex])) {
-                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                        } else {
-                            throw new \Exception("No Status supported " . $transactionExportArray[$statusIndex]);
-                        }
+                if (preg_match('/Unpaid Confirmed/', $transactionExportArray[$statusIndex]) || preg_match('/Paid Confirmed/', $transactionExportArray[$statusIndex])) {
+                    $transaction['status'] = Utilities::STATUS_CONFIRMED;
+                } elseif (preg_match('/Unpaid Unconfirmed/', $transactionExportArray[$statusIndex])) {
+                    $transaction['status'] = Utilities::STATUS_PENDING;
+                } elseif (preg_match('/Unpaid Rejected/', $transactionExportArray[$statusIndex])) {
+                    $transaction['status'] = Utilities::STATUS_DECLINED;
+                } else {
+                    throw new Exception("No Status supported " . $transactionExportArray[$statusIndex]);
+                }
 
-                $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[$valueIndex]);
-                $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[$commissionIndex]);
+                $transaction['amount'] = Utilities::parseDouble($transactionExportArray[$valueIndex]);
+                $transaction['commission'] = Utilities::parseDouble($transactionExportArray[$commissionIndex]);
                 $totalTransactions[] = $transaction;
             }
         }

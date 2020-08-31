@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Repositories\CommissionJunction;
-use App\Http\Repositories\LinkShare;
 use App\Http\Repositories\ScoutRepository;
 use App\Http\Repositories\ShareSale;
-use Facade\Ignition\Support\Packagist\Package;
 use Illuminate\Http\Request;
 
 class ScoutsController__back extends Controller
@@ -23,13 +20,13 @@ class ScoutsController__back extends Controller
     {
         $sel_network = $request->input('sel_network');
         $params = [
-            'keywords' => $request->input('search_str'),
-            'sale_min' => $request->input('sale_min'),
-            'sale_max' => $request->input('sale_max'),
+            'keywords'    => $request->input('search_str'),
+            'sale_min'    => $request->input('sale_min'),
+            'sale_max'    => $request->input('sale_max'),
             'popular_min' => $request->input('popular_min'),
             'popular_max' => $request->input('popular_max'),
-            'page' => $request->input('page'),
-            'limit' => $request->input('limit'),
+            'page'        => $request->input('page'),
+            'limit'       => $request->input('limit'),
         ];
 
         $reData = [];
@@ -137,13 +134,13 @@ class ScoutsController__back extends Controller
 
                 foreach ($re['item'] as $key => $row) {
                     $reData[$key] = [
-                        'name' => $row['mid'] . ' - ' . $row['merchantname'] . '(' . $row['productname'] . ')',
+                        'name'       => $row['mid'] . ' - ' . $row['merchantname'] . '(' . $row['productname'] . ')',
                         'popularity' => '',
-                        'network' => $sel_network,
-//                        'sale' => 'https://cli.linksynergy.com/cli/publisher/programs/apply_confirmation.php',
-                        'sale' => $row['saleprice'],
-                        'sign_up' => $row['linkurl'],
-                        'details' => $row,
+                        'network'    => $sel_network,
+                        //                        'sale' => 'https://cli.linksynergy.com/cli/publisher/programs/apply_confirmation.php',
+                        'sale'       => $row['saleprice'],
+                        'sign_up'    => $row['linkurl'],
+                        'details'    => $row,
                     ];
                 }
             }
@@ -161,8 +158,8 @@ class ScoutsController__back extends Controller
         }
 
         return response()->json([
-            'result' => 'success',
-            'rows' => $reData,
+            'result'    => 'success',
+            'rows'      => $reData,
             'pageCount' => $pageCount
         ]);
     }

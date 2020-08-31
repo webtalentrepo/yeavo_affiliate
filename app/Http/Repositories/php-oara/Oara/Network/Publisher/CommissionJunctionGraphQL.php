@@ -2,8 +2,22 @@
 
 namespace Oara\Network\Publisher;
 
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 use Exception;
-use http\Exception\RuntimeException;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function array_keys;
+use function count;
+use function date;
+use function json_decode;
+use function preg_match;
+use function simplexml_load_string;
+use function str_getcsv;
+use function strtotime;
 
 /**
  * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
@@ -34,16 +48,15 @@ use http\Exception\RuntimeException;
  * @version    Release: 01.00
  *
  */
-class CommissionJunctionGraphQL extends \Oara\Network
+class CommissionJunctionGraphQL extends Network
 {
+    protected $_sitesAllowed = [];
     private $_client = null;
     private $_memberId = null;
     private $_accountId = null;
     private $_apiPassword = null;
     private $_requestor_cid = null;
     private $_connected = false;
-
-    protected $_sitesAllowed = array();
 
     /*
      * ATTENTION - IMPORTANT UPDATES - 2019-05-05 by <PN>
@@ -80,15 +93,15 @@ class CommissionJunctionGraphQL extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "API Password ";
         $parameter["required"] = true;
         $parameter["name"] = "API";
@@ -114,11 +127,40 @@ class CommissionJunctionGraphQL extends \Oara\Network
         if (isset($result->errors) && count($result->errors) > 0) {
             $error_message = $result->errors[0]->message;
             $this->_connected = false;
-            throw new \Exception("Error checking connection: " . $error_message);
+            throw new Exception("Error checking connection: " . $error_message);
         }
         $this->_connected = true;
 
         return $this->_connected;
+    }
+
+    /**
+     * Execute e GrapQL API call and return json results
+     * @param string $query
+     * @return mixed
+     */
+    private function grapQLApiCall(string $query)
+    {
+        $url = "https://commissions.api.cj.com/query";
+        $ch = curl_init();
+
+        if (stripos($query, '#cid#') !== false) {
+            // Replace placeholder with request cid
+            $query = str_ireplace('#cid#', $this->_requestor_cid, $query);
+        }
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, FALSE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer " . $this->_apiPassword]);
+
+        $curl_results = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($curl_results);
     }
 
     /**
@@ -136,7 +178,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
      */
     private function getMerchantExport($params)
     {
-        $merchantReportList = array();
+        $merchantReportList = [];
         $page = 1;
         $per_page = 100;
         $total_pages = 99;
@@ -158,7 +200,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
 
             // Get All programs even if not active - 2018-04-23 <PN>
             $response = self::apiCall('https://advertiser-lookup.api.cj.com/v3/advertiser-lookup?advertiser-ids=&records-per-page=' . $per_page . '&page-number=' . $page);
-            $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+            $xml = simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
 
             if (!isset($xml->advertisers)) {
                 break;
@@ -181,15 +223,59 @@ class CommissionJunctionGraphQL extends \Oara\Network
     }
 
     /**
+     * API Rest call
+     * @param $url
+     * @return bool|string
+     */
+    private function apiCall($url)
+    {
+        $ch = curl_init();
+        if (!empty($this->_requestor_cid)) {
+            if (strpos($url, 'requestor-cid') === false) {
+                /**
+                 * 2019-03-22 <PN>
+                 * For new created accounts you cannot generate a new developer key, but only a PERSONAL ACCESS TOKEN.
+                 * REST API could use the Personal Access Tokens by sending it in the header as "Authorization: Bearer XXXXXXX ... "
+                 * The api call need a NEW MANDATORY PARAMETER called "requestor-cid" that represent the COMPANY ID in the CJ account dashboard.
+                 */
+                // Add cid parameter to url
+                $pos = strpos($url, '?');
+                if ($pos === false) {
+                    // The only parameter
+                    $url = $url . '?requestor-cid=' . $this->_requestor_cid;
+                } else {
+                    // Prepend to first parameter
+                    $url = substr($url, 0, $pos + 1) . 'requestor-cid=' . $this->_requestor_cid . '&' . substr($url, $pos + 1);
+                }
+            }
+        }
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        if (!empty($this->_requestor_cid)) {
+            // 2019-03-22 <PN> see notes above
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer " . $this->_apiPassword]);
+        } else {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: " . $this->_apiPassword]);
+        }
+        $curl_results = curl_exec($ch);
+        curl_close($ch);
+
+        return $curl_results;
+    }
+
+    /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      * @throws Exception
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
         $byMerchant = false;
 
         // Example of $merchantList parameter to filter only some merchants
@@ -202,7 +288,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
 
 
         if (!is_null($merchantList) && is_array($merchantList) && count($merchantList) > 0) {
-            $a_merchants = \array_keys(\Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList));
+            $a_merchants = array_keys(Utilities::getMerchantIdMapFromMerchantList($merchantList));
             $byMerchant = true;
         }
 
@@ -211,10 +297,10 @@ class CommissionJunctionGraphQL extends \Oara\Network
             $dStartDate->setTime(0, 0, 0, 0);
             $dEndDate->setTime(0, 0, 0, 0);
 
-            $dStartDate->setTimezone(new \DateTimeZone('UTC'));
+            $dStartDate->setTimezone(new DateTimeZone('UTC'));
             $sinceDateISO = $dStartDate->format(DATE_ISO8601);
             $sinceDateISO = str_replace('+0000', 'Z', $sinceDateISO);
-            $beforeDateISO = ((clone $dEndDate)->add(new \DateInterval('P1D')))->setTimezone(new \DateTimeZone('UTC'))->format(DATE_ISO8601);
+            $beforeDateISO = ((clone $dEndDate)->add(new DateInterval('P1D')))->setTimezone(new DateTimeZone('UTC'))->format(DATE_ISO8601);
             $beforeDateISO = str_replace('+0000', 'Z', $beforeDateISO);
         } else {
             // Get default dates
@@ -223,7 +309,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
 
         $payloadComplete = false;
         $sinceCommissionId = null;
-        $a_transactions = array();
+        $a_transactions = [];
 
         while (!$payloadComplete) {
 
@@ -262,7 +348,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
 
             if (isset($response->errors) && count($response->errors) > 0) {
                 $error_message = $response->errors[0]->message;
-                throw new \Exception("Error querying PublisherCommissions: " . $error_message);
+                throw new Exception("Error querying PublisherCommissions: " . $error_message);
             }
             if (isset($response->data)) {
                 $publisherCommissions = $response->data->publisherCommissions;
@@ -285,7 +371,7 @@ class CommissionJunctionGraphQL extends \Oara\Network
                 for ($t = 0; $t < $count; $t++) {
                     $record = $records[$t];
 
-                    $transaction = array();
+                    $transaction = [];
                     $transaction['unique_id'] = $record->commissionId;
                     /**
                      * Ref. to https://developers.cj.com/graphql/reference/Commission%20Detail
@@ -293,40 +379,40 @@ class CommissionJunctionGraphQL extends \Oara\Network
                      */
                     $transaction['action'] = $record->actionType;
                     if ($record->actionType == 'bonus') {
-                        $transaction['action'] = \Oara\Utilities::TYPE_BONUS;
-                    } else if ($record->actionType == 'item_sale' || $record->actionType == 'sim_sale') {
-                        $transaction['action'] = \Oara\Utilities::TYPE_SALE;
-                    } else if ($record->actionType == 'sim_lead' || $record->actionType == 'item_lead') {
-                        $transaction['action'] = \Oara\Utilities::TYPE_LEAD;
-                    } else if ($record->actionType == 'click') {
-                        $transaction['action'] = \Oara\Utilities::TYPE_CLICK;
-                    } else if ($record->actionType == 'imp') {
-                        $transaction['action'] = \Oara\Utilities::TYPE_IMPRESSION;
-                    } else if ($record->actionType == 'perf_inc') {
-                        $transaction['action'] = \Oara\Utilities::TYPE_PERFORMANCE_INCREASE;
+                        $transaction['action'] = Utilities::TYPE_BONUS;
+                    } elseif ($record->actionType == 'item_sale' || $record->actionType == 'sim_sale') {
+                        $transaction['action'] = Utilities::TYPE_SALE;
+                    } elseif ($record->actionType == 'sim_lead' || $record->actionType == 'item_lead') {
+                        $transaction['action'] = Utilities::TYPE_LEAD;
+                    } elseif ($record->actionType == 'click') {
+                        $transaction['action'] = Utilities::TYPE_CLICK;
+                    } elseif ($record->actionType == 'imp') {
+                        $transaction['action'] = Utilities::TYPE_IMPRESSION;
+                    } elseif ($record->actionType == 'perf_inc') {
+                        $transaction['action'] = Utilities::TYPE_PERFORMANCE_INCREASE;
                     }
 
                     $transaction['merchantId'] = $record->advertiserId;
                     //event-date - The associated event date for the item in UTC time zone.
-                    $transactionDate = \DateTime::createFromFormat("Y-m-d\TH:i:sO", $record->eventDate);
+                    $transactionDate = DateTime::createFromFormat("Y-m-d\TH:i:sO", $record->eventDate);
                     $transaction['date'] = $transactionDate->format("Y-m-d H:i:sO");
                     $transaction['custom_id'] = '';
                     if (isset($record->shopperId)) {
                         $transaction['custom_id'] = $record->shopperId;
                     }
-                    $transaction['amount'] = \Oara\Utilities::parseDouble($record->saleAmountPubCurrency);
-                    $transaction['commission'] = \Oara\Utilities::parseDouble($record->pubCommissionAmountPubCurrency);
+                    $transaction['amount'] = Utilities::parseDouble($record->saleAmountPubCurrency);
+                    $transaction['commission'] = Utilities::parseDouble($record->pubCommissionAmountPubCurrency);
 
                     if ($record->actionStatus == 'locked' || $record->actionStatus == 'closed') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else if ($record->actionStatus == 'extended' || $record->actionStatus == 'new') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                    } else if ($record->actionStatus == 'corrected') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                        $transaction['status'] = Utilities::STATUS_CONFIRMED;
+                    } elseif ($record->actionStatus == 'extended' || $record->actionStatus == 'new') {
+                        $transaction['status'] = Utilities::STATUS_PENDING;
+                    } elseif ($record->actionStatus == 'corrected') {
+                        $transaction['status'] = Utilities::STATUS_DECLINED;
                     }
 
                     if ($transaction['commission'] == 0) {
-                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                        $transaction['status'] = Utilities::STATUS_PENDING;
                     }
 
                     /*
@@ -355,79 +441,6 @@ class CommissionJunctionGraphQL extends \Oara\Network
     }
 
     /**
-     * Execute e GrapQL API call and return json results
-     * @param string $query
-     * @return mixed
-     */
-    private function grapQLApiCall(string $query)
-    {
-        $url = "https://commissions.api.cj.com/query";
-        $ch = curl_init();
-
-        if (stripos($query, '#cid#') !== false) {
-            // Replace placeholder with request cid
-            $query = str_ireplace('#cid#', $this->_requestor_cid, $query);
-        }
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, FALSE);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_apiPassword));
-
-        $curl_results = curl_exec($ch);
-        curl_close($ch);
-
-        return json_decode($curl_results);
-    }
-
-    /**
-     * API Rest call
-     * @param $url
-     * @return bool|string
-     */
-    private function apiCall($url)
-    {
-        $ch = curl_init();
-        if (!empty($this->_requestor_cid)) {
-            if (strpos($url, 'requestor-cid') === false) {
-                /**
-                 * 2019-03-22 <PN>
-                 * For new created accounts you cannot generate a new developer key, but only a PERSONAL ACCESS TOKEN.
-                 * REST API could use the Personal Access Tokens by sending it in the header as "Authorization: Bearer XXXXXXX ... "
-                 * The api call need a NEW MANDATORY PARAMETER called "requestor-cid" that represent the COMPANY ID in the CJ account dashboard.
-                 */
-                // Add cid parameter to url
-                $pos = strpos($url, '?');
-                if ($pos === false) {
-                    // The only parameter
-                    $url = $url . '?requestor-cid=' . $this->_requestor_cid;
-                } else {
-                    // Prepend to first parameter
-                    $url = substr($url, 0, $pos + 1) . 'requestor-cid=' . $this->_requestor_cid . '&' . substr($url, $pos + 1);
-                }
-            }
-        }
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        if (!empty($this->_requestor_cid)) {
-            // 2019-03-22 <PN> see notes above
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_apiPassword));
-        } else {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: " . $this->_apiPassword));
-        }
-        $curl_results = curl_exec($ch);
-        curl_close($ch);
-
-        return $curl_results;
-    }
-
-    /**
      * @param $pid
      * @param null $merchantList
      * @param null $startDate
@@ -435,31 +448,31 @@ class CommissionJunctionGraphQL extends \Oara\Network
      */
     public function paymentTransactions($pid)
     {
-        $transactionList = array();
+        $transactionList = [];
         $invoices = $this->getPaymentHistory();
-        for ($i = 0; $i < \count($invoices); $i++) {
+        for ($i = 0; $i < count($invoices); $i++) {
             if ($invoices[$i]['pid'] == $pid) {
                 $endDate = $invoices[$i]['date'];
                 if (isset($invoices[$i + 1])) {
                     $startDate = $invoices[$i + 1]['date'];
                 } else {
-                    $startDate = \date("Y-m-d", \strtotime($invoices[i]['date']) - (90 * 60 * 60 * 24));
+                    $startDate = date("Y-m-d", strtotime($invoices[i]['date']) - (90 * 60 * 60 * 24));
                 }
                 break;
             }
         }
-        $startDate = \date("Y-m-d", \strtotime($startDate));
-        $endDate = \date("Y-m-d", \strtotime($endDate));
-        $exportReport = $this->_client->get(array(new \Oara\Curl\Request('https://members.cj.com/member/publisher/' . $this->_accountId . '/transactionReport.json?startDate=' . $startDate . '&endDate=' . $endDate . '&allowAllDateRanges=true&columnSort=amount%09DESC&startRow=1&endRow=1000', array())));
-        $advertiserPaymentIds = array();
-        foreach (\json_decode($exportReport[0])->{'records'}->{'record'} as $advertiser) {
+        $startDate = date("Y-m-d", strtotime($startDate));
+        $endDate = date("Y-m-d", strtotime($endDate));
+        $exportReport = $this->_client->get([new Request('https://members.cj.com/member/publisher/' . $this->_accountId . '/transactionReport.json?startDate=' . $startDate . '&endDate=' . $endDate . '&allowAllDateRanges=true&columnSort=amount%09DESC&startRow=1&endRow=1000', [])]);
+        $advertiserPaymentIds = [];
+        foreach (json_decode($exportReport[0])->{'records'}->{'record'} as $advertiser) {
             if (($advertiser->{'advertiserId'} != '-3') && (!in_array($advertiser->{'txnId'}, $advertiserPaymentIds))) {
                 $advertiserPaymentIds[] = $advertiser->{'txnId'};
             }
         }
         foreach ($advertiserPaymentIds as $id) {
-            $exportReport = $this->_client->get(array(new \Oara\Curl\Request('https://members.cj.com/member/publisher/' . $this->_accountId . '/commissionReport/detailForTransactionId.json?allowAllDateRanges=true&txnId=' . $id . '&columnSort=publisherCommission%09DESC&startRow=1&endRow=1000', array())));
-            $transactions = \json_decode($exportReport[0])->{'records'}->{'record'};
+            $exportReport = $this->_client->get([new Request('https://members.cj.com/member/publisher/' . $this->_accountId . '/commissionReport/detailForTransactionId.json?allowAllDateRanges=true&txnId=' . $id . '&columnSort=publisherCommission%09DESC&startRow=1&endRow=1000', [])]);
+            $transactions = json_decode($exportReport[0])->{'records'}->{'record'};
             if (!isset($transactions->{'advertiserId'})) {
                 foreach ($transactions as $transaction) {
                     $transactionList[] = $transaction->{'commissionId'};
@@ -476,31 +489,32 @@ class CommissionJunctionGraphQL extends \Oara\Network
      */
     public function getPaymentHistory()
     {
-        $paymentHistory = array();
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('https://members.cj.com/member/cj/publisher/paymentStatus', array());
+        $paymentHistory = [];
+        $urls = [];
+        $urls[] = new Request('https://members.cj.com/member/cj/publisher/paymentStatus', []);
         $exportReport = $this->_client->get($urls);
-        if (\preg_match('/\/publisher\/getpublisherpaymenthistory\.do/', $exportReport[0], $matches)) {
-            $urls = array();
-            $valuesFromExport = array(new \Oara\Curl\Parameter('startRow', '0'),
-                new \Oara\Curl\Parameter('sortKey', ''),
-                new \Oara\Curl\Parameter('sortOrder', ''),
-                new \Oara\Curl\Parameter('format', '6'),
-                new \Oara\Curl\Parameter('button', 'Go')
-            );
-            $urls[] = new \Oara\Curl\Request('https://members.cj.com/member/' . $this->_memberId . '/publisher/getpublisherpaymenthistory.do?', $valuesFromExport);
+        if (preg_match('/\/publisher\/getpublisherpaymenthistory\.do/', $exportReport[0], $matches)) {
+            $urls = [];
+            $valuesFromExport = [
+                new Parameter('startRow', '0'),
+                new Parameter('sortKey', ''),
+                new Parameter('sortOrder', ''),
+                new Parameter('format', '6'),
+                new Parameter('button', 'Go')
+            ];
+            $urls[] = new Request('https://members.cj.com/member/' . $this->_memberId . '/publisher/getpublisherpaymenthistory.do?', $valuesFromExport);
             $exportReport = $this->_client->get($urls);
-            $exportData = \str_getcsv($exportReport[0], "\n");
-            $num = \count($exportData);
+            $exportData = str_getcsv($exportReport[0], "\n");
+            $num = count($exportData);
             for ($j = 1; $j < $num; $j++) {
-                $paymentData = \str_getcsv($exportData[$j], ",");
-                $obj = array();
-                $date = \DateTime::createFromFormat("d-M-Y H:i \P\S\T", $paymentData[0]);
+                $paymentData = str_getcsv($exportData[$j], ",");
+                $obj = [];
+                $date = DateTime::createFromFormat("d-M-Y H:i \P\S\T", $paymentData[0]);
                 if (!$date) {
-                    $date = \DateTime::createFromFormat("d-M-Y H:i \P\D\T", $paymentData[0]);
+                    $date = DateTime::createFromFormat("d-M-Y H:i \P\D\T", $paymentData[0]);
                 }
                 $obj['date'] = $date->format("Y-m-d H:i:s");
-                $obj['value'] = \Oara\Utilities::parseDouble($paymentData[1]);
+                $obj['value'] = Utilities::parseDouble($paymentData[1]);
                 $obj['method'] = $paymentData[2];
                 $obj['pid'] = $paymentData[6];
                 $paymentHistory[] = $obj;

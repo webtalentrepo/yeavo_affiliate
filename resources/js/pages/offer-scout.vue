@@ -385,7 +385,7 @@ export default {
             };
 
             this.$http
-                .post('/api/child-data', params)
+                .post('/child-data', params)
                 .then((r) => {
                     if (r.data.result === 'success') {
                         // console.log(r)
@@ -396,7 +396,7 @@ export default {
                     this.cSearchStart = false;
                 })
                 // eslint-disable-next-line no-unused-vars
-                .catch((e) => {
+                .catch(() => {
                     this.cSearchStart = false;
                 });
         },
@@ -418,7 +418,7 @@ export default {
             };
 
             this.$http
-                .post('/api/scout-data', params)
+                .post('/scout-data', params)
                 .then((r) => {
                     if (r.data.result === 'success') {
                         // console.log(r)
@@ -435,6 +435,7 @@ export default {
     },
 };
 </script>
+
 <style lang="scss">
 .v-dialog.v-dialog--fullscreen {
     position: fixed;

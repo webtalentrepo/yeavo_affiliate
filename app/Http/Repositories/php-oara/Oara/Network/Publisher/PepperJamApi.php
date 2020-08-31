@@ -1,7 +1,13 @@
 <?php
+
 namespace Oara\Network\Publisher;
 
-class PepperJamApi extends \Oara\Network
+use DateTime;
+use Exception;
+use Oara\Network;
+use Oara\Utilities;
+
+class PepperJamApi extends Network
 {
     private $_api_key;
 
@@ -48,7 +54,7 @@ class PepperJamApi extends \Oara\Network
             if (isset($response->meta->pagination->next->href)) {
                 $nextPageUrl = $response->meta->pagination->next->href;
             }
-            
+
             // iterate through pages
             if ($nextPageUrl) {
                 $hasNextPage = true;
@@ -59,7 +65,7 @@ class PepperJamApi extends \Oara\Network
                     if (isset($response->meta->pagination->next->href)) {
                         $nextPageUrl = $response->meta->pagination->next->href;
                     }
-                    
+
                     $merchants = array_merge($merchants, $this->parseMerchants($response->data));
 
                     if (!$nextPageUrl) {
@@ -67,87 +73,12 @@ class PepperJamApi extends \Oara\Network
                     }
                 }
             }
-        } catch (\Exception $e) {
-            throw new \Exception('[php-oara][Oara][Network][Publisher][PepperJamApi][getMerchantList][Exception] ' . $e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception('[php-oara][Oara][Network][Publisher][PepperJamApi][getMerchantList][Exception] ' . $e->getMessage());
         }
 
         return $merchants;
     }
-
-    /**
-     * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
-     * @return array
-     * @throws Exception
-     */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
-    {
-        $transactions = [];
-
-        try {
-            $TRANSACTIONS_LIST_PATH = "{$this->BASE_PATH}/report/transaction-details";
-
-            $params = [
-                "startDate" => $dStartDate->format("Y-m-d"),
-                "endDate" => $dEndDate->format("Y-m-d")
-            ];
-
-            $client = $this->buildClient($TRANSACTIONS_LIST_PATH, $params);
-
-            $response = json_decode($this->execClientCall($client));
-
-            $transactions = $this->parseTransactions($response->data);
-
-            $nextPageUrl = null;
-            if (isset($response->meta->pagination->next->href)) {
-                $nextPageUrl = $response->meta->pagination->next->href;
-            }
-            
-            // iterate through pages
-            if ($nextPageUrl) {
-                $hasNextPage = true;
-                while ($hasNextPage) {
-                    $response = json_decode($this->getNextPage($nextPageUrl));
-
-                    $nextPageUrl = null;
-                    if (isset($response->meta->pagination->next->href)) {
-                        $nextPageUrl = $response->meta->pagination->next->href;
-                    }
-                    
-                    $transactions = array_merge($transactions, $this->parseTransactions($response->data));
-
-                    if (!$nextPageUrl) {
-                        $hasNextPage = false;
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            throw new \Exception('[php-oara][Oara][Network][Publisher][PepperJamApi][getTransactionList][Exception] ' . $e->getMessage());
-        }
-
-        return $transactions;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPaymentHistory()
-    {
-        return [];
-    }
-
-    /**
-     * @param $paymentId
-     * @return array
-     */
-    public function paymentTransactions($paymentId)
-    {
-        return [];
-    }
-
-
-    // PRIVATE
 
     private function buildClient($basePath, $params = [])
     {
@@ -169,16 +100,6 @@ class PepperJamApi extends \Oara\Network
         return $response;
     }
 
-    private function getNextPage($url)
-    {
-        $client = curl_init();
-        curl_setopt($client, CURLOPT_URL, $url);
-        curl_setopt($client, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($client);
-        curl_close($client);
-        return $response;
-    }
-
     private function parseMerchants($rawMerchants)
     {
         return array_map(function ($rawMerchant) {
@@ -194,6 +115,74 @@ class PepperJamApi extends \Oara\Network
         }, $rawMerchants);
     }
 
+
+    // PRIVATE
+
+    private function getNextPage($url)
+    {
+        $client = curl_init();
+        curl_setopt($client, CURLOPT_URL, $url);
+        curl_setopt($client, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($client);
+        curl_close($client);
+        return $response;
+    }
+
+    /**
+     * @param null $merchantList
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
+     * @return array
+     * @throws Exception
+     */
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
+    {
+        $transactions = [];
+
+        try {
+            $TRANSACTIONS_LIST_PATH = "{$this->BASE_PATH}/report/transaction-details";
+
+            $params = [
+                "startDate" => $dStartDate->format("Y-m-d"),
+                "endDate"   => $dEndDate->format("Y-m-d")
+            ];
+
+            $client = $this->buildClient($TRANSACTIONS_LIST_PATH, $params);
+
+            $response = json_decode($this->execClientCall($client));
+
+            $transactions = $this->parseTransactions($response->data);
+
+            $nextPageUrl = null;
+            if (isset($response->meta->pagination->next->href)) {
+                $nextPageUrl = $response->meta->pagination->next->href;
+            }
+
+            // iterate through pages
+            if ($nextPageUrl) {
+                $hasNextPage = true;
+                while ($hasNextPage) {
+                    $response = json_decode($this->getNextPage($nextPageUrl));
+
+                    $nextPageUrl = null;
+                    if (isset($response->meta->pagination->next->href)) {
+                        $nextPageUrl = $response->meta->pagination->next->href;
+                    }
+
+                    $transactions = array_merge($transactions, $this->parseTransactions($response->data));
+
+                    if (!$nextPageUrl) {
+                        $hasNextPage = false;
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            throw new Exception('[php-oara][Oara][Network][Publisher][PepperJamApi][getTransactionList][Exception] ' . $e->getMessage());
+        }
+
+        return $transactions;
+    }
+
     private function parseTransactions($rawTransactions)
     {
         return array_map(function ($rawTransaction) {
@@ -202,30 +191,30 @@ class PepperJamApi extends \Oara\Network
             $transaction["unique_id"] = $rawTransaction->transaction_id;
             $transaction["order_id"] = $rawTransaction->order_id;
             $transaction["creative_type"] = $rawTransaction->creative_type;
-            $transaction["commission"] = \Oara\Utilities::parseDouble($rawTransaction->commission);
-            $transaction["amount"] = \Oara\Utilities::parseDouble($rawTransaction->sale_amount);
+            $transaction["commission"] = Utilities::parseDouble($rawTransaction->commission);
+            $transaction["amount"] = Utilities::parseDouble($rawTransaction->sale_amount);
             $transaction["type"] = $rawTransaction->type;
             $transaction["date"] = $rawTransaction->date;
             // status
             switch ($rawTransaction->status) {
                 case "pending":
                 case "delayed":
-                    $transaction["status"] = \Oara\Utilities::STATUS_PENDING;
+                    $transaction["status"] = Utilities::STATUS_PENDING;
                     break;
                 case "lock":
-                    $transaction["status"] = \Oara\Utilities::STATUS_CONFIRMED;
+                    $transaction["status"] = Utilities::STATUS_CONFIRMED;
                     break;
                 case "unconfirmed":
-                    $transaction["status"] = \Oara\Utilities::STATUS_DECLINED;
+                    $transaction["status"] = Utilities::STATUS_DECLINED;
                     break;
                 case "paid":
-                    $transaction["status"] = \Oara\Utilities::STATUS_PAID;
+                    $transaction["status"] = Utilities::STATUS_PAID;
                     break;
                 default:
                     $transaction["status"] = $rawTransaction->status;
                     break;
             }
-            
+
             $transaction["new_to_file"] = $rawTransaction->new_to_file;
             $transaction["sub_type"] = $rawTransaction->sub_type;
             $transaction["custom_id"] = $rawTransaction->sid;
@@ -234,5 +223,22 @@ class PepperJamApi extends \Oara\Network
 
             return $transaction;
         }, $rawTransactions);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPaymentHistory()
+    {
+        return [];
+    }
+
+    /**
+     * @param $paymentId
+     * @return array
+     */
+    public function paymentTransactions($paymentId)
+    {
+        return [];
     }
 }

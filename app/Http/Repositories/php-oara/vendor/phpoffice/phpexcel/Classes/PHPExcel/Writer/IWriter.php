@@ -19,19 +19,19 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- *  @category   PHPExcel
- *  @package    PHPExcel_Writer
- *  @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
- *  @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
- *  @version    ##VERSION##, ##DATE##
+ * @category   PHPExcel
+ * @package    PHPExcel_Writer
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
 interface PHPExcel_Writer_IWriter
 {
     /**
      *  Save PHPExcel to file
      *
-     *  @param   string       $pFilename  Name of the file to save
-     *  @throws  PHPExcel_Writer_Exception
+     * @param string $pFilename Name of the file to save
+     * @throws  PHPExcel_Writer_Exception
      */
     public function save($pFilename = null);
 }

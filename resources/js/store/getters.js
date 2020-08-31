@@ -22,16 +22,6 @@ const getters = {
             state.accessToken === BCookie.get('DBAccessToken')
         );
     },
-
-    /**
-     * Return authenticated user data.
-     *
-     * @param state
-     * @returns {*}
-     */
-    userInfo: (state) => {
-        return state.authInfo;
-    },
 };
 
 export default getters;

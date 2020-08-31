@@ -27,30 +27,26 @@
  */
 class PHPExcel_CachedObjectStorage_Igbinary extends PHPExcel_CachedObjectStorage_CacheBase implements PHPExcel_CachedObjectStorage_ICache
 {
-    /**
-     * Store cell data in cache for the current cell object if it's "dirty",
-     *     and the 'nullify' the current cell object
+        /**
+     * Identify whether the caching method is currently available
+     * Some methods are dependent on the availability of certain extensions being enabled in the PHP build
      *
-     * @return    void
-     * @throws    PHPExcel_Exception
+     * @return    boolean
      */
-    protected function storeData()
+    public static function cacheMethodIsAvailable()
     {
-        if ($this->currentCellIsDirty && !empty($this->currentObjectID)) {
-            $this->currentObject->detach();
-
-            $this->cellCache[$this->currentObjectID] = igbinary_serialize($this->currentObject);
-            $this->currentCellIsDirty = false;
+        if (!function_exists('igbinary_serialize')) {
+            return false;
         }
-        $this->currentObjectID = $this->currentObject = null;
+
+        return true;
     }    //    function _storeData()
 
-
-    /**
+/**
      * Add or Update a cell in cache identified by coordinate address
      *
-     * @param    string            $pCoord        Coordinate address of the cell to update
-     * @param    PHPExcel_Cell    $cell        Cell to update
+     * @param string $pCoord Coordinate address of the cell to update
+     * @param PHPExcel_Cell $cell Cell to update
      * @return    PHPExcel_Cell
      * @throws    PHPExcel_Exception
      */
@@ -67,13 +63,30 @@ class PHPExcel_CachedObjectStorage_Igbinary extends PHPExcel_CachedObjectStorage
         return $cell;
     }    //    function addCacheData()
 
+/**
+     * Store cell data in cache for the current cell object if it's "dirty",
+     *     and the 'nullify' the current cell object
+     *
+     * @return    void
+     * @throws    PHPExcel_Exception
+     */
+    protected function storeData()
+    {
+        if ($this->currentCellIsDirty && !empty($this->currentObjectID)) {
+            $this->currentObject->detach();
 
-    /**
+            $this->cellCache[$this->currentObjectID] = igbinary_serialize($this->currentObject);
+            $this->currentCellIsDirty = false;
+        }
+        $this->currentObjectID = $this->currentObject = null;
+    }    //    function getCacheData()
+
+/**
      * Get cell at a specific coordinate
      *
-     * @param     string             $pCoord        Coordinate of the cell
-     * @throws     PHPExcel_Exception
+     * @param string $pCoord Coordinate of the cell
      * @return     PHPExcel_Cell     Cell that was found, or null if not found
+     * @throws     PHPExcel_Exception
      */
     public function getCacheData($pCoord)
     {
@@ -96,8 +109,7 @@ class PHPExcel_CachedObjectStorage_Igbinary extends PHPExcel_CachedObjectStorage
 
         //    Return requested entry
         return $this->currentObject;
-    }    //    function getCacheData()
-
+    }
 
     /**
      * Get a list of all cell addresses currently held in cache
@@ -111,10 +123,9 @@ class PHPExcel_CachedObjectStorage_Igbinary extends PHPExcel_CachedObjectStorage
         }
 
         return parent::getCellList();
-    }
+    }    //    function unsetWorksheetCells()
 
-
-    /**
+/**
      * Clear the cell collection and disconnect from our parent
      *
      * @return    void
@@ -125,25 +136,9 @@ class PHPExcel_CachedObjectStorage_Igbinary extends PHPExcel_CachedObjectStorage
             $this->currentObject->detach();
             $this->currentObject = $this->currentObjectID = null;
         }
-        $this->cellCache = array();
+        $this->cellCache = [];
 
         //    detach ourself from the worksheet, so that it can then delete this object successfully
         $this->parent = null;
-    }    //    function unsetWorksheetCells()
-
-
-    /**
-     * Identify whether the caching method is currently available
-     * Some methods are dependent on the availability of certain extensions being enabled in the PHP build
-     *
-     * @return    boolean
-     */
-    public static function cacheMethodIsAvailable()
-    {
-        if (!function_exists('igbinary_serialize')) {
-            return false;
-        }
-
-        return true;
     }
 }

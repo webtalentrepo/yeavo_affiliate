@@ -1,24 +1,41 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use DOMDocument;
+use DOMXPath;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function array_merge;
+use function count;
+use function preg_match;
+use function preg_replace;
+use function str_getcsv;
+use function trim;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Export Class
  *
@@ -28,7 +45,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class CgtAffiliate extends \Oara\Network
+class CgtAffiliate extends Network
 {
 
     private $_client = null;
@@ -40,16 +57,16 @@ class CgtAffiliate extends \Oara\Network
     {
         $user = $credentials['user'];
         $password = $credentials['password'];
-        $this->_client = new \Oara\Curl\Access($credentials);
+        $this->_client = new Access($credentials);
 
-        $valuesLogin = array(
-            new \Oara\Curl\Parameter('userid', $user),
-            new \Oara\Curl\Parameter('password', $password),
-        );
+        $valuesLogin = [
+            new Parameter('userid', $user),
+            new Parameter('password', $password),
+        ];
         $loginUrl = 'http://www.cgtaffiliate.com/idevaffiliate/login.php';
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($loginUrl, $valuesLogin);
+        $urls = [];
+        $urls[] = new Request($loginUrl, $valuesLogin);
         $this->_client->post($urls);
     }
 
@@ -58,15 +75,15 @@ class CgtAffiliate extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -82,11 +99,11 @@ class CgtAffiliate extends \Oara\Network
     {
         //If not login properly the construct launch an exception
         $connection = false;
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.cgtaffiliate.com/idevaffiliate/account.php', array());
+        $urls = [];
+        $urls[] = new Request('http://www.cgtaffiliate.com/idevaffiliate/account.php', []);
         $exportReport = $this->_client->get($urls);
 
-        if (\preg_match("/Logout/", $exportReport[0])) {
+        if (preg_match("/Logout/", $exportReport[0])) {
             $connection = true;
         }
         return $connection;
@@ -97,9 +114,9 @@ class CgtAffiliate extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = array();
+        $merchants = [];
 
-        $obj = array();
+        $obj = [];
         $obj['cid'] = 1;
         $obj['name'] = "Custom Greek Threads";
         $merchants[] = $obj;
@@ -109,55 +126,55 @@ class CgtAffiliate extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
 
-        $totalTransactions = array();
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.cgtaffiliate.com/idevaffiliate/account.php?page=4&report=1', array());
+        $totalTransactions = [];
+        $urls = [];
+        $urls[] = new Request('http://www.cgtaffiliate.com/idevaffiliate/account.php?page=4&report=1', []);
         $exportReport = $this->_client->get($urls);
-        $totalTransactions = \array_merge($totalTransactions, self::readTransactions($exportReport[0]));
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.cgtaffiliate.com/idevaffiliate/account.php?page=4&report=3', array());
+        $totalTransactions = array_merge($totalTransactions, self::readTransactions($exportReport[0]));
+        $urls = [];
+        $urls[] = new Request('http://www.cgtaffiliate.com/idevaffiliate/account.php?page=4&report=3', []);
         $exportReport = $this->_client->get($urls);
-        $totalTransactions = \array_merge($totalTransactions, self::readTransactions($exportReport[0]));
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('http://www.cgtaffiliate.com/idevaffiliate/account.php?page=4&report=4', array());
+        $totalTransactions = array_merge($totalTransactions, self::readTransactions($exportReport[0]));
+        $urls = [];
+        $urls[] = new Request('http://www.cgtaffiliate.com/idevaffiliate/account.php?page=4&report=4', []);
         $exportReport = $this->_client->get($urls);
-        $totalTransactions = \array_merge($totalTransactions, self::readTransactions($exportReport[0]));
+        $totalTransactions = array_merge($totalTransactions, self::readTransactions($exportReport[0]));
 
         return $totalTransactions;
     }
 
     private function readTransactions($html)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
 
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         @$doc->loadHTML($html);
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $tableList = $xpath->query('//table[@bgcolor="#003366"][@align="center"][@width="100%"]');
-        $exportData = \Oara\Utilities::htmlToCsv(\Oara\Utilities::DOMinnerHTML($tableList->item(0)));
-        $num = \count($exportData);
+        $exportData = Utilities::htmlToCsv(Utilities::DOMinnerHTML($tableList->item(0)));
+        $num = count($exportData);
         for ($i = 3; $i < $num; $i++) {
-            $transactionExportArray = \str_getcsv($exportData[$i], ";");
-            $transaction = Array();
+            $transactionExportArray = str_getcsv($exportData[$i], ";");
+            $transaction = [];
             $transaction['merchantId'] = 1;
-            $transaction['date'] = \preg_replace("/[^0-9\-]/", "", $transactionExportArray[0]) . " 00:00:00";
-            $transactionExportArray[1] = \trim($transactionExportArray[1]);
-            if (\preg_match("/Paid/", $transactionExportArray[1])) {
-                $transaction['status'] = \Oara\Utilities::STATUS_PAID;
-            } else if (\preg_match("/Pending/", $transactionExportArray[1])) {
-                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-            } else if (\preg_match("/Approved/", $transactionExportArray[1])) {
-                $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+            $transaction['date'] = preg_replace("/[^0-9\-]/", "", $transactionExportArray[0]) . " 00:00:00";
+            $transactionExportArray[1] = trim($transactionExportArray[1]);
+            if (preg_match("/Paid/", $transactionExportArray[1])) {
+                $transaction['status'] = Utilities::STATUS_PAID;
+            } elseif (preg_match("/Pending/", $transactionExportArray[1])) {
+                $transaction['status'] = Utilities::STATUS_PENDING;
+            } elseif (preg_match("/Approved/", $transactionExportArray[1])) {
+                $transaction['status'] = Utilities::STATUS_CONFIRMED;
             }
-            $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[2]);
-            $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[2]);
+            $transaction['amount'] = Utilities::parseDouble($transactionExportArray[2]);
+            $transaction['commission'] = Utilities::parseDouble($transactionExportArray[2]);
             $totalTransactions[] = $transaction;
         }
         return $totalTransactions;

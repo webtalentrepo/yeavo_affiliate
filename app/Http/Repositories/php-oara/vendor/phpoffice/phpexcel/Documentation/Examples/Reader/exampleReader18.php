@@ -8,9 +8,9 @@ date_default_timezone_set('Europe/London');
 ?>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-<title>PHPExcel Reader Example #18</title>
+    <title>PHPExcel Reader Example #18</title>
 
 </head>
 <body>
@@ -33,7 +33,7 @@ $inputFileType = 'Excel5';
 //	$inputFileType = 'Gnumeric';
 $inputFileName = './sampleData/example1.xls';
 
-echo 'Loading file ',pathinfo($inputFileName,PATHINFO_BASENAME),' information using IOFactory with a defined reader type of ',$inputFileType,'<br />';
+echo 'Loading file ', pathinfo($inputFileName, PATHINFO_BASENAME), ' information using IOFactory with a defined reader type of ', $inputFileType, '<br />';
 
 $objReader = PHPExcel_IOFactory::createReader($inputFileType);
 $worksheetNames = $objReader->listWorksheetNames($inputFileName);
@@ -41,7 +41,7 @@ $worksheetNames = $objReader->listWorksheetNames($inputFileName);
 echo '<h3>Worksheet Names</h3>';
 echo '<ol>';
 foreach ($worksheetNames as $worksheetName) {
-	echo '<li>', $worksheetName, '</li>';
+    echo '<li>', $worksheetName, '</li>';
 }
 echo '</ol>';
 

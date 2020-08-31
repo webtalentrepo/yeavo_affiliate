@@ -104,8 +104,8 @@ abstract class PHPExcel_Worksheet_Dimension
      * Value must be between 0 and 7
      *
      * @param int $pValue
-     * @throws PHPExcel_Exception
      * @return PHPExcel_Worksheet_Dimension
+     * @throws PHPExcel_Exception
      */
     public function setOutlineLevel($pValue)
     {

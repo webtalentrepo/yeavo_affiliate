@@ -2,6 +2,9 @@
 
 namespace App\Console;
 
+use App\Console\Commands\ChildProductsInsert;
+use App\Console\Commands\ScoutsDataInsert;
+use App\Console\Commands\ShareASaleInsert;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -14,15 +17,15 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        \App\Console\Commands\ScoutsDataInsert::class,
-        \App\Console\Commands\ChildProductsInsert::class,
-        \App\Console\Commands\ShareASaleInsert::class,
+        ScoutsDataInsert::class,
+        ChildProductsInsert::class,
+        ShareASaleInsert::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     * @param Schedule $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)

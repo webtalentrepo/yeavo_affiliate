@@ -28,19 +28,10 @@
 class PHPExcel_CachedObjectStorage_Memory extends PHPExcel_CachedObjectStorage_CacheBase implements PHPExcel_CachedObjectStorage_ICache
 {
     /**
-     * Dummy method callable from CacheBase, but unused by Memory cache
-     *
-     * @return    void
-     */
-    protected function storeData()
-    {
-    }
-
-    /**
      * Add or Update a cell in cache identified by coordinate address
      *
-     * @param    string            $pCoord        Coordinate address of the cell to update
-     * @param    PHPExcel_Cell    $cell        Cell to update
+     * @param string $pCoord Coordinate address of the cell to update
+     * @param PHPExcel_Cell $cell Cell to update
      * @return    PHPExcel_Cell
      * @throws    PHPExcel_Exception
      */
@@ -54,13 +45,12 @@ class PHPExcel_CachedObjectStorage_Memory extends PHPExcel_CachedObjectStorage_C
         return $cell;
     }
 
-
     /**
      * Get cell at a specific coordinate
      *
-     * @param     string             $pCoord        Coordinate of the cell
-     * @throws     PHPExcel_Exception
+     * @param string $pCoord Coordinate of the cell
      * @return     PHPExcel_Cell     Cell that was found, or null if not found
+     * @throws     PHPExcel_Exception
      */
     public function getCacheData($pCoord)
     {
@@ -78,17 +68,16 @@ class PHPExcel_CachedObjectStorage_Memory extends PHPExcel_CachedObjectStorage_C
         return $this->cellCache[$pCoord];
     }
 
-
     /**
      * Clone the cell collection
      *
-     * @param    PHPExcel_Worksheet    $parent        The new worksheet
+     * @param PHPExcel_Worksheet $parent The new worksheet
      */
     public function copyCellCollection(PHPExcel_Worksheet $parent)
     {
         parent::copyCellCollection($parent);
 
-        $newCollection = array();
+        $newCollection = [];
         foreach ($this->cellCache as $k => &$cell) {
             $newCollection[$k] = clone $cell;
             $newCollection[$k]->attach($this);
@@ -110,9 +99,18 @@ class PHPExcel_CachedObjectStorage_Memory extends PHPExcel_CachedObjectStorage_C
         }
         unset($cell);
 
-        $this->cellCache = array();
+        $this->cellCache = [];
 
         //    detach ourself from the worksheet, so that it can then delete this object successfully
         $this->parent = null;
+    }
+
+    /**
+     * Dummy method callable from CacheBase, but unused by Memory cache
+     *
+     * @return    void
+     */
+    protected function storeData()
+    {
     }
 }

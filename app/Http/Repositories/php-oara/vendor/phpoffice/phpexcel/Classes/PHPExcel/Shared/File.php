@@ -35,18 +35,6 @@ class PHPExcel_Shared_File
      */
     protected static $useUploadTempDirectory = false;
 
-
-    /**
-     * Set the flag indicating whether the File Upload Temp directory should be used for temporary files
-     *
-     * @param     boolean    $useUploadTempDir        Use File Upload Temporary directory (true or false)
-     */
-    public static function setUseUploadTempDirectory($useUploadTempDir = false)
-    {
-        self::$useUploadTempDirectory = (boolean) $useUploadTempDir;
-    }
-
-
     /**
      * Get the flag indicating whether the File Upload Temp directory should be used for temporary files
      *
@@ -57,13 +45,22 @@ class PHPExcel_Shared_File
         return self::$useUploadTempDirectory;
     }
 
+    /**
+     * Set the flag indicating whether the File Upload Temp directory should be used for temporary files
+     *
+     * @param boolean $useUploadTempDir Use File Upload Temporary directory (true or false)
+     */
+    public static function setUseUploadTempDirectory($useUploadTempDir = false)
+    {
+        self::$useUploadTempDirectory = (boolean)$useUploadTempDir;
+    }
 
     /**
-      * Verify if a file exists
-      *
-      * @param     string    $pFilename    Filename
-      * @return bool
-      */
+     * Verify if a file exists
+     *
+     * @param string $pFilename Filename
+     * @return bool
+     */
     public static function file_exists($pFilename)
     {
         // Sick construction, but it seems that
@@ -71,7 +68,7 @@ class PHPExcel_Shared_File
         // doing the original file_exists on ZIP archives...
         if (strtolower(substr($pFilename, 0, 3)) == 'zip') {
             // Open ZIP file and verify if the file exists
-            $zipFile     = substr($pFilename, 6, strpos($pFilename, '#') - 6);
+            $zipFile = substr($pFilename, 6, strpos($pFilename, '#') - 6);
             $archiveFile = substr($pFilename, strpos($pFilename, '#') + 1);
 
             $zip = new ZipArchive();

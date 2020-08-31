@@ -1,24 +1,43 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use DOMDocument;
+use DOMXPath;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use function base64_encode;
+use function file_get_contents;
+use function json_decode;
+use function parse_str;
+use function parse_url;
+use function stream_context_create;
+use function urlencode;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Export Class
  *
@@ -28,7 +47,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class WebePartners extends \Oara\Network
+class WebePartners extends Network
 {
     private $_client = null;
     private $_user = null;
@@ -43,16 +62,16 @@ class WebePartners extends \Oara\Network
         $user = $credentials['user'];
         $password = $credentials['password'];
 
-        $this->_client = new \Oara\Curl\Access($credentials);
+        $this->_client = new Access($credentials);
 
         $url = "http://panel.webepartners.pl/Account/Login";
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($url, array());
+        $urls = [];
+        $urls[] = new Request($url, []);
         $result = $this->_client->get($urls);
 
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         @$doc->loadHTML($result[0]);
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $results = $xpath->query('//input[@type="hidden"]');
         foreach ($results as $result) {
             $name = $result->attributes->getNamedItem("name")->nodeValue;
@@ -61,34 +80,33 @@ class WebePartners extends \Oara\Network
             }
         }
         if ($hiddenValue == null) {
-            throw new \Exception("hidden value not found");
+            throw new Exception("hidden value not found");
         }
 
-        $valuesLogin = array(
-            new \Oara\Curl\Parameter('__RequestVerificationToken', $hiddenValue),
-            new \Oara\Curl\Parameter('Login', $user),
-            new \Oara\Curl\Parameter('Password', $password),
-        );
+        $valuesLogin = [
+            new Parameter('__RequestVerificationToken', $hiddenValue),
+            new Parameter('Login', $user),
+            new Parameter('Password', $password),
+        ];
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($url, $valuesLogin);
+        $urls = [];
+        $urls[] = new Request($url, $valuesLogin);
         $this->_client->post($urls);
 
 
-
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request("http://panel.webepartners.pl/AffiliateTools/Api", $valuesLogin);
+        $urls = [];
+        $urls[] = new Request("http://panel.webepartners.pl/AffiliateTools/Api", $valuesLogin);
         $result = $this->_client->post($urls);
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         @$doc->loadHTML($result[0]);
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $results = $xpath->query('//a[@href*="Authorize"]');
 
         if ($results->length > 0) {
             $item = $results->item(0);
             $url = $item->attributes->getNamedItem("href")->nodeValue;
-            $parsedUrl = \parse_url($url);
-            \parse_str($parsedUrl["query"], $parameters);
+            $parsedUrl = parse_url($url);
+            parse_str($parsedUrl["query"], $parameters);
             $apiPass = $parameters["password"];
             $this->_pass = $apiPass;
         }
@@ -100,15 +118,15 @@ class WebePartners extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -125,12 +143,12 @@ class WebePartners extends \Oara\Network
         $connection = false;
         $loginUrl = "http://api.webepartners.pl/wydawca/Authorize?login={$this->_user}&password={$this->_pass}";
 
-        $context = \stream_context_create(array(
-            'http' => array(
-                'header' => "Authorization: Basic " . \base64_encode("{$this->_user}:{$this->_pass}")
-            )
-        ));
-        $data = \file_get_contents($loginUrl, false, $context);
+        $context = stream_context_create([
+            'http' => [
+                'header' => "Authorization: Basic " . base64_encode("{$this->_user}:{$this->_pass}")
+            ]
+        ]);
+        $data = file_get_contents($loginUrl, false, $context);
         if ($data == true) {
             $connection = true;
         }
@@ -142,18 +160,18 @@ class WebePartners extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = array();
+        $merchants = [];
 
-        $context = \stream_context_create(array(
-            'http' => array(
-                'header' => "Authorization: Basic " . \base64_encode("{$this->_user}:{$this->_pass}")
-            )
-        ));
+        $context = stream_context_create([
+            'http' => [
+                'header' => "Authorization: Basic " . base64_encode("{$this->_user}:{$this->_pass}")
+            ]
+        ]);
 
-        $data = \file_get_contents("http://api.webepartners.pl/wydawca/Programs", false, $context);
-        $dataArray = \json_decode($data, true);
+        $data = file_get_contents("http://api.webepartners.pl/wydawca/Programs", false, $context);
+        $dataArray = json_decode($data, true);
         foreach ($dataArray as $merchantObject) {
-            $obj = array();
+            $obj = [];
             $obj['cid'] = $merchantObject["ProgramId"];
             $obj['name'] = $merchantObject["ProgramName"];
             $merchants[] = $obj;
@@ -163,28 +181,28 @@ class WebePartners extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $merchantIdList = Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
-        $context = \stream_context_create(array(
-            'http' => array(
-                'header' => "Authorization: Basic " . \base64_encode("{$this->_user}:{$this->_pass}")
-            )
-        ));
+        $context = stream_context_create([
+            'http' => [
+                'header' => "Authorization: Basic " . base64_encode("{$this->_user}:{$this->_pass}")
+            ]
+        ]);
 
-        $from = \urlencode($dStartDate->format("Y-m-d H:i:s"));
+        $from = urlencode($dStartDate->format("Y-m-d H:i:s"));
 
-        $data = \file_get_contents("http://api.webepartners.pl/wydawca/Auctions?from=$from", false, $context);
-        $dataArray = \json_decode($data, true);
+        $data = file_get_contents("http://api.webepartners.pl/wydawca/Auctions?from=$from", false, $context);
+        $dataArray = json_decode($data, true);
         foreach ($dataArray as $transactionObject) {
 
             if (isset($merchantIdList[$transactionObject["ProgramId"]])) {
-                $transaction = Array();
+                $transaction = [];
                 $transaction['merchantId'] = $transactionObject["ProgramId"];
                 $transaction['date'] = $transactionObject["AuctionDate"];
                 if (isset($transactionObject["AuctionId"]) && $transactionObject["AuctionId"] != '') {
@@ -195,20 +213,17 @@ class WebePartners extends \Oara\Network
                 }
 
                 if ($transactionObject["AuctionStatusId"] == 3 || $transactionObject["AuctionStatusId"] == 4 || $transactionObject["AuctionStatusId"] == 5) {
-                    $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                } else
-                    if ($transactionObject["AuctionStatusId"] == 1) {
-                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                    } else
-                        if ($transactionObject["AuctionStatusId"] == 2) {
-                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                        } else
-                            if ($transactionObject["AuctionStatusId"] == 6) {
-                                $transaction['status'] = \Oara\Utilities::STATUS_PAID;
-                            }
+                    $transaction['status'] = Utilities::STATUS_CONFIRMED;
+                } elseif ($transactionObject["AuctionStatusId"] == 1) {
+                    $transaction['status'] = Utilities::STATUS_PENDING;
+                } elseif ($transactionObject["AuctionStatusId"] == 2) {
+                    $transaction['status'] = Utilities::STATUS_DECLINED;
+                } elseif ($transactionObject["AuctionStatusId"] == 6) {
+                    $transaction['status'] = Utilities::STATUS_PAID;
+                }
 
-                $transaction['amount'] = \Oara\Utilities::parseDouble($transactionObject["OrderCost"]);
-                $transaction['commission'] = \Oara\Utilities::parseDouble($transactionObject["Commission"]);
+                $transaction['amount'] = Utilities::parseDouble($transactionObject["OrderCost"]);
+                $transaction['commission'] = Utilities::parseDouble($transactionObject["Commission"]);
                 $totalTransactions[] = $transaction;
             }
         }

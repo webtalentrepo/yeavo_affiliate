@@ -39,12 +39,12 @@ class PHPExcel_Chart_PlotArea
      *
      * @var array of PHPExcel_Chart_DataSeries
      */
-    private $plotSeries = array();
+    private $plotSeries = [];
 
     /**
      * Create a new PHPExcel_Chart_PlotArea
      */
-    public function __construct(PHPExcel_Chart_Layout $layout = null, $plotSeries = array())
+    public function __construct(PHPExcel_Chart_Layout $layout = null, $plotSeries = [])
     {
         $this->layout = $layout;
         $this->plotSeries = $plotSeries;
@@ -110,10 +110,10 @@ class PHPExcel_Chart_PlotArea
      * @param [PHPExcel_Chart_DataSeries]
      * @return PHPExcel_Chart_PlotArea
      */
-    public function setPlotSeries($plotSeries = array())
+    public function setPlotSeries($plotSeries = [])
     {
         $this->plotSeries = $plotSeries;
-        
+
         return $this;
     }
 

@@ -44,13 +44,13 @@ class PHPExcel_Worksheet_Row
     /**
      * Create a new row
      *
-     * @param PHPExcel_Worksheet         $parent
-     * @param int                        $rowIndex
+     * @param PHPExcel_Worksheet $parent
+     * @param int $rowIndex
      */
     public function __construct(PHPExcel_Worksheet $parent = null, $rowIndex = 1)
     {
         // Set parent and row index
-        $this->parent   = $parent;
+        $this->parent = $parent;
         $this->rowIndex = $rowIndex;
     }
 
@@ -75,8 +75,8 @@ class PHPExcel_Worksheet_Row
     /**
      * Get cell iterator
      *
-     * @param    string                $startColumn    The column address at which to start iterating
-     * @param    string                $endColumn        Optionally, the column address at which to stop iterating
+     * @param string $startColumn The column address at which to start iterating
+     * @param string $endColumn Optionally, the column address at which to stop iterating
      * @return PHPExcel_Worksheet_CellIterator
      */
     public function getCellIterator($startColumn = 'A', $endColumn = null)

@@ -31,5 +31,6 @@ export default {
 <style scoped lang="scss">
 .app-footer {
     align-items: center;
+    font-size: 85%;
 }
 </style>

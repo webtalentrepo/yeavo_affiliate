@@ -9,30 +9,6 @@ class CityAds_Api
     protected $format = 'json';
     protected $accessToken;
 
-    public function setFormat($format)
-    {
-        if (!in_array($format, array('xml', 'json')))
-            $format = 'json';
-        $this->format = $format;
-        return $this;
-    }
-
-    public function getFormat()
-    {
-        return $this->format;
-    }
-
-    public function getAccessToken()
-    {
-        return $this->accessToken;
-    }
-
-    public function setAccessToken($accessToken)
-    {
-        $this->accessToken = $accessToken;
-        return $this;
-    }
-
     public function login($accessToken = null)
     {
         $this->accessToken = $accessToken;
@@ -48,11 +24,11 @@ class CityAds_Api
      */
     public function getAuthorizeUrl($clientId, $redirectUri, $responseType = 'code')
     {
-        return $this->host . '/auth/?' . http_build_query(array(
-            'client_id' => $clientId,
-            'redirect_uri' => $redirectUri,
-            'response_type' => $responseType
-        ));
+        return $this->host . '/auth/?' . http_build_query([
+                'client_id'     => $clientId,
+                'redirect_uri'  => $redirectUri,
+                'response_type' => $responseType
+            ]);
     }
 
     /**
@@ -66,18 +42,20 @@ class CityAds_Api
      */
     public function requestAccessToken($clientId, $secretKey, $code, $redirectUri)
     {
-        $post = array('client_id' => $clientId,
+        $post = [
+            'client_id'     => $clientId,
             'client_secret' => $secretKey,
-            'grant_type' => 'authorizationCode',
-            'code' => $code,
-            'redirect_uri' => $redirectUri);
+            'grant_type'    => 'authorizationCode',
+            'code'          => $code,
+            'redirect_uri'  => $redirectUri
+        ];
         $client = new CityAds_Curl();
         $jsonResponse = $client->post($this->host . '/auth/token', $post);
         $response = json_decode($jsonResponse, true);
         return $response;
     }
 
-    public function get($method, $params = array())
+    public function get($method, $params = [])
     {
         $client = new CityAds_Curl();
         $getParams = '';
@@ -88,20 +66,28 @@ class CityAds_Api
         return $this->checkedResponse($response);
     }
 
-    public function post($method, $params = '')
+    public function getFormat()
     {
-        $client = new CityAds_Curl();
-        $methodUrl = $this->host . $this->resourse . $this->getFormat() . '/' . $method . '?remote_auth=' . $this->getAccessToken();
-        $response = $client->post($methodUrl, $params);
-        return $this->checkedResponse($response);
+        return $this->format;
     }
 
-    public function put($method, $params = '')
+    public function setFormat($format)
     {
-        $client = new CityAds_Curl();
-        $methodUrl = $this->host . $this->resourse . $this->getFormat() . '/' . $method . '?remote_auth=' . $this->getAccessToken();
-        $response = $client->put($methodUrl, $params);
-        return $this->checkedResponse($response);
+        if (!in_array($format, ['xml', 'json']))
+            $format = 'json';
+        $this->format = $format;
+        return $this;
+    }
+
+    public function getAccessToken()
+    {
+        return $this->accessToken;
+    }
+
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
+        return $this;
     }
 
     private function checkedResponse($response)
@@ -124,5 +110,21 @@ class CityAds_Api
         if (isset($data['status']) && $data['status'] != 200 && $data['status'] != 204) {
             throw new Exception((string)$data['error'], (int)$data['status']);
         }
+    }
+
+    public function post($method, $params = '')
+    {
+        $client = new CityAds_Curl();
+        $methodUrl = $this->host . $this->resourse . $this->getFormat() . '/' . $method . '?remote_auth=' . $this->getAccessToken();
+        $response = $client->post($methodUrl, $params);
+        return $this->checkedResponse($response);
+    }
+
+    public function put($method, $params = '')
+    {
+        $client = new CityAds_Curl();
+        $methodUrl = $this->host . $this->resourse . $this->getFormat() . '/' . $method . '?remote_auth=' . $this->getAccessToken();
+        $response = $client->put($methodUrl, $params);
+        return $this->checkedResponse($response);
     }
 }

@@ -11,6 +11,8 @@ namespace Zend\Dom;
 
 use DOMDocument;
 use DOMNode;
+use DOMNodeList;
+use ErrorException;
 
 /**
  * Query DOM structures based on CSS selectors and/or XPath
@@ -22,8 +24,8 @@ class Query
     /**#@+
      * Document types
      */
-    const DOC_XML   = 'docXml';
-    const DOC_HTML  = 'docHtml';
+    const DOC_XML = 'docXml';
+    const DOC_HTML = 'docHtml';
     const DOC_XHTML = 'docXhtml';
     /**#@-*/
 
@@ -75,32 +77,151 @@ class Query
     }
 
     /**
-     * Set document encoding
+     * Register HTML document
      *
-     * @param  string $encoding
+     * @param string $document
+     * @param null|string $encoding Document encoding
      * @return Query
      */
-    public function setEncoding($encoding)
+    public function setDocumentHtml($document, $encoding = null)
     {
-        $this->encoding = (null === $encoding) ? null : (string) $encoding;
+        $this->document = (string)$document;
+        $this->docType = self::DOC_HTML;
+        if (null !== $encoding) {
+            $this->setEncoding($encoding);
+        }
         return $this;
     }
 
     /**
-     * Get document encoding
+     * Register XHTML document
      *
-     * @return null|string
+     * @param string $document
+     * @param null|string $encoding Document encoding
+     * @return Query
      */
-    public function getEncoding()
+    public function setDocumentXhtml($document, $encoding = null)
     {
-        return $this->encoding;
+        $this->document = (string)$document;
+        $this->docType = self::DOC_XHTML;
+        if (null !== $encoding) {
+            $this->setEncoding($encoding);
+        }
+        return $this;
+    }
+
+    /**
+     * Register XML document
+     *
+     * @param string $document
+     * @param null|string $encoding Document encoding
+     * @return Query
+     */
+    public function setDocumentXml($document, $encoding = null)
+    {
+        $this->document = (string)$document;
+        $this->docType = self::DOC_XML;
+        if (null !== $encoding) {
+            $this->setEncoding($encoding);
+        }
+        return $this;
+    }
+
+    /**
+     * Get any DOMDocument errors found
+     *
+     * @return false|array
+     */
+    public function getDocumentErrors()
+    {
+        return $this->documentErrors;
+    }
+
+    /**
+     * Perform a CSS selector query
+     *
+     * @param string $query
+     * @param DOMNode $contextNode
+     * @return NodeList
+     */
+    public function execute($query, DOMNode $contextNode = null)
+    {
+        $xpathQuery = Document\Query::cssToXpath($query);
+        return $this->queryXpath($xpathQuery, $query, $contextNode);
+    }
+
+    /**
+     * Perform an XPath query
+     *
+     * @param string|array $xpathQuery
+     * @param string|null $query CSS selector query
+     * @param DOMNode $contextNode $contextNode
+     * @return NodeList
+     * @throws Exception\RuntimeException
+     */
+    public function queryXpath($xpathQuery, $query = null, DOMNode $contextNode = null)
+    {
+        if (null === ($document = $this->getDocument())) {
+            throw new Exception\RuntimeException('Cannot query; no document registered');
+        }
+
+        $encoding = $this->getEncoding();
+        libxml_use_internal_errors(true);
+        libxml_disable_entity_loader(true);
+        if (null === $encoding) {
+            $domDoc = new DOMDocument('1.0');
+        } else {
+            $domDoc = new DOMDocument('1.0', $encoding);
+        }
+        $type = $this->getDocumentType();
+        switch ($type) {
+            case self::DOC_XML:
+                $success = $domDoc->loadXML($document);
+                foreach ($domDoc->childNodes as $child) {
+                    if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
+                        throw new Exception\RuntimeException(
+                            'Invalid XML: Detected use of illegal DOCTYPE'
+                        );
+                    }
+                }
+                break;
+            case self::DOC_HTML:
+            case self::DOC_XHTML:
+            default:
+                $success = $domDoc->loadHTML($document);
+                break;
+        }
+        $errors = libxml_get_errors();
+        if (!empty($errors)) {
+            $this->documentErrors = $errors;
+            libxml_clear_errors();
+        }
+        libxml_disable_entity_loader(false);
+        libxml_use_internal_errors(false);
+
+        if (!$success) {
+            throw new Exception\RuntimeException(sprintf('Error parsing document (type == %s)', $type));
+        }
+
+        $nodeList = $this->getNodeList($domDoc, $xpathQuery, $contextNode);
+        return new NodeList($query, $xpathQuery, $domDoc, $nodeList, $contextNode);
+    }
+
+    /**
+     * Retrieve current document
+     *
+     * @return string
+     */
+    public function getDocument()
+    {
+        return $this->document;
     }
 
     /**
      * Set document to query
      *
-     * @param  string $document
-     * @param  null|string $encoding Document encoding
+     * @param string $document
+     * @param null|string $encoding Document encoding
      * @return Query
      */
     public function setDocument($document, $encoding = null)
@@ -123,64 +244,25 @@ class Query
     }
 
     /**
-     * Register HTML document
+     * Get document encoding
      *
-     * @param  string $document
-     * @param  null|string $encoding Document encoding
-     * @return Query
+     * @return null|string
      */
-    public function setDocumentHtml($document, $encoding = null)
+    public function getEncoding()
     {
-        $this->document = (string) $document;
-        $this->docType  = self::DOC_HTML;
-        if (null !== $encoding) {
-            $this->setEncoding($encoding);
-        }
-        return $this;
+        return $this->encoding;
     }
 
     /**
-     * Register XHTML document
+     * Set document encoding
      *
-     * @param  string $document
-     * @param  null|string $encoding Document encoding
+     * @param string $encoding
      * @return Query
      */
-    public function setDocumentXhtml($document, $encoding = null)
+    public function setEncoding($encoding)
     {
-        $this->document = (string) $document;
-        $this->docType  = self::DOC_XHTML;
-        if (null !== $encoding) {
-            $this->setEncoding($encoding);
-        }
+        $this->encoding = (null === $encoding) ? null : (string)$encoding;
         return $this;
-    }
-
-    /**
-     * Register XML document
-     *
-     * @param  string $document
-     * @param  null|string $encoding Document encoding
-     * @return Query
-     */
-    public function setDocumentXml($document, $encoding = null)
-    {
-        $this->document = (string) $document;
-        $this->docType  = self::DOC_XML;
-        if (null !== $encoding) {
-            $this->setEncoding($encoding);
-        }
-        return $this;
-    }
-
-    /**
-     * Retrieve current document
-     *
-     * @return string
-     */
-    public function getDocument()
-    {
-        return $this->document;
     }
 
     /**
@@ -194,89 +276,36 @@ class Query
     }
 
     /**
-     * Get any DOMDocument errors found
+     * Prepare node list
      *
-     * @return false|array
+     * @param DOMDocument $document
+     * @param string|array $xpathQuery
+     * @param DOMNode $contextNode
+     * @return DOMNodeList
+     * @throws ErrorException If query cannot be executed
      */
-    public function getDocumentErrors()
+    protected function getNodeList($document, $xpathQuery, DOMNode $contextNode = null)
     {
-        return $this->documentErrors;
-    }
-
-    /**
-     * Perform a CSS selector query
-     *
-     * @param  string $query
-     * @param  DOMNode $contextNode
-     * @return NodeList
-     */
-    public function execute($query, DOMNode $contextNode = null)
-    {
-        $xpathQuery = Document\Query::cssToXpath($query);
-        return $this->queryXpath($xpathQuery, $query, $contextNode);
-    }
-
-    /**
-     * Perform an XPath query
-     *
-     * @param  string|array $xpathQuery
-     * @param  string|null  $query      CSS selector query
-     * @param  DOMNode $contextNode $contextNode
-     * @throws Exception\RuntimeException
-     * @return NodeList
-     */
-    public function queryXpath($xpathQuery, $query = null, DOMNode $contextNode = null)
-    {
-        if (null === ($document = $this->getDocument())) {
-            throw new Exception\RuntimeException('Cannot query; no document registered');
+        $xpath = new DOMXPath($document);
+        foreach ($this->xpathNamespaces as $prefix => $namespaceUri) {
+            $xpath->registerNamespace($prefix, $namespaceUri);
         }
+        if ($this->xpathPhpFunctions) {
+            $xpath->registerNamespace("php", "http://php.net/xpath");
+            ($this->xpathPhpFunctions === true) ?
+                $xpath->registerPhpFunctions()
+                : $xpath->registerPhpFunctions($this->xpathPhpFunctions);
+        }
+        $xpathQuery = (string)$xpathQuery;
 
-        $encoding = $this->getEncoding();
-        libxml_use_internal_errors(true);
-        libxml_disable_entity_loader(true);
-        if (null === $encoding) {
-            $domDoc = new DOMDocument('1.0');
-        } else {
-            $domDoc = new DOMDocument('1.0', $encoding);
-        }
-        $type   = $this->getDocumentType();
-        switch ($type) {
-            case self::DOC_XML:
-                $success = $domDoc->loadXML($document);
-                foreach ($domDoc->childNodes as $child) {
-                    if ($child->nodeType === XML_DOCUMENT_TYPE_NODE) {
-                        throw new Exception\RuntimeException(
-                            'Invalid XML: Detected use of illegal DOCTYPE'
-                        );
-                    }
-                }
-                break;
-            case self::DOC_HTML:
-            case self::DOC_XHTML:
-            default:
-                $success = $domDoc->loadHTML($document);
-                break;
-        }
-        $errors = libxml_get_errors();
-        if (! empty($errors)) {
-            $this->documentErrors = $errors;
-            libxml_clear_errors();
-        }
-        libxml_disable_entity_loader(false);
-        libxml_use_internal_errors(false);
-
-        if (! $success) {
-            throw new Exception\RuntimeException(sprintf('Error parsing document (type == %s)', $type));
-        }
-
-        $nodeList   = $this->getNodeList($domDoc, $xpathQuery, $contextNode);
-        return new NodeList($query, $xpathQuery, $domDoc, $nodeList, $contextNode);
+        $nodeList = $xpath->queryWithErrorException($xpathQuery, $contextNode);
+        return $nodeList;
     }
 
     /**
      * Register XPath namespaces
      *
-     * @param  array $xpathNamespaces
+     * @param array $xpathNamespaces
      * @return void
      */
     public function registerXpathNamespaces($xpathNamespaces)
@@ -287,38 +316,11 @@ class Query
     /**
      * Register PHP Functions to use in internal DOMXPath
      *
-     * @param  bool $xpathPhpFunctions
+     * @param bool $xpathPhpFunctions
      * @return void
      */
     public function registerXpathPhpFunctions($xpathPhpFunctions = true)
     {
         $this->xpathPhpFunctions = $xpathPhpFunctions;
-    }
-
-    /**
-     * Prepare node list
-     *
-     * @param  DOMDocument $document
-     * @param  string|array $xpathQuery
-     * @param  DOMNode $contextNode
-     * @return \DOMNodeList
-     * @throws \ErrorException If query cannot be executed
-     */
-    protected function getNodeList($document, $xpathQuery, DOMNode $contextNode = null)
-    {
-        $xpath      = new DOMXPath($document);
-        foreach ($this->xpathNamespaces as $prefix => $namespaceUri) {
-            $xpath->registerNamespace($prefix, $namespaceUri);
-        }
-        if ($this->xpathPhpFunctions) {
-            $xpath->registerNamespace("php", "http://php.net/xpath");
-            ($this->xpathPhpFunctions === true) ?
-                $xpath->registerPhpFunctions()
-                : $xpath->registerPhpFunctions($this->xpathPhpFunctions);
-        }
-        $xpathQuery = (string) $xpathQuery;
-
-        $nodeList = $xpath->queryWithErrorException($xpathQuery, $contextNode);
-        return $nodeList;
     }
 }

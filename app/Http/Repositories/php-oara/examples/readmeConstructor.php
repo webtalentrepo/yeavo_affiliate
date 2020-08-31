@@ -1,9 +1,11 @@
 <?php
-namespace Oara\Network\Publisher;
-include_once (dirname(__FILE__) . '/../settings.php');
 
-function get_defined_classes ($path, $parent = null) {
-    $classes = array();
+namespace Oara\Network\Publisher;
+include_once(dirname(__FILE__) . '/../settings.php');
+
+function get_defined_classes($path, $parent = null)
+{
+    $classes = [];
     $files = scandir($path);
     foreach ($files as $file) {
         $filePath = $path . '/' . $file;
@@ -12,7 +14,7 @@ function get_defined_classes ($path, $parent = null) {
             $tokens = token_get_all($phpCode);
             $count = count($tokens);
             for ($i = 2; $i < $count; $i++) {
-                if (   $tokens[$i - 2][0] == T_CLASS
+                if ($tokens[$i - 2][0] == T_CLASS
                     && $tokens[$i - 1][0] == T_WHITESPACE
                     && $tokens[$i][0] == T_STRING
                     && $tokens[1][0] == T_NAMESPACE
@@ -32,7 +34,8 @@ function get_defined_classes ($path, $parent = null) {
     return $classes;
 }
 
-function get_subdirectory_classes ($path, $parent = null) {
+function get_subdirectory_classes($path, $parent = null)
+{
     $classes = get_defined_classes($path, $parent);
     $directories = scandir($path);
     foreach ($directories as $directory) {

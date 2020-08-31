@@ -71,14 +71,12 @@ const actions = {
             axios
                 .post('/login', credentials)
                 .then((response) => {
-                    const {
-                        access_token: accessToken,
-                        expires_in: tokenExpired,
-                    } = response.data;
+                    const { accessToken, expiresIn, isAdmin } = response.data;
 
                     commit('setAccessToken', {
                         token: accessToken,
-                        expires: tokenExpired,
+                        expires: expiresIn,
+                        isAdmin: isAdmin,
                     });
 
                     resolve(response);

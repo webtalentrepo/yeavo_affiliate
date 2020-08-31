@@ -3,15 +3,17 @@
 
 namespace App\Http\Repositories;
 
+use Exception;
+
 require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
 class LinkShare
 {
+    protected $_tracking_parameter = '';
     private $_network = null;
     private $_username = '';
     private $_password = '';
     private $_apiClient = null;
-    protected $_tracking_parameter = '';
     private $_idSite = '';
     private $_logged = false;
 
@@ -36,7 +38,7 @@ class LinkShare
         $this->_username = $username;
         $this->_password = $password;
 
-        $credentials = array();
+        $credentials = [];
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_password;
         $credentials["idSite"] = $idSite;
@@ -61,7 +63,7 @@ class LinkShare
     {
         try {
             return $this->_network->getMerchantList($params);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $e->getMessage();
         }
     }

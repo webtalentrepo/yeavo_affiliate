@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PHPExcel_Style_Alignment
  *
@@ -27,26 +28,26 @@
 class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPExcel_IComparable
 {
     /* Horizontal alignment styles */
-    const HORIZONTAL_GENERAL           = 'general';
-    const HORIZONTAL_LEFT              = 'left';
-    const HORIZONTAL_RIGHT             = 'right';
-    const HORIZONTAL_CENTER            = 'center';
+    const HORIZONTAL_GENERAL = 'general';
+    const HORIZONTAL_LEFT = 'left';
+    const HORIZONTAL_RIGHT = 'right';
+    const HORIZONTAL_CENTER = 'center';
     const HORIZONTAL_CENTER_CONTINUOUS = 'centerContinuous';
-    const HORIZONTAL_JUSTIFY           = 'justify';
-    const HORIZONTAL_FILL              = 'fill';
-    const HORIZONTAL_DISTRIBUTED       = 'distributed';        // Excel2007 only
+    const HORIZONTAL_JUSTIFY = 'justify';
+    const HORIZONTAL_FILL = 'fill';
+    const HORIZONTAL_DISTRIBUTED = 'distributed';        // Excel2007 only
 
     /* Vertical alignment styles */
-    const VERTICAL_BOTTOM      = 'bottom';
-    const VERTICAL_TOP         = 'top';
-    const VERTICAL_CENTER      = 'center';
-    const VERTICAL_JUSTIFY     = 'justify';
+    const VERTICAL_BOTTOM = 'bottom';
+    const VERTICAL_TOP = 'top';
+    const VERTICAL_CENTER = 'center';
+    const VERTICAL_JUSTIFY = 'justify';
     const VERTICAL_DISTRIBUTED = 'distributed';        // Excel2007 only
 
     /* Read order */
     const READORDER_CONTEXT = 0;
-    const READORDER_LTR     = 1;
-    const READORDER_RTL     = 2;
+    const READORDER_LTR = 1;
+    const READORDER_RTL = 2;
 
     /**
      * Horizontal alignment
@@ -100,10 +101,10 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
     /**
      * Create a new PHPExcel_Style_Alignment
      *
-     * @param    boolean    $isSupervisor    Flag indicating if this is a supervisor or not
+     * @param boolean $isSupervisor Flag indicating if this is a supervisor or not
      *                                       Leave this value at default unless you understand exactly what
      *                                          its ramifications are
-     * @param    boolean    $isConditional   Flag indicating if this is a conditional style or not
+     * @param boolean $isConditional Flag indicating if this is a conditional style or not
      *                                       Leave this value at default unless you understand exactly what
      *                                          its ramifications are
      */
@@ -113,32 +114,10 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
         parent::__construct($isSupervisor);
 
         if ($isConditional) {
-            $this->horizontal   = null;
-            $this->vertical     = null;
+            $this->horizontal = null;
+            $this->vertical = null;
             $this->textRotation = null;
         }
-    }
-
-    /**
-     * Get the shared style component for the currently active cell in currently active sheet.
-     * Only used for style supervisor
-     *
-     * @return PHPExcel_Style_Alignment
-     */
-    public function getSharedComponent()
-    {
-        return $this->parent->getSharedComponent()->getAlignment();
-    }
-
-    /**
-     * Build style array from subcomponents
-     *
-     * @param array $array
-     * @return array
-     */
-    public function getStyleArray($array)
-    {
-        return array('alignment' => $array);
     }
 
     /**
@@ -155,9 +134,9 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
      * );
      * </code>
      *
-     * @param    array    $pStyles    Array containing style information
-     * @throws    PHPExcel_Exception
+     * @param array $pStyles Array containing style information
      * @return PHPExcel_Style_Alignment
+     * @throws    PHPExcel_Exception
      */
     public function applyFromArray($pStyles = null)
     {
@@ -195,6 +174,17 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
     }
 
     /**
+     * Build style array from subcomponents
+     *
+     * @param array $array
+     * @return array
+     */
+    public function getStyleArray($array)
+    {
+        return ['alignment' => $array];
+    }
+
+    /**
      * Get Horizontal
      *
      * @return string
@@ -220,12 +210,23 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
         }
 
         if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(array('horizontal' => $pValue));
+            $styleArray = $this->getStyleArray(['horizontal' => $pValue]);
             $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
         } else {
             $this->horizontal = $pValue;
         }
         return $this;
+    }
+
+    /**
+     * Get the shared style component for the currently active cell in currently active sheet.
+     * Only used for style supervisor
+     *
+     * @return PHPExcel_Style_Alignment
+     */
+    public function getSharedComponent()
+    {
+        return $this->parent->getSharedComponent()->getAlignment();
     }
 
     /**
@@ -254,7 +255,7 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
         }
 
         if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(array('vertical' => $pValue));
+            $styleArray = $this->getStyleArray(['vertical' => $pValue]);
             $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
         } else {
             $this->vertical = $pValue;
@@ -279,8 +280,8 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
      * Set TextRotation
      *
      * @param int $pValue
-     * @throws PHPExcel_Exception
      * @return PHPExcel_Style_Alignment
+     * @throws PHPExcel_Exception
      */
     public function setTextRotation($pValue = 0)
     {
@@ -292,7 +293,7 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
         // Set rotation
         if (($pValue >= -90 && $pValue <= 90) || $pValue == -165) {
             if ($this->isSupervisor) {
-                $styleArray = $this->getStyleArray(array('rotation' => $pValue));
+                $styleArray = $this->getStyleArray(['rotation' => $pValue]);
                 $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
             } else {
                 $this->textRotation = $pValue;
@@ -329,7 +330,7 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
             $pValue = false;
         }
         if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(array('wrap' => $pValue));
+            $styleArray = $this->getStyleArray(['wrap' => $pValue]);
             $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
         } else {
             $this->wrapText = $pValue;
@@ -362,7 +363,7 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
             $pValue = false;
         }
         if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(array('shrinkToFit' => $pValue));
+            $styleArray = $this->getStyleArray(['shrinkToFit' => $pValue]);
             $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
         } else {
             $this->shrinkToFit = $pValue;
@@ -399,7 +400,7 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
             }
         }
         if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(array('indent' => $pValue));
+            $styleArray = $this->getStyleArray(['indent' => $pValue]);
             $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
         } else {
             $this->indent = $pValue;
@@ -432,7 +433,7 @@ class PHPExcel_Style_Alignment extends PHPExcel_Style_Supervisor implements PHPE
             $pValue = 0;
         }
         if ($this->isSupervisor) {
-            $styleArray = $this->getStyleArray(array('readorder' => $pValue));
+            $styleArray = $this->getStyleArray(['readorder' => $pValue]);
             $this->getActiveSheet()->getStyle($this->getSelectedCells())->applyFromArray($styleArray);
         } else {
             $this->readorder = $pValue;

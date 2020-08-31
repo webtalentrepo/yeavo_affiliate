@@ -44,7 +44,7 @@ abstract class PHPExcel_Style_Supervisor
     /**
      * Create a new PHPExcel_Style_Alignment
      *
-     * @param    boolean    $isSupervisor    Flag indicating if this is a supervisor or not
+     * @param boolean $isSupervisor Flag indicating if this is a supervisor or not
      *                                    Leave this value at default unless you understand exactly what
      *                                        its ramifications are
      */
@@ -77,16 +77,6 @@ abstract class PHPExcel_Style_Supervisor
     }
 
     /**
-     * Get the currently active sheet. Only used for supervisor
-     *
-     * @return PHPExcel_Worksheet
-     */
-    public function getActiveSheet()
-    {
-        return $this->parent->getActiveSheet();
-    }
-
-    /**
      * Get the currently active cell coordinate in currently active sheet.
      * Only used for supervisor
      *
@@ -95,6 +85,16 @@ abstract class PHPExcel_Style_Supervisor
     public function getSelectedCells()
     {
         return $this->getActiveSheet()->getSelectedCells();
+    }
+
+    /**
+     * Get the currently active sheet. Only used for supervisor
+     *
+     * @return PHPExcel_Worksheet
+     */
+    public function getActiveSheet()
+    {
+        return $this->parent->getActiveSheet();
     }
 
     /**

@@ -31,30 +31,31 @@ ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
 date_default_timezone_set('Europe/London');
 
-define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+define('EOL', (PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
 
 /** Include PHPExcel */
 require_once dirname(__FILE__) . '/../Classes/PHPExcel.php';
 
 
 // Create new PHPExcel object
-echo date('H:i:s') , " Create new PHPExcel object" , EOL;
+echo date('H:i:s'), " Create new PHPExcel object", EOL;
 $objPHPExcel = new PHPExcel();
 
 // Set document properties
-echo date('H:i:s') , " Set document properties" , EOL;
+echo date('H:i:s'), " Set document properties", EOL;
 $objPHPExcel->getProperties()
     ->setCreator("PHPOffice")
-	->setLastModifiedBy("PHPOffice")
-	->setTitle("PHPExcel Test Document")
-	->setSubject("PHPExcel Test Document")
-	->setDescription("Test document for PHPExcel, generated using PHP classes.")
-	->setKeywords("Office PHPExcel php")
-	->setCategory("Test result file");
+    ->setLastModifiedBy("PHPOffice")
+    ->setTitle("PHPExcel Test Document")
+    ->setSubject("PHPExcel Test Document")
+    ->setDescription("Test document for PHPExcel, generated using PHP classes.")
+    ->setKeywords("Office PHPExcel php")
+    ->setCategory("Test result file");
 
 
-function transpose($value) {
-    return array($value);
+function transpose($value)
+{
+    return [$value];
 }
 
 // Add some data
@@ -62,10 +63,10 @@ $continentColumn = 'D';
 $column = 'F';
 
 // Set data for dropdowns
-foreach(glob('./data/continents/*') as $key => $filename) {
+foreach (glob('./data/continents/*') as $key => $filename) {
     $continent = pathinfo($filename, PATHINFO_FILENAME);
     echo "Loading $continent", EOL;
-    $continent = str_replace(' ','_',$continent);
+    $continent = str_replace(' ', '_', $continent);
     $countries = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $countryCount = count($countries);
 
@@ -75,7 +76,7 @@ foreach(glob('./data/continents/*') as $key => $filename) {
         ->fromArray($countries, null, $column . '1');
     $objPHPExcel->addNamedRange(
         new PHPExcel_NamedRange(
-            $continent, 
+            $continent,
             $objPHPExcel->getActiveSheet(), $column . '1:' . $column . $countryCount
         )
     );
@@ -84,7 +85,7 @@ foreach(glob('./data/continents/*') as $key => $filename) {
         ->setVisible(false);
 
     $objPHPExcel->getActiveSheet()
-        ->setCellValue($continentColumn . ($key+1), $continent);
+        ->setCellValue($continentColumn . ($key + 1), $continent);
 
     ++$column;
 }
@@ -96,8 +97,8 @@ $objPHPExcel->getActiveSheet()
 
 $objPHPExcel->addNamedRange(
     new PHPExcel_NamedRange(
-        'Continents', 
-        $objPHPExcel->getActiveSheet(), $continentColumn . '1:' . $continentColumn . ($key+1)
+        'Continents',
+        $objPHPExcel->getActiveSheet(), $continentColumn . '1:' . $continentColumn . ($key + 1)
     )
 );
 
@@ -119,8 +120,8 @@ $objPHPExcel->getActiveSheet()
 $objValidation = $objPHPExcel->getActiveSheet()
     ->getCell('B1')
     ->getDataValidation();
-$objValidation->setType( PHPExcel_Cell_DataValidation::TYPE_LIST )
-    ->setErrorStyle( PHPExcel_Cell_DataValidation::STYLE_INFORMATION )
+$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST)
+    ->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION)
     ->setAllowBlank(false)
     ->setShowInputMessage(true)
     ->setShowErrorMessage(true)
@@ -140,8 +141,8 @@ $objPHPExcel->getActiveSheet()
 $objValidation = $objPHPExcel->getActiveSheet()
     ->getCell('B3')
     ->getDataValidation();
-$objValidation->setType( PHPExcel_Cell_DataValidation::TYPE_LIST )
-    ->setErrorStyle( PHPExcel_Cell_DataValidation::STYLE_INFORMATION )
+$objValidation->setType(PHPExcel_Cell_DataValidation::TYPE_LIST)
+    ->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_INFORMATION)
     ->setAllowBlank(false)
     ->setShowInputMessage(true)
     ->setShowErrorMessage(true)
@@ -162,14 +163,14 @@ $objPHPExcel->setActiveSheetIndex(0);
 
 // Save Excel 2007 file
 // This linked validation list method only seems to work for Excel2007, not for Excel5
-echo date('H:i:s') , " Write to Excel2007 format" , EOL;
+echo date('H:i:s'), " Write to Excel2007 format", EOL;
 $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
-echo date('H:i:s') , " File written to " , str_replace('.php', '.xlsx', pathinfo(__FILE__, PATHINFO_BASENAME)) , EOL;
+echo date('H:i:s'), " File written to ", str_replace('.php', '.xlsx', pathinfo(__FILE__, PATHINFO_BASENAME)), EOL;
 
 // Echo memory peak usage
-echo date('H:i:s') , " Peak memory usage: " , (memory_get_peak_usage(true) / 1024 / 1024) , " MB" , EOL;
+echo date('H:i:s'), " Peak memory usage: ", (memory_get_peak_usage(true) / 1024 / 1024), " MB", EOL;
 
 // Echo done
-echo date('H:i:s') , " Done writing files" , EOL;
-echo 'Files have been created in ' , getcwd() , EOL;
+echo date('H:i:s'), " Done writing files", EOL;
+echo 'Files have been created in ', getcwd(), EOL;

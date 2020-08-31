@@ -9,6 +9,7 @@
 
 namespace Zend\Dom\Document;
 
+use DOMNode;
 use Zend\Dom\Document;
 use Zend\Dom\DOMXPath;
 
@@ -20,25 +21,26 @@ class Query
     /**#@+
      * Query types
      */
-    const TYPE_XPATH  = 'TYPE_XPATH';
-    const TYPE_CSS    = 'TYPE_CSS';
+    const TYPE_XPATH = 'TYPE_XPATH';
+    const TYPE_CSS = 'TYPE_CSS';
     /**#@-*/
 
     /**
      * Perform the query on Document
      *
-     * @param  string    $expression CSS selector or XPath query
-     * @param  Document  $document   Document to query
-     * @param  string    $type       The type of $expression
-     * @param  \DOMNode  $contextNode
+     * @param string $expression CSS selector or XPath query
+     * @param Document $document Document to query
+     * @param string $type The type of $expression
+     * @param DOMNode $contextNode
      * @return NodeList
      */
     public static function execute(
         $expression,
         Document $document,
         $type = self::TYPE_XPATH,
-        \DOMNode $contextNode = null
-    ) {
+        DOMNode $contextNode = null
+    )
+    {
         // Expression check
         if ($type === static::TYPE_CSS) {
             $expression = static::cssToXpath($expression);
@@ -66,14 +68,14 @@ class Query
     /**
      * Transform CSS expression to XPath
      *
-     * @param  string $path
+     * @param string $path
      * @return string
      */
     public static function cssToXpath($path)
     {
-        $path = (string) $path;
+        $path = (string)$path;
         if (strstr($path, ',')) {
-            $paths       = explode(',', $path);
+            $paths = explode(',', $path);
             $expressions = [];
             foreach ($paths as $path) {
                 $xpath = static::cssToXpath(trim($path));
@@ -99,8 +101,8 @@ class Query
             $path
         );
 
-        $paths    = ['//'];
-        $path     = preg_replace('|\s*>\s*|', '>', $path);
+        $paths = ['//'];
+        $path = preg_replace('|\s*>\s*|', '>', $path);
         $segments = preg_split('/\s+/', $path);
         $segments = str_replace($placeholder, ' ', $segments);
 
@@ -117,7 +119,7 @@ class Query
             if (0 === strpos($pathSegment, '[contains(')) {
                 foreach ($paths as $pathKey => $xpath) {
                     $paths[$pathKey] .= '//*' . ltrim($pathSegment, '*');
-                    $paths[]      = $xpath . $pathSegment;
+                    $paths[] = $xpath . $pathSegment;
                 }
             } else {
                 foreach ($paths as $pathKey => $xpath) {
@@ -133,10 +135,11 @@ class Query
     }
 
     // @codingStandardsIgnoreStart
+
     /**
      * Tokenize CSS expressions to XPath
      *
-     * @param  string $expression
+     * @param string $expression
      * @return string
      */
     protected static function _tokenize($expression)
@@ -163,7 +166,7 @@ class Query
             '/\[([a-z0-9_-]+)~=([\'"])((?!\2|\\\2).*?)\2\]/i',
             function ($matches) {
                 return "[contains(concat(' ', normalize-space(@" . strtolower($matches[1]) . "), ' '), ' "
-                     . $matches[3] . " ')]";
+                    . $matches[3] . " ')]";
             },
             $expression
         );
@@ -173,7 +176,7 @@ class Query
             '/\[([a-z0-9_-]+)\*=([\'"])((?!\2|\\\2).*?)\2\]/i',
             function ($matches) {
                 return "[contains(@" . strtolower($matches[1]) . ", '"
-                     . $matches[3] . "')]";
+                    . $matches[3] . "')]";
             },
             $expression
         );

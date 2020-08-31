@@ -1,24 +1,40 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use Zend\Dom\Query;
+use function count;
+use function preg_match;
+use function simplexml_load_file;
+use function str_getcsv;
+use function str_replace;
+use function substr;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
 
 /**
  * Export Class
@@ -29,7 +45,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class Smg extends \Oara\Network
+class Smg extends Network
 {
     private $_credentials = null;
     private $_accountSid = null;
@@ -38,57 +54,58 @@ class Smg extends \Oara\Network
     /**
      * @param $credentials
      * @throws Exception
-     * @throws \Exception
+     * @throws Exception
      * @throws \Oara\Curl\Exception
      */
     public function login($credentials)
     {
 
         $this->_credentials = $credentials;
-        $this->_client = new \Oara\Curl\Access($credentials);
+        $this->_client = new Access($credentials);
 
         $user = $this->_credentials['user'];
         $password = $this->_credentials['password'];
         $loginUrl = 'https://app.impact.com/secure/login.user';
 
-        $valuesLogin = array(new \Oara\Curl\Parameter('j_username', $user),
-            new \Oara\Curl\Parameter('j_password', $password)
-        );
+        $valuesLogin = [
+            new Parameter('j_username', $user),
+            new Parameter('j_password', $password)
+        ];
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request($loginUrl, $valuesLogin);
+        $urls = [];
+        $urls[] = new Request($loginUrl, $valuesLogin);
         $this->_client->post($urls);
 
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', array());
+        $urls = [];
+        $urls[] = new Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', []);
         $exportReport = $this->_client->get($urls);
-        $dom = new \Zend\Dom\Query($exportReport[0]);
+        $dom = new Query($exportReport[0]);
         $results = $dom->execute('div .uitkFields');
-        $count = \count($results);
+        $count = count($results);
         if ($count == 0) {
 
-            $activeAPI = array(new \Oara\Curl\Parameter('_eventId', "activate"));
-            $urls = array();
-            $urls[] = new \Oara\Curl\Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', $activeAPI);
+            $activeAPI = [new Parameter('_eventId', "activate")];
+            $urls = [];
+            $urls[] = new Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', $activeAPI);
             $this->_client->post($urls);
 
-            $urls = array();
-            $urls[] = new \Oara\Curl\Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', array());
+            $urls = [];
+            $urls[] = new Request('https://app.impact.com/secure/mediapartner/accountSettings/mp-wsapi-flow.ihtml?', []);
             $exportReport = $this->_client->get($urls);
-            $dom = new \Zend\Dom\Query($exportReport[0]);
+            $dom = new Query($exportReport[0]);
             $results = $dom->execute('div .uitkFields');
-            $count = \count($results); // get number of matches: 4
+            $count = count($results); // get number of matches: 4
             if ($count == 0) {
-                throw new \Exception ("No API credentials");
+                throw new Exception ("No API credentials");
             }
         }
         $i = 0;
         foreach ($results as $result) {
             if ($i == 0) {
-                $this->_accountSid = \str_replace(array("\n", "\t", " "), "", $result->nodeValue);
-            } else if ($i == 1) {
-                $this->_authToken = \str_replace(array("\n", "\t", " "), "", $result->nodeValue);
+                $this->_accountSid = str_replace(["\n", "\t", " "], "", $result->nodeValue);
+            } elseif ($i == 1) {
+                $this->_authToken = str_replace(["\n", "\t", " "], "", $result->nodeValue);
             }
             $i++;
         }
@@ -100,15 +117,15 @@ class Smg extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -125,11 +142,11 @@ class Smg extends \Oara\Network
         $connection = false;
 
         //Checking connection for the impact Radius website
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('https://app.impact.com/secure/mediapartner/home/pview.ihtml', array());
+        $urls = [];
+        $urls[] = new Request('https://app.impact.com/secure/mediapartner/home/pview.ihtml', []);
         $exportReport = $this->_client->get($urls);
         $newCheck = false;
-        if (\preg_match('/\/logOut\.user/', $exportReport[0], $match)) {
+        if (preg_match('/\/logOut\.user/', $exportReport[0], $match)) {
             $newCheck = true;
         }
 
@@ -137,7 +154,7 @@ class Smg extends \Oara\Network
         if ($newCheck && $this->_authToken != null && $this->_accountSid != null) {
             //Checking API connection from Impact Radius
             $uri = "https://" . $this->_accountSid . ":" . $this->_authToken . "@api.impactradius.com/2010-09-01/Mediapartners/" . $this->_accountSid . "/Campaigns.xml";
-            $res = \simplexml_load_file($uri);
+            $res = simplexml_load_file($uri);
             if (isset($res->Campaigns)) {
                 $newApi = true;
             }
@@ -157,9 +174,9 @@ class Smg extends \Oara\Network
     public function getMerchantList()
     {
         $merchantReportList = self::getMerchantReportList();
-        $merchants = Array();
+        $merchants = [];
         foreach ($merchantReportList as $key => $value) {
-            $obj = Array();
+            $obj = [];
             $obj['cid'] = $key;
             $obj['name'] = $value;
             $merchants[] = $obj;
@@ -175,7 +192,7 @@ class Smg extends \Oara\Network
     private function getMerchantReportList()
     {
         $uri = "https://" . $this->_accountSid . ":" . $this->_authToken . "@api.impactradius.com/2010-09-01/Mediapartners/" . $this->_accountSid . "/Campaigns.xml";
-        $res = \simplexml_load_file($uri);
+        $res = simplexml_load_file($uri);
         $currentPage = (int)$res->Campaigns->attributes()->page;
         $pageNumber = (int)$res->Campaigns->attributes()->numpages;
         while ($currentPage <= $pageNumber) {
@@ -189,7 +206,7 @@ class Smg extends \Oara\Network
             $currentPage++;
             $nextPageUri = (string)$res->Campaigns->attributes()->nextpageuri;
             if ($nextPageUri != null) {
-                $res = \simplexml_load_file("https://" . $this->_accountSid . ":" . $this->_authToken . "@api.impactradius.com" . $nextPageUri);
+                $res = simplexml_load_file("https://" . $this->_accountSid . ":" . $this->_authToken . "@api.impactradius.com" . $nextPageUri);
             }
         }
         return $merchantReportList;
@@ -197,17 +214,17 @@ class Smg extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = Array();
+        $totalTransactions = [];
 
         //New Interface
         $uri = "https://" . $this->_accountSid . ":" . $this->_authToken . "@api.impactradius.com/2010-09-01/Mediapartners/" . $this->_accountSid . "/Actions?ActionDateStart=" . $dStartDate->format('Y-m-d\TH:i:s') . "-00:00&ActionDateEnd=" . $dEndDate->format('Y-m-d\TH:i:s') . "-00:00";
-        $res = \simplexml_load_file($uri);
+        $res = simplexml_load_file($uri);
         if ($res) {
 
             $currentPage = (int)$res->Actions->attributes()->page;
@@ -215,10 +232,10 @@ class Smg extends \Oara\Network
             while ($currentPage <= $pageNumber) {
 
                 foreach ($res->Actions->Action as $action) {
-                    $transaction = Array();
+                    $transaction = [];
                     $transaction['merchantId'] = (int)$action->CampaignId;
 
-                    $transactionDate = \DateTime::createFromFormat("Y-m-d\TH:i:s", \substr((string)$action->EventDate,0,19));
+                    $transactionDate = DateTime::createFromFormat("Y-m-d\TH:i:s", substr((string)$action->EventDate, 0, 19));
                     $transaction['date'] = $transactionDate->format("Y-m-d H:i:s");
 
                     $transaction['unique_id'] = (string)$action->Id;
@@ -232,12 +249,12 @@ class Smg extends \Oara\Network
                     $status = (string)$action->State;
                     $statusArray[$status] = "";
                     if ($status == 'APPROVED' || $status == 'DEFAULT') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                        $transaction['status'] = Utilities::STATUS_CONFIRMED;
                     } else {
                         if ($status == 'REVERSED' || $status == 'REJECTED') {
-                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                            $transaction['status'] = Utilities::STATUS_DECLINED;
                         } else {
-                            $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                            $transaction['status'] = Utilities::STATUS_PENDING;
                         }
                     }
 
@@ -249,7 +266,7 @@ class Smg extends \Oara\Network
                 $currentPage++;
                 $nextPageUri = (string)$res->Actions->attributes()->nextpageuri;
                 if ($nextPageUri != null) {
-                    $res = \simplexml_load_file("https://" . $this->_accountSid . ":" . $this->_authToken . "@api.impactradius.com" . $nextPageUri);
+                    $res = simplexml_load_file("https://" . $this->_accountSid . ":" . $this->_authToken . "@api.impactradius.com" . $nextPageUri);
                 }
             }
         }
@@ -263,22 +280,22 @@ class Smg extends \Oara\Network
      */
     public function getPaymentHistory()
     {
-        $paymentHistory = array();
+        $paymentHistory = [];
 
-        $urls = array();
-        $urls[] = new \Oara\Curl\Request('https://app.impact.com/secure/nositemesh/accounting/getPayStubParamsCSV.csv', array());
+        $urls = [];
+        $urls[] = new Request('https://app.impact.com/secure/nositemesh/accounting/getPayStubParamsCSV.csv', []);
         $exportReport = $this->_client->get($urls);
-        $exportData = \str_getcsv($exportReport[0], "\n");
+        $exportData = str_getcsv($exportReport[0], "\n");
 
-        $num = \count($exportData);
+        $num = count($exportData);
         for ($i = 1; $i < $num; $i++) {
-            $paymentExportArray = \str_getcsv($exportData[$i], ",");
-            $obj = array();
-            $date = \DateTime::createFromFormat("M d, Y", $paymentExportArray[1]);
+            $paymentExportArray = str_getcsv($exportData[$i], ",");
+            $obj = [];
+            $date = DateTime::createFromFormat("M d, Y", $paymentExportArray[1]);
             $obj['date'] = $date->format("y-m-d H:i:s");
             $obj['pid'] = $paymentExportArray[0];
             $obj['method'] = 'BACS';
-            $obj['value'] = \Oara\Utilities::parseDouble($paymentExportArray[6]);
+            $obj['value'] = Utilities::parseDouble($paymentExportArray[6]);
             $paymentHistory[] = $obj;
         }
         return $paymentHistory;

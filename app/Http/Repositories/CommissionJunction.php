@@ -7,8 +7,8 @@ require_once __DIR__ . '/php-oara/vendor/autoload.php';
 
 use App\Models\ChildProduct;
 use App\Models\Product;
-use Oara\Network\Publisher\CommissionJunctionGraphQL;
 use Exception;
+use Oara\Network\Publisher\CommissionJunctionGraphQL;
 
 class CommissionJunction
 {
@@ -37,6 +37,13 @@ class CommissionJunction
         }
     }
 
+    public function addAllowedSite($idSite)
+    {
+        if (trim($idSite) != '') {
+            $this->_network->addAllowedSite($idSite);
+        }
+    }
+
     /**
      * @param $username
      * @param $password
@@ -54,7 +61,7 @@ class CommissionJunction
         $this->_password = $password;
         $this->_passwordApi = $password;
         $this->_publisher_id = $idSite;
-        $credentials = array();
+        $credentials = [];
         $credentials["user"] = $this->_username;
         $credentials["password"] = $this->_password;
         $credentials["apipassword"] = $this->_passwordApi;
@@ -80,13 +87,6 @@ class CommissionJunction
     public function getMerchants($params)
     {
         return $this->_network->getMerchantList($params);
-    }
-
-    public function addAllowedSite($idSite)
-    {
-        if (trim($idSite) != '') {
-            $this->_network->addAllowedSite($idSite);
-        }
     }
 
     public function getProductDetails($aid)
@@ -134,7 +134,7 @@ class CommissionJunction
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_passwordApi));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer " . $this->_passwordApi]);
 
         $curl_results = curl_exec($ch);
         curl_close($ch);

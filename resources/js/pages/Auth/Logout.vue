@@ -7,8 +7,8 @@ export default {
     name: 'Logout',
     created() {
         this.$store.state.userData = null;
-        this.$store.dispatch('destroyToken').then((response) => {
-            console.log(response);
+        this.$store.dispatch('destroyToken').then(() => {
+            // console.log(response);
             window.location.replace('/login');
         });
     },

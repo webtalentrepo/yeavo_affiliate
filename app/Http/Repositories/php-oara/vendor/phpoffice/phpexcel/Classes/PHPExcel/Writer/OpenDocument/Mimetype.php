@@ -30,7 +30,7 @@ class PHPExcel_Writer_OpenDocument_Mimetype extends PHPExcel_Writer_OpenDocument
     /**
      * Write mimetype to plain text format
      *
-     * @param     PHPExcel    $pPHPExcel
+     * @param PHPExcel $pPHPExcel
      * @return     string         XML Output
      * @throws     PHPExcel_Writer_Exception
      */
