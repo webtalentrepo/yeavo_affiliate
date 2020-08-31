@@ -261,14 +261,14 @@ class AuthController extends Controller
         $user = new UserResource($user);
 
         return response()->json([
-            'access_token' => $tokenObject->accessToken,
-            'expires_in'   => $tokenObject->token->expires_at->diffInSeconds(now()),
-            'email'        => $user->email,
-            'name'         => $user->name,
-            'id'           => $user->id,
-            'userInfo'     => $user,
-            'isAdmin'      => checkSupperAdmin($user->email),
-            'result'       => 'success'
+            'accessToken' => $tokenObject->accessToken,
+            'expiresIn'   => $tokenObject->token->expires_at->diffInSeconds(now()),
+            'email'       => $user->email,
+            'name'        => $user->name,
+            'id'          => $user->id,
+            'userInfo'    => $user,
+            'isAdmin'     => checkSupperAdmin($user->email),
+            'result'      => 'success'
         ], 200);
     }
 }

@@ -146,21 +146,26 @@ export default {
                     this.registerUser({ ...this.credentials })
                         .then((response) => {
                             if (response.data.result === 'success') {
-                                this.setUserInfo(response.data.userInfo);
+                                const {
+                                    email,
+                                    accessToken,
+                                    expiresIn,
+                                    isAdmin,
+                                    userInfo,
+                                } = response.data;
+
                                 window.BCookie.set(
                                     'DB-Auth-Email',
-                                    response.data.email,
+                                    email,
                                     259200,
                                 );
 
-                                const {
-                                    access_token: accessToken,
-                                    expires_in: tokenExpired,
-                                } = response.data;
+                                this.setUserInfo(userInfo);
 
                                 this.setAccessToken({
                                     token: accessToken,
-                                    expires: tokenExpired,
+                                    expires: expiresIn,
+                                    isAdmin: isAdmin,
                                 });
 
                                 this.$router.push('/');
