@@ -68,11 +68,11 @@ class PHPExcel_DocumentSecurity
     public function __construct()
     {
         // Initialise values
-        $this->lockRevision      = false;
-        $this->lockStructure     = false;
-        $this->lockWindows       = false;
+        $this->lockRevision = false;
+        $this->lockStructure = false;
+        $this->lockWindows = false;
         $this->revisionsPassword = '';
-        $this->workbookPassword  = '';
+        $this->workbookPassword = '';
     }
 
     /**
@@ -82,9 +82,9 @@ class PHPExcel_DocumentSecurity
      */
     public function isSecurityEnabled()
     {
-        return  $this->lockRevision ||
-                $this->lockStructure ||
-                $this->lockWindows;
+        return $this->lockRevision ||
+            $this->lockStructure ||
+            $this->lockWindows;
     }
 
     /**
@@ -166,8 +166,8 @@ class PHPExcel_DocumentSecurity
     /**
      * Set RevisionsPassword
      *
-     * @param string     $pValue
-     * @param boolean     $pAlreadyHashed If the password has already been hashed, set this to true
+     * @param string $pValue
+     * @param boolean $pAlreadyHashed If the password has already been hashed, set this to true
      * @return PHPExcel_DocumentSecurity
      */
     public function setRevisionsPassword($pValue = '', $pAlreadyHashed = false)
@@ -192,8 +192,8 @@ class PHPExcel_DocumentSecurity
     /**
      * Set WorkbookPassword
      *
-     * @param string     $pValue
-     * @param boolean     $pAlreadyHashed If the password has already been hashed, set this to true
+     * @param string $pValue
+     * @param boolean $pAlreadyHashed If the password has already been hashed, set this to true
      * @return PHPExcel_DocumentSecurity
      */
     public function setWorkbookPassword($pValue = '', $pAlreadyHashed = false)

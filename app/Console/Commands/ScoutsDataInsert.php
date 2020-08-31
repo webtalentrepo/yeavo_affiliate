@@ -4,10 +4,9 @@ namespace App\Console\Commands;
 
 use App\Http\Repositories\CommissionJunction;
 use App\Http\Repositories\ScoutRepository;
-use App\Http\Repositories\ShareSale;
-use App\Models\Product;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
+use ZipArchive;
+use function simplexml_load_string;
 
 class ScoutsDataInsert extends Command
 {
@@ -76,7 +75,7 @@ class ScoutsDataInsert extends Command
                 $content = file_get_contents('https://accounts.clickbank.com/feeds/marketplace_feed_v2.xml.zip');
 
                 if (file_put_contents(public_path('downloads/marketplace_feed_v2.xml.zip'), $content)) {
-                    $zip = new \ZipArchive();
+                    $zip = new ZipArchive();
                     $res = $zip->open(public_path('downloads/marketplace_feed_v2.xml.zip'));
                     if ($res === TRUE) {
                         $zip->extractTo($path);
@@ -85,7 +84,7 @@ class ScoutsDataInsert extends Command
                         if (file_exists(public_path('downloads/marketplace_feed_v2.xml'))) {
                             $re = file_get_contents(public_path('downloads/marketplace_feed_v2.xml'));
 
-                            $xml = \simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+                            $xml = simplexml_load_string($re, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
 
                             $json = json_encode($xml);
                             $array = json_decode($json, true);

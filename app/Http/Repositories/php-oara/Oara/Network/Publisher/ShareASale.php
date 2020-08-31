@@ -2,7 +2,12 @@
 
 namespace Oara\Network\Publisher;
 
+use DateTime;
+use DateTimeZone;
+use Exception;
+use Oara\Network;
 use Oara\Utilities;
+use function simplexml_load_string;
 
 /**
  * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
@@ -33,7 +38,7 @@ use Oara\Utilities;
  * @version    Release: 01.00
  *
  */
-class ShareASale extends \Oara\Network
+class ShareASale extends Network
 {
     /**
      * API Secret
@@ -80,21 +85,21 @@ class ShareASale extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Affiliate ID";
         $parameter["required"] = true;
         $parameter["name"] = "Affiliate ID";
         $credentials["affiliateid"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "API token";
         $parameter["required"] = true;
         $parameter["name"] = "API token";
         $credentials["apitoken"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "API secret";
         $parameter["required"] = true;
         $parameter["name"] = "API secret";
@@ -127,6 +132,30 @@ class ShareASale extends \Oara\Network
     }
 
     /**
+     * @param $actionVerb
+     * @param string $params
+     * @return mixed
+     */
+    private function makeCall($actionVerb, $params = "")
+    {
+
+        $myTimeStamp = gmdate(DATE_RFC1123);
+        $sig = $this->_apiToken . ':' . $myTimeStamp . ':' . $actionVerb . ':' . $this->_apiSecret;
+
+        $sigHash = hash("sha256", $sig);
+        $myHeaders = ["x-ShareASale-Date: $myTimeStamp", "x-ShareASale-Authentication: $sigHash"];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->_apiServer . "affiliateId=" . $this->_affiliateId . "&token=" . $this->_apiToken . "&version=" . $this->_apiVersion . "&XMLFormat=1&format=xml&action=" . $actionVerb . $params);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $myHeaders);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        $returnResult = curl_exec($ch);
+        curl_close($ch);
+
+        return $returnResult;
+    }
+
+    /**
      * @param array $params
      * @return array
      */
@@ -137,7 +166,7 @@ class ShareASale extends \Oara\Network
 
         $response = self::makeCall("merchantSearch", $params);
 
-        $xml = \simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
+        $xml = simplexml_load_string($response, null, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NOCDATA);
 
         $json = json_encode($xml);
 
@@ -147,18 +176,18 @@ class ShareASale extends \Oara\Network
     /**
      * See: https://account.shareasale.com/a-apimanager.cfm?
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getVouchers()
     {
-        $totalDeals = array();
+        $totalDeals = [];
         //Add current=1 to view only current deals. Default is 0
         $returnResult = self::makeCall("couponDeals", "&current=1");
         if (stripos($returnResult, "Error Code ")) {
             // error occurred
             echo "[ShareASale][Error] " . $returnResult . PHP_EOL;
             var_dump($returnResult);
-            throw new \Exception($returnResult);
+            throw new Exception($returnResult);
         }
         $exportData = str_getcsv($returnResult, "\r\n");
         $num = count($exportData);
@@ -167,19 +196,19 @@ class ShareASale extends \Oara\Network
             if (count($dealExportArray) < 17) {
                 continue;
             }
-            $deal = array();
+            $deal = [];
             $deal['promotionId'] = (int)$dealExportArray[0];
             $deal['advertiser_id'] = (int)$dealExportArray[1];
             $deal['advertiser_name'] = (int)$dealExportArray[2];
             if (isset($dealExportArray[3])) {
                 //ShareASale.com Inc. Chicago IL 60654
-                $deal["start_date"] = new \DateTime($dealExportArray[3], new \DateTimeZone('America/Chicago'));
-                $deal["start_date"]->setTimezone(new \DateTimeZone('Europe/Rome'));
+                $deal["start_date"] = new DateTime($dealExportArray[3], new DateTimeZone('America/Chicago'));
+                $deal["start_date"]->setTimezone(new DateTimeZone('Europe/Rome'));
             }
             if (isset($dealExportArray[4])) {
                 //ShareASale.com Inc. Chicago IL 60654
-                $deal["end_date"] = new \DateTime($dealExportArray[4], new \DateTimeZone('America/Chicago'));
-                $deal["end_date"]->setTimezone(new \DateTimeZone('Europe/Rome'));
+                $deal["end_date"] = new DateTime($dealExportArray[4], new DateTimeZone('America/Chicago'));
+                $deal["end_date"]->setTimezone(new DateTimeZone('Europe/Rome'));
             }
             $deal['name'] = $dealExportArray[6];
             $deal['tracking'] = $dealExportArray[8];
@@ -197,25 +226,24 @@ class ShareASale extends \Oara\Network
         return $totalDeals;
     }
 
-
     /**
      * See: https://account.shareasale.com/a-apimanager.cfm?
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
 
         $returnResult = self::makeCall("activity", "&dateStart=" . $dStartDate->format("m/d/Y") . "&dateEnd=" . $dEndDate->format("m/d/Y"));
         if (stripos($returnResult, "Error Code ")) {
             // error occurred
             echo "[ShareASale][Error] " . $returnResult . PHP_EOL;
             var_dump($returnResult);
-            throw new \Exception($returnResult);
+            throw new Exception($returnResult);
         }
         $exportData = str_getcsv($returnResult, "\r\n");
         $num = count($exportData);
@@ -224,7 +252,7 @@ class ShareASale extends \Oara\Network
             if (count($transactionExportArray) < 26) {
                 continue;
             }
-            $transaction = array();
+            $transaction = [];
             $transaction['unique_id'] = (int)$transactionExportArray[0];
             if (isset($transactionExportArray[1])) {
                 $transaction["affiliate_ID"] = (int)$transactionExportArray[1];
@@ -235,8 +263,8 @@ class ShareASale extends \Oara\Network
             }
             if (isset($transactionExportArray[3])) {
                 //ShareASale.com Inc. Chicago IL 60654
-                $transaction["date"] = new \DateTime($transactionExportArray[3], new \DateTimeZone('America/Chicago'));
-                $transaction["date"]->setTimezone(new \DateTimeZone('Europe/Rome'));
+                $transaction["date"] = new DateTime($transactionExportArray[3], new DateTimeZone('America/Chicago'));
+                $transaction["date"]->setTimezone(new DateTimeZone('Europe/Rome'));
             }
             $transaction['amount'] = Utilities::parseDouble($transactionExportArray[4]);
             $transaction['commission'] = Utilities::parseDouble($transactionExportArray[5]);
@@ -279,8 +307,8 @@ class ShareASale extends \Oara\Network
                 $time = date("H:i:s", $str_to_time_time);
                 $click_date = $date . " " . $time;
 
-                $transaction["click_date"] = new \DateTime($click_date, new \DateTimeZone('America/Chicago'));
-                $transaction["click_date"]->setTimezone(new \DateTimeZone('Europe/Rome'));
+                $transaction["click_date"] = new DateTime($click_date, new DateTimeZone('America/Chicago'));
+                $transaction["click_date"]->setTimezone(new DateTimeZone('Europe/Rome'));
             }
             if (isset($transactionExportArray[15])) {
                 $banner_id = $transactionExportArray[15];
@@ -321,29 +349,5 @@ class ShareASale extends \Oara\Network
             $totalTransactions[] = $transaction;
         }
         return $totalTransactions;
-    }
-
-    /**
-     * @param $actionVerb
-     * @param string $params
-     * @return mixed
-     */
-    private function makeCall($actionVerb, $params = "")
-    {
-
-        $myTimeStamp = gmdate(DATE_RFC1123);
-        $sig = $this->_apiToken . ':' . $myTimeStamp . ':' . $actionVerb . ':' . $this->_apiSecret;
-
-        $sigHash = hash("sha256", $sig);
-        $myHeaders = array("x-ShareASale-Date: $myTimeStamp", "x-ShareASale-Authentication: $sigHash");
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->_apiServer . "affiliateId=" . $this->_affiliateId . "&token=" . $this->_apiToken . "&version=" . $this->_apiVersion . "&XMLFormat=1&format=xml&action=" . $actionVerb . $params);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $myHeaders);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        $returnResult = curl_exec($ch);
-        curl_close($ch);
-
-        return $returnResult;
     }
 }

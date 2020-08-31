@@ -19,9 +19,9 @@ class Document
     /**#@+
      * Document types
      */
-    const DOC_HTML     = 'DOC_HTML';
-    const DOC_XHTML    = 'DOC_XHTML';
-    const DOC_XML      = 'DOC_XML';
+    const DOC_HTML = 'DOC_HTML';
+    const DOC_XHTML = 'DOC_XHTML';
+    const DOC_XML = 'DOC_XML';
     /**#@-*/
 
     /**
@@ -66,82 +66,14 @@ class Document
     /**
      * Constructor
      *
-     * @param string|null  $document  String containing the document
-     * @param string|null  $type      Force the document to be of a certain type,
+     * @param string|null $document String containing the document
+     * @param string|null $type Force the document to be of a certain type,
      *                                bypassing setStringDocument's detection
-     * @param string|null  $encoding  Encoding for the document (used for DOMDocument generation)
+     * @param string|null $encoding Encoding for the document (used for DOMDocument generation)
      */
     public function __construct($document = null, $type = null, $encoding = null)
     {
         $this->setStringDocument($document, $type, $encoding);
-    }
-
-    /**
-     * Get raw set document
-     *
-     * @return string|null
-     */
-    public function getStringDocument()
-    {
-        return $this->stringDocument;
-    }
-
-    /**
-     * Set raw document
-     *
-     * @param string|null  $document
-     * @param string|null  $forcedType      Type for the provided document (see constants)
-     * @param string|null  $forcedEncoding  Encoding for the provided document
-     * @return self
-     */
-    protected function setStringDocument($document, $forcedType = null, $forcedEncoding = null)
-    {
-        $type = static::DOC_HTML;
-        if (strstr($document, 'DTD XHTML')) {
-            $type = static::DOC_XHTML;
-        }
-
-        // Breaking XML declaration to make syntax highlighting work
-        if ('<' . '?xml' == substr(trim($document), 0, 5)) {
-            $type = static::DOC_XML;
-            if (preg_match('/<html[^>]*xmlns="([^"]+)"[^>]*>/i', $document, $matches)) {
-                $this->xpathNamespaces[] = $matches[1];
-                $type = static::DOC_XHTML;
-            }
-        }
-
-        // Unsetting previously registered DOMDocument
-        $this->domDocument     = null;
-        $this->stringDocument  = ! empty($document) ? $document : null;
-
-        $this->setType($forcedType ?: (! empty($document) ? $type : null));
-        $this->setEncoding($forcedEncoding);
-        $this->setErrors([]);
-
-        return $this;
-    }
-
-    /**
-     * Get raw document type
-     *
-     * @return string|null
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set raw document type
-     *
-     * @param  string    $type
-     * @return self
-     */
-    protected function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
     }
 
     /**
@@ -166,7 +98,7 @@ class Document
     /**
      * Set DOMDocument
      *
-     * @param  DOMDocument $domDocument
+     * @param DOMDocument $domDocument
      * @return self
      * @deprecated
      */
@@ -178,47 +110,46 @@ class Document
     }
 
     /**
-     * Get set document encoding
+     * Get raw set document
      *
      * @return string|null
      */
-    public function getEncoding()
+    public function getStringDocument()
     {
-        return $this->encoding;
+        return $this->stringDocument;
     }
 
     /**
-     * Set raw document encoding for DOMDocument generation
+     * Set raw document
      *
-     * @param  string|null $encoding
+     * @param string|null $document
+     * @param string|null $forcedType Type for the provided document (see constants)
+     * @param string|null $forcedEncoding Encoding for the provided document
      * @return self
      */
-    public function setEncoding($encoding)
+    protected function setStringDocument($document, $forcedType = null, $forcedEncoding = null)
     {
-        $this->encoding = $encoding;
+        $type = static::DOC_HTML;
+        if (strstr($document, 'DTD XHTML')) {
+            $type = static::DOC_XHTML;
+        }
 
-        return $this;
-    }
+        // Breaking XML declaration to make syntax highlighting work
+        if ('<' . '?xml' == substr(trim($document), 0, 5)) {
+            $type = static::DOC_XML;
+            if (preg_match('/<html[^>]*xmlns="([^"]+)"[^>]*>/i', $document, $matches)) {
+                $this->xpathNamespaces[] = $matches[1];
+                $type = static::DOC_XHTML;
+            }
+        }
 
-    /**
-     * Get DOMDocument generation errors
-     *
-     * @return array
-     */
-    public function getErrors()
-    {
-        return $this->errors;
-    }
+        // Unsetting previously registered DOMDocument
+        $this->domDocument = null;
+        $this->stringDocument = !empty($document) ? $document : null;
 
-    /**
-     * Set document errors from DOMDocument generation
-     *
-     * @param  array $errors
-     * @return self
-     */
-    protected function setErrors($errors)
-    {
-        $this->errors = $errors;
+        $this->setType($forcedType ?: (!empty($document) ? $type : null));
+        $this->setEncoding($forcedEncoding);
+        $this->setErrors([]);
 
         return $this;
     }
@@ -234,9 +165,9 @@ class Document
         libxml_use_internal_errors(true);
         libxml_disable_entity_loader(true);
 
-        $encoding  = $this->getEncoding();
-        $domDoc    = null === $encoding ? new DOMDocument('1.0') : new DOMDocument('1.0', $encoding);
-        $type      = $this->getType();
+        $encoding = $this->getEncoding();
+        $domDoc = null === $encoding ? new DOMDocument('1.0') : new DOMDocument('1.0', $encoding);
+        $type = $this->getType();
 
         switch ($type) {
             case static::DOC_XML:
@@ -257,7 +188,7 @@ class Document
         }
 
         $errors = libxml_get_errors();
-        if (! empty($errors)) {
+        if (!empty($errors)) {
             $this->setErrors($errors);
             libxml_clear_errors();
         }
@@ -265,11 +196,80 @@ class Document
         libxml_disable_entity_loader(false);
         libxml_use_internal_errors(false);
 
-        if (! $success) {
+        if (!$success) {
             throw new Exception\RuntimeException(sprintf('Error parsing document (type == %s)', $type));
         }
 
         return $domDoc;
+    }
+
+    /**
+     * Get set document encoding
+     *
+     * @return string|null
+     */
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
+
+    /**
+     * Set raw document encoding for DOMDocument generation
+     *
+     * @param string|null $encoding
+     * @return self
+     */
+    public function setEncoding($encoding)
+    {
+        $this->encoding = $encoding;
+
+        return $this;
+    }
+
+    /**
+     * Get raw document type
+     *
+     * @return string|null
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set raw document type
+     *
+     * @param string $type
+     * @return self
+     */
+    protected function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get DOMDocument generation errors
+     *
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * Set document errors from DOMDocument generation
+     *
+     * @param array $errors
+     * @return self
+     */
+    protected function setErrors($errors)
+    {
+        $this->errors = $errors;
+
+        return $this;
     }
 
     /**
@@ -285,7 +285,7 @@ class Document
     /**
      * Register XPath namespaces
      *
-     * @param  array $xpathNamespaces
+     * @param array $xpathNamespaces
      * @return void
      */
     public function registerXpathNamespaces($xpathNamespaces)
@@ -302,10 +302,11 @@ class Document
     {
         return $this->xpathPhpFunctions;
     }
+
     /**
      * Register PHP Functions to use in internal DOMXPath
      *
-     * @param  bool $xpathPhpFunctions
+     * @param bool $xpathPhpFunctions
      * @return void
      */
     public function registerXpathPhpFunctions($xpathPhpFunctions = true)

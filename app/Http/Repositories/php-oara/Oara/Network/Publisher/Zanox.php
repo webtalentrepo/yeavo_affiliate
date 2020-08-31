@@ -1,24 +1,36 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use ApiClient;
+use DateInterval;
+use DateTime;
+use Exception;
+use Oara\Network;
+use Oara\Utilities;
+use function array_merge;
+use function gc_collect_cycles;
+use function strlen;
+use function substr;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
 /**
  * Api Class
  *
@@ -31,7 +43,7 @@ namespace Oara\Network\Publisher;
 
 require "Zanox/Zapi/ApiClient.php";
 
-class Zanox extends \Oara\Network
+class Zanox extends Network
 {
 
     protected $_apiClient = null;
@@ -42,7 +54,7 @@ class Zanox extends \Oara\Network
      */
     public function login($credentials)
     {
-        $api = \ApiClient::factory(PROTOCOL_SOAP, VERSION_2011_03_01);
+        $api = ApiClient::factory(PROTOCOL_SOAP, VERSION_2011_03_01);
         $connectId = $credentials['connectid'];
         $secretKey = $credentials['secretkey'];
         $api->setConnectId($connectId);
@@ -56,15 +68,15 @@ class Zanox extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Connect Id";
         $parameter["required"] = true;
         $parameter["name"] = "Connect Id";
         $credentials["connectId"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Secret Key";
         $parameter["required"] = true;
         $parameter["name"] = "Secret Key";
@@ -81,7 +93,7 @@ class Zanox extends \Oara\Network
         $connection = true;
         try {
             $profile = $this->_apiClient->getProfile();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $connection = false;
         }
 
@@ -93,7 +105,7 @@ class Zanox extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchantList = array();
+        $merchantList = [];
 
         $programApplicationList = $this->_apiClient->getProgramApplications(null, null, "confirmed", 0, $this->_pageSize);
         if ($programApplicationList->total > 0) {
@@ -103,7 +115,7 @@ class Zanox extends \Oara\Network
                 $programApplicationList = $this->_apiClient->getProgramApplications(null, null, "confirmed", $j, $this->_pageSize);
                 foreach ($programApplicationList->programApplicationItems->programApplicationItem as $programApplication) {
                     if (!isset($merchantList[$programApplication->program->id])) {
-                        $obj = array();
+                        $obj = [];
                         $obj['cid'] = $programApplication->program->id;
                         $obj['name'] = $programApplication->program->_;
                         $merchantList[$programApplication->program->id] = $obj;
@@ -131,59 +143,57 @@ class Zanox extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
         $diff = $dStartDate->diff($dEndDate)->days;
 
-        $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $merchantIdList = Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
         $auxDate = clone $dStartDate;
         for ($i = 0; $i < $diff; $i++) {
-            $totalAuxTransactions = array();
+            $totalAuxTransactions = [];
             $transactionList = $this->getSales($auxDate->format("Y-m-d"), 0, $this->_pageSize);
 
             if ($transactionList->total > 0) {
                 $iteration = self::calculeIterationNumber($transactionList->total, $this->_pageSize);
-                $totalAuxTransactions = \array_merge($totalAuxTransactions, $transactionList->saleItems->saleItem);
+                $totalAuxTransactions = array_merge($totalAuxTransactions, $transactionList->saleItems->saleItem);
                 for ($j = 1; $j < $iteration; $j++) {
                     $transactionList = $this->getSales($auxDate->format("Y-m-d"), $j, $this->_pageSize);
-                    $totalAuxTransactions = \array_merge($totalAuxTransactions, $transactionList->saleItems->saleItem);
+                    $totalAuxTransactions = array_merge($totalAuxTransactions, $transactionList->saleItems->saleItem);
                     unset($transactionList);
-                    \gc_collect_cycles();
+                    gc_collect_cycles();
                 }
 
             }
             $leadList = $this->_apiClient->getLeads($auxDate->format("Y-m-d"), 'trackingDate', null, null, null, 0, $this->_pageSize);
             if ($leadList->total > 0) {
                 $iteration = self::calculeIterationNumber($leadList->total, $this->_pageSize);
-                $totalAuxTransactions = \array_merge($totalAuxTransactions, $leadList->leadItems->leadItem);
+                $totalAuxTransactions = array_merge($totalAuxTransactions, $leadList->leadItems->leadItem);
                 for ($j = 1; $j < $iteration; $j++) {
                     $leadList = $this->_apiClient->getLeads($auxDate->format("Y-m-d"), 'trackingDate', null, null, null, $j, $this->_pageSize);
-                    $totalAuxTransactions = \array_merge($totalAuxTransactions, $leadList->leadItems->leadItem);
+                    $totalAuxTransactions = array_merge($totalAuxTransactions, $leadList->leadItems->leadItem);
                     unset($leadList);
-                    \gc_collect_cycles();
+                    gc_collect_cycles();
                 }
             }
 
             foreach ($totalAuxTransactions as $transaction) {
 
                 if ($merchantList == null || isset($merchantIdList[$transaction->program->id])) {
-                    $obj = array();
+                    $obj = [];
                     $obj['currency'] = $transaction->currency;
                     if ($transaction->reviewState == 'confirmed') {
-                        $obj['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                    } else
-                        if ($transaction->reviewState == 'open' || $transaction->reviewState == 'approved') {
-                            $obj['status'] = \Oara\Utilities::STATUS_PENDING;
-                        } else
-                            if ($transaction->reviewState == 'rejected') {
-                                $obj['status'] = \Oara\Utilities::STATUS_DECLINED;
-                            }
+                        $obj['status'] = Utilities::STATUS_CONFIRMED;
+                    } elseif ($transaction->reviewState == 'open' || $transaction->reviewState == 'approved') {
+                        $obj['status'] = Utilities::STATUS_PENDING;
+                    } elseif ($transaction->reviewState == 'rejected') {
+                        $obj['status'] = Utilities::STATUS_DECLINED;
+                    }
                     if (!isset($transaction->amount) || $transaction->amount == 0) {
                         $obj['amount'] = $transaction->commission;
                     } else {
@@ -193,8 +203,8 @@ class Zanox extends \Oara\Network
                     if (isset($transaction->gpps) && $transaction->gpps != null) {
                         foreach ($transaction->gpps->gpp as $gpp) {
                             if ($gpp->id == "zpar0") {
-                                if (\strlen($gpp->_) > 150) {
-                                    $gpp->_ = \substr($gpp->_, 0, 150);
+                                if (strlen($gpp->_) > 150) {
+                                    $gpp->_ = substr($gpp->_, 0, 150);
                                 }
                                 $obj['custom_id'] = $gpp->_;
                             }
@@ -215,9 +225,9 @@ class Zanox extends \Oara\Network
 
             }
             unset($totalAuxTransactions);
-            \gc_collect_cycles();
+            gc_collect_cycles();
 
-            $interval = new \DateInterval('P1D');
+            $interval = new DateInterval('P1D');
             $auxDate->add($interval);
         }
         return $totalTransactions;
@@ -225,10 +235,10 @@ class Zanox extends \Oara\Network
 
     protected function getSales($date, $page, $pageSize, $iteration = 0)
     {
-        $transactionList = array();
+        $transactionList = [];
         try {
             $transactionList = $this->_apiClient->getSales($date, 'trackingDate', null, null, null, $page, $pageSize, $iteration);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $iteration++;
             if ($iteration < 5) {
                 $transactionList = self::getSales($date, $page, $pageSize, $iteration);

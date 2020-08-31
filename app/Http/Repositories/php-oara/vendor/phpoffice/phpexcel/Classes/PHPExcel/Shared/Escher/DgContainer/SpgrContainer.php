@@ -39,17 +39,7 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer
      *
      * @var array
      */
-    private $children = array();
-
-    /**
-     * Set parent Shape Group Container
-     *
-     * @param PHPExcel_Shared_Escher_DgContainer_SpgrContainer $parent
-     */
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-    }
+    private $children = [];
 
     /**
      * Get the parent Shape Group Container if any
@@ -59,6 +49,16 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * Set parent Shape Group Container
+     *
+     * @param PHPExcel_Shared_Escher_DgContainer_SpgrContainer $parent
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
     }
 
     /**
@@ -87,7 +87,7 @@ class PHPExcel_Shared_Escher_DgContainer_SpgrContainer
      */
     public function getAllSpContainers()
     {
-        $allSpContainers = array();
+        $allSpContainers = [];
 
         foreach ($this->children as $child) {
             if ($child instanceof PHPExcel_Shared_Escher_DgContainer_SpgrContainer) {

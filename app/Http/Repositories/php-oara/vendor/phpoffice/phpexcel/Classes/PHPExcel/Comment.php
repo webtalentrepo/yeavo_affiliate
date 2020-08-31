@@ -98,8 +98,8 @@ class PHPExcel_Comment implements PHPExcel_IComparable
     public function __construct()
     {
         // Initialise variables
-        $this->author    = 'Author';
-        $this->text      = new PHPExcel_RichText();
+        $this->author = 'Author';
+        $this->text = new PHPExcel_RichText();
         $this->fillColor = new PHPExcel_Style_Color('FFFFFFE1');
         $this->alignment = PHPExcel_Style_Alignment::HORIZONTAL_GENERAL;
     }
@@ -269,6 +269,16 @@ class PHPExcel_Comment implements PHPExcel_IComparable
     }
 
     /**
+     * Get Alignment
+     *
+     * @return string
+     */
+    public function getAlignment()
+    {
+        return $this->alignment;
+    }
+
+    /**
      * Set Alignment
      *
      * @param string $pValue
@@ -278,16 +288,6 @@ class PHPExcel_Comment implements PHPExcel_IComparable
     {
         $this->alignment = $pValue;
         return $this;
-    }
-
-    /**
-     * Get Alignment
-     *
-     * @return string
-     */
-    public function getAlignment()
-    {
-        return $this->alignment;
     }
 
     /**

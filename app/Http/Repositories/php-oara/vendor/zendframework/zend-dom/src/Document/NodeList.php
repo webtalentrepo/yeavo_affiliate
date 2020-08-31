@@ -35,7 +35,7 @@ class NodeList implements Iterator, Countable, ArrayAccess
     /**
      * Constructor
      *
-     * @param DOMNodeList  $list
+     * @param DOMNodeList $list
      */
     public function __construct(DOMNodeList $list)
     {
@@ -62,6 +62,18 @@ class NodeList implements Iterator, Countable, ArrayAccess
     public function valid()
     {
         return $this->offsetExists($this->position);
+    }
+
+    /**
+     * ArrayAccess: offset exists
+     *
+     * @param int $key
+     * @return bool
+     */
+    public function offsetExists($key)
+    {
+        // DOMNodeList return `null` if item not exists.
+        return (null !== $this->list->item($key));
     }
 
     /**
@@ -107,18 +119,6 @@ class NodeList implements Iterator, Countable, ArrayAccess
     }
 
     /**
-     * ArrayAccess: offset exists
-     *
-     * @param int $key
-     * @return bool
-     */
-    public function offsetExists($key)
-    {
-        // DOMNodeList return `null` if item not exists.
-        return (null !== $this->list->item($key));
-    }
-
-    /**
      * ArrayAccess: get offset
      *
      * @param int $key
@@ -132,8 +132,8 @@ class NodeList implements Iterator, Countable, ArrayAccess
     /**
      * ArrayAccess: set offset
      *
-     * @param  mixed $key
-     * @param  mixed $value
+     * @param mixed $key
+     * @param mixed $value
      * @throws Exception\BadMethodCallException when attempting to write to a read-only item
      */
     public function offsetSet($key, $value)
@@ -144,7 +144,7 @@ class NodeList implements Iterator, Countable, ArrayAccess
     /**
      * ArrayAccess: unset offset
      *
-     * @param  mixed $key
+     * @param mixed $key
      * @throws Exception\BadMethodCallException when attempting to unset a read-only item
      */
     public function offsetUnset($key)

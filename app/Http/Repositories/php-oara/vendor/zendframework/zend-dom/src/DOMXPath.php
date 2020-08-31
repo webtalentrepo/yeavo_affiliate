@@ -6,9 +6,13 @@
  * @copyright Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
+
 namespace Zend\Dom;
 
+use DOMNode;
+use DOMNodeList;
 use ErrorException;
+use const E_WARNING;
 
 /**
  * Extends DOMXpath to throw ErrorExceptions instead of raising errors.
@@ -27,11 +31,11 @@ class DOMXPath extends \DOMXPath
      * raising an error
      *
      * @param string $expression The XPath expression to evaluate.
-     * @param \DOMNode $contextNode
-     * @return \DOMNodeList
+     * @param DOMNode $contextNode
+     * @return DOMNodeList
      * @throws ErrorException
      */
-    public function queryWithErrorException($expression, \DOMNode $contextNode = null)
+    public function queryWithErrorException($expression, DOMNode $contextNode = null)
     {
         $this->errors = [null];
 
@@ -39,7 +43,7 @@ class DOMXPath extends \DOMXPath
             $contextNode = $this->document->documentElement;
         }
 
-        set_error_handler([$this, 'addError'], \E_WARNING);
+        set_error_handler([$this, 'addError'], E_WARNING);
         $nodeList = $this->query($expression, $contextNode);
         restore_error_handler();
 
@@ -54,10 +58,10 @@ class DOMXPath extends \DOMXPath
     /**
      * Adds an error to the stack of errors
      *
-     * @param int    $errno
+     * @param int $errno
      * @param string $errstr
      * @param string $errfile
-     * @param int    $errline
+     * @param int $errline
      * @return void
      */
     public function addError($errno, $errstr = '', $errfile = '', $errline = 0)

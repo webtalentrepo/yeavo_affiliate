@@ -1,5 +1,15 @@
 <?php
+
 namespace Oara\Network\Publisher;
+use DateTime;
+use Oara\Network;
+use Oara\Utilities;
+use function count;
+use function file_get_contents;
+use function simplexml_load_string;
+use function str_getcsv;
+use function utf8_encode;
+
 /**
  * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
  * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
@@ -19,6 +29,7 @@ namespace Oara\Network\Publisher;
  * ------------
  * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
  **/
+
 /**
  * API Class
  *
@@ -28,7 +39,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class Effiliation extends \Oara\Network
+class Effiliation extends Network
 {
 
     protected $_credentials = null;
@@ -48,9 +59,9 @@ class Effiliation extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "API Password";
         $parameter["required"] = true;
         $parameter["name"] = "API";
@@ -86,12 +97,12 @@ class Effiliation extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = array();
+        $merchants = [];
         $url = 'https://api.effiliation.com/apiv2/programs.xml?key=' . $this->_credentials["apiPassword"] . "&filter=active&timestamp=" . time();
-        $content = @\file_get_contents($url);
-        $xml = \simplexml_load_string($content, null, LIBXML_NOERROR | LIBXML_NOWARNING);
+        $content = @file_get_contents($url);
+        $xml = simplexml_load_string($content, null, LIBXML_NOERROR | LIBXML_NOWARNING);
         foreach ($xml->program as $merchant) {
-            $obj = array();
+            $obj = [];
             $obj['cid'] = (string)$merchant->id_programme;
             $obj['name'] = (string)$merchant->nom;
             $obj['url'] = "";
@@ -102,46 +113,44 @@ class Effiliation extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
 
-        $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $merchantIdList = Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
         $url = 'https://api.effiliation.com/apiv2/transaction.csv?key=' . $this->_credentials["apiPassword"] . '&start=' . $dStartDate->format("d/m/Y") . '&end=' . $dEndDate->format("d/m/Y") . '&type=date&timestamp=' . time();
-        $content = \utf8_encode(\file_get_contents($url));
-        $exportData = \str_getcsv($content, "\n");
-        $num = \count($exportData);
+        $content = utf8_encode(file_get_contents($url));
+        $exportData = str_getcsv($content, "\n");
+        $num = count($exportData);
         for ($i = 1; $i < $num; $i++) {
-            $transactionExportArray = \str_getcsv($exportData[$i], "|");
+            $transactionExportArray = str_getcsv($exportData[$i], "|");
             if (isset($merchantIdList[(int)$transactionExportArray[2]])) {
 
-                $transaction = Array();
+                $transaction = [];
                 $merchantId = (int)$transactionExportArray[2];
                 $transaction['merchantId'] = $merchantId;
                 // Changed Transaction date index from 10 to 12 - 2018-01-01 <PN>
                 $transaction['date'] = $transactionExportArray[12];
                 $transaction['unique_id'] = $transactionExportArray[0];
-                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                $transaction['status'] = Utilities::STATUS_PENDING;
                 if ($transactionExportArray[15] != null) {
                     $transaction['custom_id'] = $transactionExportArray[15];
                 }
 
                 if ($transactionExportArray[9] == 'Valide') {
-                    $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                } else
-                    if ($transactionExportArray[9] == 'Attente') {
-                        $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
-                    } else
-                        if ($transactionExportArray[9] == 'Refusé') {
-                            $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
-                        }
-                $transaction['amount'] = \Oara\Utilities::parseDouble($transactionExportArray[7]);
-                $transaction['commission'] = \Oara\Utilities::parseDouble($transactionExportArray[8]);
+                    $transaction['status'] = Utilities::STATUS_CONFIRMED;
+                } elseif ($transactionExportArray[9] == 'Attente') {
+                    $transaction['status'] = Utilities::STATUS_PENDING;
+                } elseif ($transactionExportArray[9] == 'Refusé') {
+                    $transaction['status'] = Utilities::STATUS_DECLINED;
+                }
+                $transaction['amount'] = Utilities::parseDouble($transactionExportArray[7]);
+                $transaction['commission'] = Utilities::parseDouble($transactionExportArray[8]);
                 $totalTransactions[] = $transaction;
             }
         }

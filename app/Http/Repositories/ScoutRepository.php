@@ -14,16 +14,6 @@ class ScoutRepository
 
     }
 
-    public function model()
-    {
-        return app(Product::class);
-    }
-
-    public function child_model()
-    {
-        return app(ChildProduct::class);
-    }
-
     public function setClickBankData($re, $link)
     {
         foreach ($re as $row) {
@@ -90,6 +80,11 @@ class ScoutRepository
         $scout->edited_flag = 0;
 
         $scout->save();
+    }
+
+    public function model()
+    {
+        return app(Product::class);
     }
 
     /**
@@ -250,5 +245,10 @@ class ScoutRepository
         $qry = $qry->get();
 
         return $qry;
+    }
+
+    public function child_model()
+    {
+        return app(ChildProduct::class);
     }
 }

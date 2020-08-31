@@ -28,6 +28,42 @@
 class PHPExcel_Worksheet_HeaderFooterDrawing extends PHPExcel_Worksheet_Drawing implements PHPExcel_IComparable
 {
     /**
+     * Name
+     *
+     * @var string
+     */
+    protected $name;
+    /**
+     * Offset X
+     *
+     * @var int
+     */
+    protected $offsetX;
+    /**
+     * Offset Y
+     *
+     * @var int
+     */
+    protected $offsetY;
+    /**
+     * Width
+     *
+     * @var int
+     */
+    protected $width;
+    /**
+     * Height
+     *
+     * @var int
+     */
+    protected $height;
+    /**
+     * Proportional resize
+     *
+     * @var boolean
+     */
+    protected $resizeProportional;
+    /**
      * Path
      *
      * @var string
@@ -35,60 +71,18 @@ class PHPExcel_Worksheet_HeaderFooterDrawing extends PHPExcel_Worksheet_Drawing 
     private $path;
 
     /**
-     * Name
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * Offset X
-     *
-     * @var int
-     */
-    protected $offsetX;
-
-    /**
-     * Offset Y
-     *
-     * @var int
-     */
-    protected $offsetY;
-
-    /**
-     * Width
-     *
-     * @var int
-     */
-    protected $width;
-
-    /**
-     * Height
-     *
-     * @var int
-     */
-    protected $height;
-
-    /**
-     * Proportional resize
-     *
-     * @var boolean
-     */
-    protected $resizeProportional;
-
-    /**
      * Create a new PHPExcel_Worksheet_HeaderFooterDrawing
      */
     public function __construct()
     {
         // Initialise values
-        $this->path                = '';
-        $this->name                = '';
-        $this->offsetX             = 0;
-        $this->offsetY             = 0;
-        $this->width               = 0;
-        $this->height              = 0;
-        $this->resizeProportional  = true;
+        $this->path = '';
+        $this->name = '';
+        $this->offsetX = 0;
+        $this->offsetY = 0;
+        $this->width = 0;
+        $this->height = 0;
+        $this->resizeProportional = true;
     }
 
     /**
@@ -225,10 +219,10 @@ class PHPExcel_Worksheet_HeaderFooterDrawing extends PHPExcel_Worksheet_Drawing 
      * $objDrawing->setWidthAndHeight(160,120);
      * </code>
      *
-     * @author Vincent@luo MSN:kele_100@hotmail.com
      * @param int $width
      * @param int $height
      * @return PHPExcel_Worksheet_HeaderFooterDrawing
+     * @author Vincent@luo MSN:kele_100@hotmail.com
      */
     public function setWidthAndHeight($width = 0, $height = 0)
     {
@@ -237,10 +231,10 @@ class PHPExcel_Worksheet_HeaderFooterDrawing extends PHPExcel_Worksheet_Drawing 
         if ($this->resizeProportional && !($width == 0 || $height == 0)) {
             if (($xratio * $this->height) < $height) {
                 $this->height = ceil($xratio * $this->height);
-                $this->width  = $width;
+                $this->width = $width;
             } else {
-                $this->width    = ceil($yratio * $this->width);
-                $this->height    = $height;
+                $this->width = ceil($yratio * $this->width);
+                $this->height = $height;
             }
         }
         return $this;
@@ -302,10 +296,10 @@ class PHPExcel_Worksheet_HeaderFooterDrawing extends PHPExcel_Worksheet_Drawing 
     /**
      * Set Path
      *
-     * @param     string         $pValue            File path
-     * @param     boolean        $pVerifyFile    Verify file
-     * @throws     PHPExcel_Exception
+     * @param string $pValue File path
+     * @param boolean $pVerifyFile Verify file
      * @return PHPExcel_Worksheet_HeaderFooterDrawing
+     * @throws     PHPExcel_Exception
      */
     public function setPath($pValue = '', $pVerifyFile = true)
     {
@@ -315,7 +309,7 @@ class PHPExcel_Worksheet_HeaderFooterDrawing extends PHPExcel_Worksheet_Drawing 
 
                 if ($this->width == 0 && $this->height == 0) {
                     // Get width/height
-                    list($this->width, $this->height) = getimagesize($pValue);
+                    [$this->width, $this->height] = getimagesize($pValue);
                 }
             } else {
                 throw new PHPExcel_Exception("File $pValue not found!");

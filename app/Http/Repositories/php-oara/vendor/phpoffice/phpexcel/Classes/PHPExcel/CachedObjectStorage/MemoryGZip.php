@@ -28,6 +28,27 @@
 class PHPExcel_CachedObjectStorage_MemoryGZip extends PHPExcel_CachedObjectStorage_CacheBase implements PHPExcel_CachedObjectStorage_ICache
 {
     /**
+     * Add or Update a cell in cache identified by coordinate address
+     *
+     * @param string $pCoord Coordinate address of the cell to update
+     * @param PHPExcel_Cell $cell Cell to update
+     * @return    PHPExcel_Cell
+     * @throws    PHPExcel_Exception
+     */
+    public function addCacheData($pCoord, PHPExcel_Cell $cell)
+    {
+        if (($pCoord !== $this->currentObjectID) && ($this->currentObjectID !== null)) {
+            $this->storeData();
+        }
+
+        $this->currentObjectID = $pCoord;
+        $this->currentObject = $cell;
+        $this->currentCellIsDirty = true;
+
+        return $cell;
+    }
+
+    /**
      * Store cell data in cache for the current cell object if it's "dirty",
      *     and the 'nullify' the current cell object
      *
@@ -45,35 +66,12 @@ class PHPExcel_CachedObjectStorage_MemoryGZip extends PHPExcel_CachedObjectStora
         $this->currentObjectID = $this->currentObject = null;
     }
 
-
-    /**
-     * Add or Update a cell in cache identified by coordinate address
-     *
-     * @param    string            $pCoord        Coordinate address of the cell to update
-     * @param    PHPExcel_Cell    $cell        Cell to update
-     * @return    PHPExcel_Cell
-     * @throws    PHPExcel_Exception
-     */
-    public function addCacheData($pCoord, PHPExcel_Cell $cell)
-    {
-        if (($pCoord !== $this->currentObjectID) && ($this->currentObjectID !== null)) {
-            $this->storeData();
-        }
-
-        $this->currentObjectID = $pCoord;
-        $this->currentObject = $cell;
-        $this->currentCellIsDirty = true;
-
-        return $cell;
-    }
-
-
     /**
      * Get cell at a specific coordinate
      *
-     * @param     string             $pCoord        Coordinate of the cell
-     * @throws     PHPExcel_Exception
+     * @param string $pCoord Coordinate of the cell
      * @return     PHPExcel_Cell     Cell that was found, or null if not found
+     * @throws     PHPExcel_Exception
      */
     public function getCacheData($pCoord)
     {
@@ -125,7 +123,7 @@ class PHPExcel_CachedObjectStorage_MemoryGZip extends PHPExcel_CachedObjectStora
             $this->currentObject->detach();
             $this->currentObject = $this->currentObjectID = null;
         }
-        $this->cellCache = array();
+        $this->cellCache = [];
 
         //    detach ourself from the worksheet, so that it can then delete this object successfully
         $this->parent = null;

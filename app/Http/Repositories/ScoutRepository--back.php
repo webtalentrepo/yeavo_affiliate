@@ -25,7 +25,7 @@ class ScoutRepositoryBack
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Accept:application/json", "Authorization:{$dev_key}:{$clerk_key}"));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Accept:application/json", "Authorization:{$dev_key}:{$clerk_key}"]);
         curl_setopt($ch, CURLOPT_HTTPGET, true);
 
         $return = curl_exec($ch);
@@ -56,18 +56,6 @@ class ScoutRepositoryBack
         return $this->getCJResponse($qry);
     }
 
-    public function getCJProductsCount($params)
-    {
-        $companyId = '2632470';
-        $qry = '{ products(companyId: "' . $companyId . '", limit: 10000';
-        if ($params['keywords'] && !is_null($params['keywords'])) {
-            $qry .= ', keywords: ["' . $params['keywords'] . '"]';
-        }
-        $qry .= ') {totalCount, count  } }';
-
-        return $this->getCJResponse($qry);
-    }
-
     private function getCJResponse($qry)
     {
         $access_key = config('services.cj_access_token');
@@ -91,6 +79,18 @@ class ScoutRepositoryBack
         curl_close($ch);
 
         return $result;
+    }
+
+    public function getCJProductsCount($params)
+    {
+        $companyId = '2632470';
+        $qry = '{ products(companyId: "' . $companyId . '", limit: 10000';
+        if ($params['keywords'] && !is_null($params['keywords'])) {
+            $qry .= ', keywords: ["' . $params['keywords'] . '"]';
+        }
+        $qry .= ') {totalCount, count  } }';
+
+        return $this->getCJResponse($qry);
     }
 
     public function getRakutenProduct($params)

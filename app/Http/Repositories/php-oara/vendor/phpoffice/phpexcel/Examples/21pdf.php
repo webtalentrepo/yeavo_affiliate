@@ -31,7 +31,7 @@ ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
 date_default_timezone_set('Europe/London');
 
-define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+define('EOL', (PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
 
 date_default_timezone_set('Europe/London');
 
@@ -52,24 +52,24 @@ $rendererLibrary = 'domPDF0.6.0beta3';
 $rendererLibraryPath = '/php/libraries/PDF/' . $rendererLibrary;
 
 
-echo date('H:i:s') , " Hide grid lines" , EOL;
+echo date('H:i:s'), " Hide grid lines", EOL;
 $objPHPExcel->getActiveSheet()->setShowGridLines(false);
 
-echo date('H:i:s') , " Set orientation to landscape" , EOL;
+echo date('H:i:s'), " Set orientation to landscape", EOL;
 $objPHPExcel->getActiveSheet()->getPageSetup()->setOrientation(PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
 
 
-echo date('H:i:s') , " Write to PDF format using {$rendererName}" , EOL;
+echo date('H:i:s'), " Write to PDF format using {$rendererName}", EOL;
 
 if (!PHPExcel_Settings::setPdfRenderer(
-		$rendererName,
-		$rendererLibraryPath
-	)) {
-	die(
-		'NOTICE: Please set the $rendererName and $rendererLibraryPath values' .
-		EOL .
-		'at the top of this script as appropriate for your directory structure'
-	);
+    $rendererName,
+    $rendererLibraryPath
+)) {
+    die(
+        'NOTICE: Please set the $rendererName and $rendererLibraryPath values' .
+        EOL .
+        'at the top of this script as appropriate for your directory structure'
+    );
 }
 
 
@@ -77,18 +77,18 @@ $callStartTime = microtime(true);
 
 $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
 $objWriter->setSheetIndex(0);
-$objWriter->save(str_replace('.php', '_'.$rendererName.'.pdf', __FILE__));
+$objWriter->save(str_replace('.php', '_' . $rendererName . '.pdf', __FILE__));
 $callEndTime = microtime(true);
 $callTime = $callEndTime - $callStartTime;
-echo date('H:i:s') , " File written to " , str_replace('.php', '_'.$rendererName.'.pdf', pathinfo(__FILE__, PATHINFO_BASENAME)) , EOL;
-echo 'Call time to write Workbook was ' , sprintf('%.4f',$callTime) , " seconds" , EOL;
+echo date('H:i:s'), " File written to ", str_replace('.php', '_' . $rendererName . '.pdf', pathinfo(__FILE__, PATHINFO_BASENAME)), EOL;
+echo 'Call time to write Workbook was ', sprintf('%.4f', $callTime), " seconds", EOL;
 // Echo memory usage
-echo date('H:i:s') , ' Current memory usage: ' , (memory_get_usage(true) / 1024 / 1024) , " MB" , EOL;
+echo date('H:i:s'), ' Current memory usage: ', (memory_get_usage(true) / 1024 / 1024), " MB", EOL;
 
 
 // Echo memory peak usage
-echo date('H:i:s') , " Peak memory usage: " , (memory_get_peak_usage(true) / 1024 / 1024) , " MB" , EOL;
+echo date('H:i:s'), " Peak memory usage: ", (memory_get_peak_usage(true) / 1024 / 1024), " MB", EOL;
 
 // Echo done
-echo date('H:i:s') , " Done writing files" , EOL;
-echo 'File has been created in ' , getcwd() , EOL;
+echo date('H:i:s'), " Done writing files", EOL;
+echo 'File has been created in ', getcwd(), EOL;

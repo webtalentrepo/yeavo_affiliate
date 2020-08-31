@@ -53,14 +53,14 @@ class PHPExcel_Best_Fit
      *
      * @var    float[]
      **/
-    protected $xValues = array();
+    protected $xValues = [];
 
     /**
      * Y-value dataseries of values
      *
      * @var    float[]
      **/
-    protected $yValues = array();
+    protected $yValues = [];
 
     /**
      * Flag indicating whether values should be adjusted to Y=0
@@ -74,7 +74,7 @@ class PHPExcel_Best_Fit
      *
      * @var    float[]
      **/
-    protected $yBestFitValues = array();
+    protected $yBestFitValues = [];
 
     protected $goodnessOfFit = 1;
 
@@ -104,12 +104,38 @@ class PHPExcel_Best_Fit
 
     protected $yOffset = 0;
 
+    /**
+     * Define the regression
+     *
+     * @param float[] $yValues The set of Y-values for this regression
+     * @param float[] $xValues The set of X-values for this regression
+     * @param boolean $const
+     */
+    public function __construct($yValues, $xValues = [], $const = true)
+    {
+        //    Calculate number of points
+        $nY = count($yValues);
+        $nX = count($xValues);
+
+        //    Define X Values if necessary
+        if ($nX == 0) {
+            $xValues = range(1, $nY);
+            $nX = $nY;
+        } elseif ($nY != $nX) {
+            //    Ensure both arrays of points are the same size
+            $this->error = true;
+            return false;
+        }
+
+        $this->valueCount = $nY;
+        $this->xValues = $xValues;
+        $this->yValues = $yValues;
+    }
 
     public function getError()
     {
         return $this->error;
     }
-
 
     public function getBestFitType()
     {
@@ -117,20 +143,9 @@ class PHPExcel_Best_Fit
     }
 
     /**
-     * Return the Y-Value for a specified value of X
-     *
-     * @param     float        $xValue            X-Value
-     * @return     float                        Y-Value
-     */
-    public function getValueOfYForX($xValue)
-    {
-        return false;
-    }
-
-    /**
      * Return the X-Value for a specified value of Y
      *
-     * @param     float        $yValue            Y-Value
+     * @param float $yValue Y-Value
      * @return     float                        X-Value
      */
     public function getValueOfXForY($yValue)
@@ -151,7 +166,7 @@ class PHPExcel_Best_Fit
     /**
      * Return the Equation of the best-fit line
      *
-     * @param     int        $dp        Number of places of decimal precision to display
+     * @param int $dp Number of places of decimal precision to display
      * @return     string
      */
     public function getEquation($dp = 0)
@@ -162,7 +177,7 @@ class PHPExcel_Best_Fit
     /**
      * Return the Slope of the line
      *
-     * @param     int        $dp        Number of places of decimal precision to display
+     * @param int $dp Number of places of decimal precision to display
      * @return     string
      */
     public function getSlope($dp = 0)
@@ -176,7 +191,7 @@ class PHPExcel_Best_Fit
     /**
      * Return the standard error of the Slope
      *
-     * @param     int        $dp        Number of places of decimal precision to display
+     * @param int $dp Number of places of decimal precision to display
      * @return     string
      */
     public function getSlopeSE($dp = 0)
@@ -190,7 +205,7 @@ class PHPExcel_Best_Fit
     /**
      * Return the Value of X where it intersects Y = 0
      *
-     * @param     int        $dp        Number of places of decimal precision to display
+     * @param int $dp Number of places of decimal precision to display
      * @return     string
      */
     public function getIntersect($dp = 0)
@@ -204,7 +219,7 @@ class PHPExcel_Best_Fit
     /**
      * Return the standard error of the Intersect
      *
-     * @param     int        $dp        Number of places of decimal precision to display
+     * @param int $dp Number of places of decimal precision to display
      * @return     string
      */
     public function getIntersectSE($dp = 0)
@@ -218,7 +233,7 @@ class PHPExcel_Best_Fit
     /**
      * Return the goodness of fit for this regression
      *
-     * @param     int        $dp        Number of places of decimal precision to return
+     * @param int $dp Number of places of decimal precision to return
      * @return     float
      */
     public function getGoodnessOfFit($dp = 0)
@@ -240,7 +255,7 @@ class PHPExcel_Best_Fit
     /**
      * Return the standard deviation of the residuals for this regression
      *
-     * @param     int        $dp        Number of places of decimal precision to return
+     * @param int $dp Number of places of decimal precision to return
      * @return     float
      */
     public function getStdevOfResiduals($dp = 0)
@@ -304,6 +319,43 @@ class PHPExcel_Best_Fit
         return $this->yBestFitValues;
     }
 
+    protected function leastSquareFit($yValues, $xValues, $const)
+    {
+        // calculate sums
+        $x_sum = array_sum($xValues);
+        $y_sum = array_sum($yValues);
+        $meanX = $x_sum / $this->valueCount;
+        $meanY = $y_sum / $this->valueCount;
+        $mBase = $mDivisor = $xx_sum = $xy_sum = $yy_sum = 0.0;
+        for ($i = 0; $i < $this->valueCount; ++$i) {
+            $xy_sum += $xValues[$i] * $yValues[$i];
+            $xx_sum += $xValues[$i] * $xValues[$i];
+            $yy_sum += $yValues[$i] * $yValues[$i];
+
+            if ($const) {
+                $mBase += ($xValues[$i] - $meanX) * ($yValues[$i] - $meanY);
+                $mDivisor += ($xValues[$i] - $meanX) * ($xValues[$i] - $meanX);
+            } else {
+                $mBase += $xValues[$i] * $yValues[$i];
+                $mDivisor += $xValues[$i] * $xValues[$i];
+            }
+        }
+
+        // calculate slope
+//        $this->slope = (($this->valueCount * $xy_sum) - ($x_sum * $y_sum)) / (($this->valueCount * $xx_sum) - ($x_sum * $x_sum));
+        $this->slope = $mBase / $mDivisor;
+
+        // calculate intersect
+//        $this->intersect = ($y_sum - ($this->slope * $x_sum)) / $this->valueCount;
+        if ($const) {
+            $this->intersect = $meanY - ($this->slope * $meanX);
+        } else {
+            $this->intersect = 0;
+        }
+
+        $this->calculateGoodnessOfFit($x_sum, $y_sum, $xx_sum, $yy_sum, $xy_sum, $meanX, $meanY, $const);
+    }
+
     protected function calculateGoodnessOfFit($sumX, $sumY, $sumX2, $sumY2, $sumXY, $meanX, $meanY, $const)
     {
         $SSres = $SScov = $SScor = $SStot = $SSsex = 0.0;
@@ -358,68 +410,14 @@ class PHPExcel_Best_Fit
         }
     }
 
-    protected function leastSquareFit($yValues, $xValues, $const)
-    {
-        // calculate sums
-        $x_sum = array_sum($xValues);
-        $y_sum = array_sum($yValues);
-        $meanX = $x_sum / $this->valueCount;
-        $meanY = $y_sum / $this->valueCount;
-        $mBase = $mDivisor = $xx_sum = $xy_sum = $yy_sum = 0.0;
-        for ($i = 0; $i < $this->valueCount; ++$i) {
-            $xy_sum += $xValues[$i] * $yValues[$i];
-            $xx_sum += $xValues[$i] * $xValues[$i];
-            $yy_sum += $yValues[$i] * $yValues[$i];
-
-            if ($const) {
-                $mBase += ($xValues[$i] - $meanX) * ($yValues[$i] - $meanY);
-                $mDivisor += ($xValues[$i] - $meanX) * ($xValues[$i] - $meanX);
-            } else {
-                $mBase += $xValues[$i] * $yValues[$i];
-                $mDivisor += $xValues[$i] * $xValues[$i];
-            }
-        }
-
-        // calculate slope
-//        $this->slope = (($this->valueCount * $xy_sum) - ($x_sum * $y_sum)) / (($this->valueCount * $xx_sum) - ($x_sum * $x_sum));
-        $this->slope = $mBase / $mDivisor;
-
-        // calculate intersect
-//        $this->intersect = ($y_sum - ($this->slope * $x_sum)) / $this->valueCount;
-        if ($const) {
-            $this->intersect = $meanY - ($this->slope * $meanX);
-        } else {
-            $this->intersect = 0;
-        }
-
-        $this->calculateGoodnessOfFit($x_sum, $y_sum, $xx_sum, $yy_sum, $xy_sum, $meanX, $meanY, $const);
-    }
-
     /**
-     * Define the regression
+     * Return the Y-Value for a specified value of X
      *
-     * @param    float[]        $yValues    The set of Y-values for this regression
-     * @param    float[]        $xValues    The set of X-values for this regression
-     * @param    boolean        $const
+     * @param float $xValue X-Value
+     * @return     float                        Y-Value
      */
-    public function __construct($yValues, $xValues = array(), $const = true)
+    public function getValueOfYForX($xValue)
     {
-        //    Calculate number of points
-        $nY = count($yValues);
-        $nX = count($xValues);
-
-        //    Define X Values if necessary
-        if ($nX == 0) {
-            $xValues = range(1, $nY);
-            $nX = $nY;
-        } elseif ($nY != $nX) {
-            //    Ensure both arrays of points are the same size
-            $this->error = true;
-            return false;
-        }
-
-        $this->valueCount = $nY;
-        $this->xValues = $xValues;
-        $this->yValues = $yValues;
+        return false;
     }
 }

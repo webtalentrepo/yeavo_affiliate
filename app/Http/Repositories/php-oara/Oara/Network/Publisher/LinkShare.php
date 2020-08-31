@@ -2,7 +2,25 @@
 
 namespace Oara\Network\Publisher;
 
-use http\Exception;
+use DateInterval;
+use DateTime;
+use DOMDocument;
+use DOMXPath;
+use Exception;
+use Oara\Curl\Access;
+use Oara\Curl\Parameter;
+use Oara\Curl\Request;
+use Oara\Network;
+use Oara\Utilities;
+use stdClass;
+use function count;
+use function explode;
+use function file_get_contents;
+use function is_numeric;
+use function parse_url;
+use function preg_match;
+use function str_getcsv;
+use function urlencode;
 
 /**
  * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
@@ -33,13 +51,13 @@ use http\Exception;
  * @version    Release: 01.00
  *
  */
-class LinkShare extends \Oara\Network
+class LinkShare extends Network
 {
 
     public $_nid = null;
-    protected $_sitesAllowed = array();
+    protected $_sitesAllowed = [];
     private $_client = null;
-    private $_siteList = array();
+    private $_siteList = [];
     private $_idSite = null;
     private $_token = null;
     private $_user = null;
@@ -48,7 +66,7 @@ class LinkShare extends \Oara\Network
 
     /**
      * @param $credentials
-     * @throws \Exception
+     * @throws Exception
      */
     public function login($credentials)
     {
@@ -62,7 +80,7 @@ class LinkShare extends \Oara\Network
             if (!empty($this->_bearer)) {
                 $this->getToken($this->_bearer);
                 // Create a dummy site structure (allows access to only one site at a time)
-                $site = new \stdClass();
+                $site = new stdClass();
                 $site->website = '';
                 $site->url = '';
                 $site->id = $this->_idSite;
@@ -71,66 +89,44 @@ class LinkShare extends \Oara\Network
                     // Get security token from the environment - 2019-10-12 <PN>
                     $site->secureToken = $_ENV['LINKSHARE_SECURITY_TOKEN'];
                 } else {
-                    $site->secureToken = '';;
+                    $site->secureToken = '';
                 }
                 $siteList[] = $site;
                 $this->_siteList = $siteList;
             }
         } else {
             // Try to login as a dashboard user to grab token from web services page
-            $this->_client = new \Oara\Curl\Access ($credentials);
+            $this->_client = new Access ($credentials);
 
-            $loginUrl = 'https://login.linkshare.com/sso/login?service=' . \urlencode("http://cli.linksynergy.com/cli/publisher/home.php");
-            $valuesLogin = array(
-                new \Oara\Curl\Parameter ('HEALTHCHECK', 'HEALTHCHECK PASSED.'),
-                new \Oara\Curl\Parameter ('username', $this->_user),
-                new \Oara\Curl\Parameter ('password', $this->_password),
-                new \Oara\Curl\Parameter ('login', 'Log In')
-            );
+            $loginUrl = 'https://login.linkshare.com/sso/login?service=' . urlencode("http://cli.linksynergy.com/cli/publisher/home.php");
+            $valuesLogin = [
+                new Parameter ('HEALTHCHECK', 'HEALTHCHECK PASSED.'),
+                new Parameter ('username', $this->_user),
+                new Parameter ('password', $this->_password),
+                new Parameter ('login', 'Log In')
+            ];
 
-            $urls = array();
-            $urls [] = new \Oara\Curl\Request ($loginUrl, array());
+            $urls = [];
+            $urls [] = new Request ($loginUrl, []);
             $exportReport = $this->_client->get($urls);
-            $doc = new \DOMDocument();
+            $doc = new DOMDocument();
             @$doc->loadHTML($exportReport[0]);
-            $xpath = new \DOMXPath($doc);
+            $xpath = new DOMXPath($doc);
             $hidden = $xpath->query('//input[@type="hidden"]');
             foreach ($hidden as $values) {
-                $valuesLogin[] = new \Oara\Curl\Parameter($values->getAttribute("name"), $values->getAttribute("value"));
+                $valuesLogin[] = new Parameter($values->getAttribute("name"), $values->getAttribute("value"));
             }
-            $doc = new \DOMDocument();
+            $doc = new DOMDocument();
             @$doc->loadHTML($exportReport[0]);
-            $xpath = new \DOMXPath($doc);
+            $xpath = new DOMXPath($doc);
             $formList = $xpath->query('//form');
             foreach ($formList as $form) {
                 $loginUrl = "https://login.linkshare.com" . $form->getAttribute("action");
             }
-            $urls = array();
-            $urls [] = new \Oara\Curl\Request ($loginUrl, $valuesLogin);
+            $urls = [];
+            $urls [] = new Request ($loginUrl, $valuesLogin);
             $this->_client->post($urls);
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getNeededCredentials()
-    {
-        $credentials = array();
-
-        $parameter = array();
-        $parameter["description"] = "User Log in";
-        $parameter["required"] = true;
-        $parameter["name"] = "User";
-        $credentials["user"] = $parameter;
-
-        $parameter = array();
-        $parameter["description"] = "Password to Log in";
-        $parameter["required"] = true;
-        $parameter["name"] = "Password";
-        $credentials["password"] = $parameter;
-
-        return $credentials;
     }
 
     public function getToken($apiKey)
@@ -156,16 +152,16 @@ class LinkShare extends \Oara\Network
         // Retrieve access token
         $loginUrl = "https://api.rakutenmarketing.com/token";
 
-        $params = array(
-            new \Oara\Curl\Parameter('grant_type', 'password'),
-            new \Oara\Curl\Parameter('username', $this->_user),
-            new \Oara\Curl\Parameter('password', $this->_password),
-            new \Oara\Curl\Parameter('scope', $this->_idSite)
-        );
+        $params = [
+            new Parameter('grant_type', 'password'),
+            new Parameter('username', $this->_user),
+            new Parameter('password', $this->_password),
+            new Parameter('scope', $this->_idSite)
+        ];
 
-        $p = array();
+        $p = [];
         foreach ($params as $parameter) {
-            $p[] = $parameter->getKey() . '=' . \urlencode($parameter->getValue());
+            $p[] = $parameter->getKey() . '=' . urlencode($parameter->getValue());
         }
         $post_params = implode('&', $p);
 
@@ -176,7 +172,7 @@ class LinkShare extends \Oara\Network
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Basic " . config('services.rakuten.token')));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Basic " . config('services.rakuten.token')]);
 
         $curl_results = curl_exec($ch);
         curl_close($ch);
@@ -185,6 +181,28 @@ class LinkShare extends \Oara\Network
             $this->_token = $response->access_token;
         }
         return $this->_token;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNeededCredentials()
+    {
+        $credentials = [];
+
+        $parameter = [];
+        $parameter["description"] = "User Log in";
+        $parameter["required"] = true;
+        $parameter["name"] = "User";
+        $credentials["user"] = $parameter;
+
+        $parameter = [];
+        $parameter["description"] = "Password to Log in";
+        $parameter["required"] = true;
+        $parameter["name"] = "Password";
+        $credentials["password"] = $parameter;
+
+        return $credentials;
     }
 
     /**
@@ -202,32 +220,32 @@ class LinkShare extends \Oara\Network
         // ... It's not supposed to enter here anymore if login() succeeded
         $connection = false;
 
-        $urls = array();
+        $urls = [];
 
-        $urls [] = new \Oara\Curl\Request ('http://cli.linksynergy.com/cli/publisher/home.php?', array());
+        $urls [] = new Request ('http://cli.linksynergy.com/cli/publisher/home.php?', []);
         $result = $this->_client->get($urls);
 
         // Check if the credentials are right
-        if (\preg_match('/https:\/\/cli\.linksynergy\.com\/cli\/common\/logout\.php/', $result [0], $matches)) {
+        if (preg_match('/https:\/\/cli\.linksynergy\.com\/cli\/common\/logout\.php/', $result [0], $matches)) {
 
-            $urls = array();
-            $urls [] = new \Oara\Curl\Request ('https://cli.linksynergy.com/cli/publisher/my_account/marketingChannels.php', array());
+            $urls = [];
+            $urls [] = new Request ('https://cli.linksynergy.com/cli/publisher/my_account/marketingChannels.php', []);
             $exportReport = $this->_client->get($urls);
 
-            $doc = new \DOMDocument();
+            $doc = new DOMDocument();
             @$doc->loadHTML($exportReport[0]);
-            $xpath = new \DOMXPath($doc);
+            $xpath = new DOMXPath($doc);
             $results = $xpath->query('//table');
             foreach ($results as $table) {
-                $tableCsv = \Oara\Utilities::htmlToCsv(\Oara\Utilities::DOMinnerHTML($table));
+                $tableCsv = Utilities::htmlToCsv(Utilities::DOMinnerHTML($table));
             }
 
-            $resultsSites = array();
-            $num = \count($tableCsv);
+            $resultsSites = [];
+            $num = count($tableCsv);
             for ($i = 1; $i < $num; $i++) {
-                $siteArray = \str_getcsv($tableCsv [$i], ";");
-                if (isset ($siteArray [2]) && \is_numeric($siteArray [2])) {
-                    $result = array();
+                $siteArray = str_getcsv($tableCsv [$i], ";");
+                if (isset ($siteArray [2]) && is_numeric($siteArray [2])) {
+                    $result = [];
                     $result ["id"] = $siteArray [2];
                     $result ["name"] = $siteArray [1];
                     $result ["url"] = "https://cli.linksynergy.com/cli/publisher/common/changeCurrentChannel.php?sid=" . $result ["id"];
@@ -235,33 +253,33 @@ class LinkShare extends \Oara\Network
                 }
             }
 
-            $siteList = array();
+            $siteList = [];
             foreach ($resultsSites as $resultSite) {
-                $site = new \stdClass ();
+                $site = new stdClass ();
                 $site->website = $resultSite ["name"];
                 $site->url = $resultSite ["url"];
-                $parsedUrl = \parse_url($site->url);
-                $attributesArray = \explode('&', $parsedUrl ['query']);
-                $attributeMap = array();
+                $parsedUrl = parse_url($site->url);
+                $attributesArray = explode('&', $parsedUrl ['query']);
+                $attributeMap = [];
                 foreach ($attributesArray as $attribute) {
-                    $attributeValue = \explode('=', $attribute);
+                    $attributeValue = explode('=', $attribute);
                     $attributeMap [$attributeValue [0]] = $attributeValue [1];
                 }
                 $site->id = $attributeMap ['sid'];
                 // Login into the Site ID
-                $urls = array();
-                $urls [] = new \Oara\Curl\Request ($site->url, array());
+                $urls = [];
+                $urls [] = new Request ($site->url, []);
                 $this->_client->get($urls);
 
-                $urls = array();
-                $urls [] = new \Oara\Curl\Request ('https://cli.linksynergy.com/cli/publisher/reports/reporting.php', array());
+                $urls = [];
+                $urls [] = new Request ('https://cli.linksynergy.com/cli/publisher/reports/reporting.php', []);
                 $result = $this->_client->get($urls);
                 if (preg_match_all('/\"token_one\"\: \"(.+)\"/', $result[0], $match)) {
                     $site->token = $match[1][0];
                 }
 
-                $urls = array();
-                $urls [] = new \Oara\Curl\Request ('http://cli.linksynergy.com/cli/publisher/links/webServices.php', array());
+                $urls = [];
+                $urls [] = new Request ('http://cli.linksynergy.com/cli/publisher/links/webServices.php', []);
                 $result = $this->_client->get($urls);
                 if (preg_match_all('/<div class="token">(.+)<\/div>/', $result[0], $match)) {
                     $site->secureToken = $match[1][1];
@@ -301,11 +319,11 @@ class LinkShare extends \Oara\Network
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Accept: */*',
                 'Content-Type: application/x-www-form-urlencoded',
                 'Authorization: Bearer ' . $this->_token,
-            ));
+            ]);
 
             $curl_results = curl_exec($ch);
             curl_close($ch);
@@ -317,12 +335,12 @@ class LinkShare extends \Oara\Network
 
             if (!is_array($response) || count($response) <= 0) {
                 $message = 'Linkshare: getMerchantList XML Error';
-                throw new \Exception($message);
+                throw new Exception($message);
             }
 
             if (!isset($response['ns1:getMerchByAppStatusResponse'])) {
                 $message = 'Linkshare: getMerchantList XML Error';
-                throw new \Exception($message);
+                throw new Exception($message);
             }
 
             $result = $response['ns1:getMerchByAppStatusResponse'];
@@ -342,23 +360,23 @@ class LinkShare extends \Oara\Network
 //                );
 //            }
 //            return $arrResult;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "LinkShare getMerchantList error: " . $e->getMessage() . "\n ";
-            throw new \Exception($e);
+            throw new Exception($e);
         }
     }
 
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
-        $merchantIdList = \Oara\Utilities::getMerchantIdMapFromMerchantList($merchantList);
+        $totalTransactions = [];
+        $merchantIdList = Utilities::getMerchantIdMapFromMerchantList($merchantList);
 
         foreach ($this->_siteList as $site) {
             if (!empty($this->_idSite) && !$site == $this->_idSite) {
@@ -389,7 +407,7 @@ class LinkShare extends \Oara\Network
                 $resultSignature = $this->getRemoteUrl($url);
                 // $resultSignature = file_get_contents($url);
 
-                $signatureMap = array();
+                $signatureMap = [];
                 $exportData = str_getcsv($resultSignature, "\n");
                 $num = count($exportData);
                 for ($j = 1; $j < $num; $j++) {
@@ -402,11 +420,11 @@ class LinkShare extends \Oara\Network
                     $signatureMap[$orderId] = $signatureData[0];
                 }
 
-                $exportData = \str_getcsv($result, "\n");
-                $num = \count($exportData);
+                $exportData = str_getcsv($result, "\n");
+                $num = count($exportData);
                 for ($j = 1; $j < $num; $j++) {
                     try {
-                        $transactionData = \str_getcsv($exportData [$j], ",");
+                        $transactionData = str_getcsv($exportData [$j], ",");
 
                         if (count($transactionData) > 10 && (count($merchantIdList) == 0 || isset($merchantIdList[$transactionData[3]]))) {
                             if ($transactionData[1] === '' && strpos($transactionData[2], '/') !== false) {
@@ -414,10 +432,10 @@ class LinkShare extends \Oara\Network
                                 unset($transactionData[1]);
                                 $transactionData = array_values($transactionData);
                             }
-                            $transaction = array();
+                            $transaction = [];
                             $transaction['merchantId'] = ( int )$transactionData[3];
                             $transaction['merchantName'] = $transactionData[4];
-                            $transactionDate = \DateTime::createFromFormat("m/d/y H:i:s", $transactionData[1] . " " . $transactionData[2]);
+                            $transactionDate = DateTime::createFromFormat("m/d/y H:i:s", $transactionData[1] . " " . $transactionData[2]);
 
                             // $transaction['date'] = $transactionDate->format("Y-m-d H:i:s");
                             $transaction['date'] = $transactionDate->format("Y-m-d H:i:s") . '+00:00';
@@ -431,27 +449,27 @@ class LinkShare extends \Oara\Network
                             $transaction['currency'] = $transactionData[11];
 
                             // $sales = $filter->filter($transactionData[7]);
-                            $sales = \Oara\Utilities::parseDouble($transactionData[7]);
+                            $sales = Utilities::parseDouble($transactionData[7]);
 
                             if ($sales != 0) {
-                                $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-                            } else if ($sales == 0) {
-                                $transaction['status'] = \Oara\Utilities::STATUS_PENDING;
+                                $transaction['status'] = Utilities::STATUS_CONFIRMED;
+                            } elseif ($sales == 0) {
+                                $transaction['status'] = Utilities::STATUS_PENDING;
                             }
 
-                            $transaction['amount'] = \Oara\Utilities::parseDouble($transactionData[7]);
+                            $transaction['amount'] = Utilities::parseDouble($transactionData[7]);
 
-                            $transaction['commission'] = \Oara\Utilities::parseDouble($transactionData[9]);
+                            $transaction['commission'] = Utilities::parseDouble($transactionData[9]);
 
                             if ($transaction['commission'] < 0) {
                                 $transaction['amount'] = abs($transaction['amount']);
                                 $transaction['commission'] = abs($transaction['commission']);
-                                $transaction['status'] = \Oara\Utilities::STATUS_DECLINED;
+                                $transaction['status'] = Utilities::STATUS_DECLINED;
                             }
                             $transaction['IP'] = '';    // not available
                             $totalTransactions [] = $transaction;
                         }
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         echo "[LinkShare][getTransactionsList] Error: " . $e->getMessage();
                     }
                 }
@@ -461,13 +479,30 @@ class LinkShare extends \Oara\Network
     }
 
     /**
+     * Get a remote url content using Curl
+     * @param $url
+     * @return bool|string
+     */
+    private function getRemoteUrl($url)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 300);                 // 5 minutes timeout
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 300);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
+
+    /**
      * Get list of Vouchers / Coupons / Offers
      * @param $apiKey   string api Key is needed to access data feed
      * @return array
      */
     public function getVouchers($apiKey, $network)
     {
-        $vouchers = array();
+        $vouchers = [];
 
         try {
             if (empty($this->_token)) {
@@ -479,28 +514,28 @@ class LinkShare extends \Oara\Network
 
             $loginUrl = "https://api.rakutenmarketing.com/coupon/1.0";
             $currentPage = 1;
-            $arrResult = array();
+            $arrResult = [];
             if (strpos($network, ',') !== false) {
                 // If more than one networks are provided ... don't use network parameter to get ALL networks - 2019-06-24 <PN>
                 $network = null;
             }
             while (true) {
-                $params = array(
+                $params = [
                     // Optional parameters category / promotiontype
                     // new \Oara\Curl\Parameter('category', '1|2|3|4|5|6|7|8'),
                     // new \Oara\Curl\Parameter('promotiontype', 31),
                     // new \Oara\Curl\Parameter('network', $network),
-                    new \Oara\Curl\Parameter('resultsperpage', 100),
-                    new \Oara\Curl\Parameter('pagenumber', $currentPage)
-                );
+                    new Parameter('resultsperpage', 100),
+                    new Parameter('pagenumber', $currentPage)
+                ];
                 if (!empty($network) && $network == intval($network)) {
                     // Add network parameter only if a unique valid integer value
-                    $params[] = new \Oara\Curl\Parameter('network', $network);
+                    $params[] = new Parameter('network', $network);
                 }
 
-                $p = array();
+                $p = [];
                 foreach ($params as $parameter) {
-                    $p[] = $parameter->getKey() . '=' . \urlencode($parameter->getValue());
+                    $p[] = $parameter->getKey() . '=' . urlencode($parameter->getValue());
                 }
                 $post_params = implode('&', $p);
 
@@ -510,7 +545,7 @@ class LinkShare extends \Oara\Network
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $this->_token));
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ["Authorization: Bearer " . $this->_token]);
 
                 $curl_results = curl_exec($ch);
                 curl_close($ch);
@@ -522,7 +557,7 @@ class LinkShare extends \Oara\Network
                 if (!isset($response['couponfeed'])) {
                     if (isset($response['ams:fault'])) {
                         $message = 'Linkshare: ' . $response['ams:fault']['ams:message'] . ' - ' . $response['ams:fault']['ams:description'];
-                        throw new \Exception($message);
+                        throw new Exception($message);
                     }
                 }
                 $couponfeed = $response['couponfeed'];
@@ -564,7 +599,7 @@ class LinkShare extends \Oara\Network
 
                         switch ($promotion_type_code) {
                             case '2':
-                                $type = \Oara\Utilities::OFFER_TYPE_FREE_ARTICLE;
+                                $type = Utilities::OFFER_TYPE_FREE_ARTICLE;
                                 break;
                             case 3:
                             case 4:
@@ -573,40 +608,40 @@ class LinkShare extends \Oara\Network
                             case 8:
                             case 1:
                             case 10:
-                                $type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                                $type = Utilities::OFFER_TYPE_VOUCHER;
                                 break;
                             case 13:
                                 // <promotiontype id="13">Free Delivery</promotiontype>
-                                $type = \Oara\Utilities::OFFER_TYPE_FREE_SHIPPING;
+                                $type = Utilities::OFFER_TYPE_FREE_SHIPPING;
                                 break;
                             case 9:
                                 // <promotiontype id="9">Gift with Purchase</promotiontype>
-                                $type = \Oara\Utilities::OFFER_TYPE_FREE_ARTICLE;
+                                $type = Utilities::OFFER_TYPE_FREE_ARTICLE;
                                 break;
                             case 11:
                                 // <promotiontype id="11">Percentage off</promotiontype>
-                                $type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                                $type = Utilities::OFFER_TYPE_DISCOUNT;
                                 break;
                             case 12:
                                 // <promotiontype id="12">Pounds amount off</promotiontype>
-                                $type = \Oara\Utilities::OFFER_TYPE_DISCOUNT;
+                                $type = Utilities::OFFER_TYPE_DISCOUNT;
                                 break;
                             default:
-                                $type = \Oara\Utilities::OFFER_TYPE_VOUCHER;
+                                $type = Utilities::OFFER_TYPE_VOUCHER;
                         }
 
-                        $arrResult[] = array(
-                            'promotionId' => '',
-                            'advertiser_id' => $advertiser_id,
+                        $arrResult[] = [
+                            'promotionId'     => '',
+                            'advertiser_id'   => $advertiser_id,
                             'advertiser_name' => $advertiser_name,
-                            'code' => $coupon_code,
-                            'description' => $description,
-                            'restriction' => $coupon_restriction,
-                            'start_date' => $start_date,
-                            'end_date' => $end_date,
-                            'tracking' => $click_url,
-                            'type' => $type
-                        );
+                            'code'            => $coupon_code,
+                            'description'     => $description,
+                            'restriction'     => $coupon_restriction,
+                            'start_date'      => $start_date,
+                            'end_date'        => $end_date,
+                            'tracking'        => $click_url,
+                            'type'            => $type
+                        ];
                     }
                 }
                 if ($currentPage >= $totalPages) {
@@ -619,23 +654,22 @@ class LinkShare extends \Oara\Network
             return $arrResult;
 
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "LinkShare getVouchers error:" . $e->getMessage() . "\n ";
-            throw new \Exception($e);
+            throw new Exception($e);
         }
 //        return $vouchers;
     }
 
-
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getPaymentHistory()
     {
-        $paymentHistory = array();
-        $past = new \DateTime ("2013-01-01 00:00:00");
-        $now = new \DateTime ();
+        $paymentHistory = [];
+        $past = new DateTime ("2013-01-01 00:00:00");
+        $now = new DateTime ();
 
         foreach ($this->_siteList as $site) {
 
@@ -646,49 +680,31 @@ class LinkShare extends \Oara\Network
             for ($i = 0; $i < $numberYears; $i++) {
 
                 $auxEndData = clone $auxStartDate;
-                $auxEndData = $auxEndData->add(new \DateInterval('P1Y'));
+                $auxEndData = $auxEndData->add(new DateInterval('P1Y'));
 
                 $url = "https://reportws.linksynergy.com/downloadreport.php?bdate=" . $auxStartDate->format("Ymd") . "&edate=" . $auxEndData->format("Ymd") . "&token=" . $site->secureToken . "&nid=" . $this->_nid . "&reportid=1";
-                $result = \file_get_contents($url);
-                if (\preg_match("/You cannot request/", $result)) {
-                    throw new \Exception ("Reached the limit");
+                $result = file_get_contents($url);
+                if (preg_match("/You cannot request/", $result)) {
+                    throw new Exception ("Reached the limit");
                 }
-                $paymentLines = \str_getcsv($result, "\n");
-                $number = \count($paymentLines);
+                $paymentLines = str_getcsv($result, "\n");
+                $number = count($paymentLines);
                 for ($j = 1; $j < $number; $j++) {
-                    $paymentData = \str_getcsv($paymentLines [$j], ",");
-                    $obj = array();
-                    $date = \DateTime::createFromFormat("Y-m-d", $paymentData [1]);
+                    $paymentData = str_getcsv($paymentLines [$j], ",");
+                    $obj = [];
+                    $date = DateTime::createFromFormat("Y-m-d", $paymentData [1]);
                     $obj ['date'] = $date->format("Y-m-d H:i:s");
-                    $obj ['value'] = \Oara\Utilities::parseDouble($paymentData [5]);
+                    $obj ['value'] = Utilities::parseDouble($paymentData [5]);
                     $obj ['method'] = "BACS";
                     $obj ['pid'] = $paymentData [0];
                     $paymentHistory [] = $obj;
                 }
 
-                $auxStartDate->add(new \DateInterval('P1Y'));
+                $auxStartDate->add(new DateInterval('P1Y'));
             }
         }
 
         return $paymentHistory;
-    }
-
-
-    /**
-     * Get a remote url content using Curl
-     * @param $url
-     * @return bool|string
-     */
-    private function getRemoteUrl($url)
-    {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 300);                 // 5 minutes timeout
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 300);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        return $response;
     }
 
 }

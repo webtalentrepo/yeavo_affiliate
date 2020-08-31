@@ -1,10 +1,10 @@
 <?php
 /**
- *    @package JAMA
+ * @package JAMA
  *
  *    Error handling
- *    @author Michael Bommarito
- *    @version 01292005
+ * @author Michael Bommarito
+ * @version 01292005
  */
 
 //Language constant
@@ -14,7 +14,7 @@ define('JAMALANG', 'EN');
 //All errors may be defined by the following format:
 //define('ExceptionName', N);
 //$error['lang'][ExceptionName] = 'Error message';
-$error = array();
+$error = [];
 
 /*
 I've used Babelfish and a little poor knowledge of Romance/Germanic languages for the translations here.
@@ -23,8 +23,8 @@ Feel free to correct anything that looks amiss to you.
 
 define('POLYMORPHIC_ARGUMENT_EXCEPTION', -1);
 $error['EN'][POLYMORPHIC_ARGUMENT_EXCEPTION] = "Invalid argument pattern for polymorphic function.";
-$error['FR'][POLYMORPHIC_ARGUMENT_EXCEPTION] = "Modèle inadmissible d'argument pour la fonction polymorphe.".
-$error['DE'][POLYMORPHIC_ARGUMENT_EXCEPTION] = "Unzulässiges Argumentmuster für polymorphe Funktion.";
+$error['FR'][POLYMORPHIC_ARGUMENT_EXCEPTION] = "Modèle inadmissible d'argument pour la fonction polymorphe." .
+    $error['DE'][POLYMORPHIC_ARGUMENT_EXCEPTION] = "Unzulässiges Argumentmuster für polymorphe Funktion.";
 
 define('ARGUMENT_TYPE_EXCEPTION', -2);
 $error['EN'][ARGUMENT_TYPE_EXCEPTION] = "Invalid argument type.";
@@ -65,7 +65,7 @@ $error['EN'][ROW_LENGTH_EXCEPTION] = "All rows must have the same length.";
 
 /**
  *    Custom error handler
- *    @param int $num Error number
+ * @param int $num Error number
  */
 function JAMAError($errorNumber = null)
 {

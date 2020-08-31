@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,10 +12,31 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/scout-data', 'Api\ScoutsController@index');
-Route::post('/child-data', 'Api\ScoutsController@getChildData');
-Route::get('/scout-data', 'Api\ScoutsController@index');
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group([
+    'middleware' => ['cors']
+], function () {
+    Route::post('/login', 'Api\AuthController@login');
+    Route::post('/register', 'Api\AuthController@register');
+    Route::post('/send-reset-password-link', 'Api\AuthController@sendResetPasswordLink');
+    Route::post('/reset-password-by-token', 'Api\AuthController@setNewPasswordByToken');
+});
+
+Route::group([
+    'middleware' => ['cors', 'auth:api']
+], function () {
+    Route::post('/logout', 'Api\AuthController@logout');
+    Route::get('/users/me', 'Api\AuthController@getAuthUserInfo');
+
+    // admin area
+    Route::resource('roles', 'Admin\RolesController', ['names' => ['index' => 'roles'], 'except' => ['create', 'show']]);
+    Route::resource('plans', 'Admin\PlansController', ['names' => ['index' => 'plans'], 'except' => ['create', 'show']]);
+    Route::resource('users', 'Admin\UsersController', ['names' => ['index' => 'users'], 'except' => ['create', 'show']]);
+    Route::resource('maps', 'Admin\MapsController', ['names' => ['index' => 'maps'], 'except' => ['create', 'show', 'edit', 'update']]);
+    Route::resource('assets', 'Admin\AssetsController', ['names' => ['index' => 'assets'], 'except' => ['create', 'show', 'edit', 'update']]);
+
+    // users area
+    Route::post('/scout-data', 'Api\ScoutsController@index');
+    Route::post('/child-data', 'Api\ScoutsController@getChildData');
+    Route::get('/scout-data', 'Api\ScoutsController@index');
 });

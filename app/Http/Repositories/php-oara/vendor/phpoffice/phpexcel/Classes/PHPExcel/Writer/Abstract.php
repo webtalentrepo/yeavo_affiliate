@@ -56,7 +56,7 @@ abstract class PHPExcel_Writer_Abstract implements PHPExcel_Writer_IWriter
      *
      * @var string
      */
-    protected $_diskCachingDirectory    = './';
+    protected $_diskCachingDirectory = './';
 
     /**
      * Write charts in workbook?
@@ -75,12 +75,12 @@ abstract class PHPExcel_Writer_Abstract implements PHPExcel_Writer_IWriter
      *        Set to true, to advise the Writer to include any charts that exist in the PHPExcel object.
      *        Set to false (the default) to ignore charts.
      *
-     * @param    boolean    $pValue
+     * @param boolean $pValue
      * @return    PHPExcel_Writer_IWriter
      */
     public function setIncludeCharts($pValue = false)
     {
-        $this->includeCharts = (boolean) $pValue;
+        $this->includeCharts = (boolean)$pValue;
         return $this;
     }
 
@@ -104,12 +104,12 @@ abstract class PHPExcel_Writer_Abstract implements PHPExcel_Writer_IWriter
      *        Set to true (the default) to advise the Writer to calculate all formulae on save
      *        Set to false to prevent precalculation of formulae on save.
      *
-     * @param boolean $pValue    Pre-Calculate Formulas?
+     * @param boolean $pValue Pre-Calculate Formulas?
      * @return    PHPExcel_Writer_IWriter
      */
     public function setPreCalculateFormulas($pValue = true)
     {
-        $this->preCalculateFormulas = (boolean) $pValue;
+        $this->preCalculateFormulas = (boolean)$pValue;
         return $this;
     }
 
@@ -126,10 +126,10 @@ abstract class PHPExcel_Writer_Abstract implements PHPExcel_Writer_IWriter
     /**
      * Set use disk caching where possible?
      *
-     * @param     boolean     $pValue
-     * @param    string        $pDirectory        Disk caching directory
-     * @throws    PHPExcel_Writer_Exception    when directory does not exist
+     * @param boolean $pValue
+     * @param string $pDirectory Disk caching directory
      * @return PHPExcel_Writer_Excel2007
+     * @throws    PHPExcel_Writer_Exception    when directory does not exist
      */
     public function setUseDiskCaching($pValue = false, $pDirectory = null)
     {

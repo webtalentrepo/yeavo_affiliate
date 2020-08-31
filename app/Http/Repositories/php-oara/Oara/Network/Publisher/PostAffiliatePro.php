@@ -1,24 +1,35 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use Gpf_Api_Session;
+use Oara\Network;
+use Oara\Utilities;
+use Pap_Api_TransactionsGrid;
+use function ceil;
+use function dirname;
+use function realpath;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Export Class
  *
@@ -28,7 +39,7 @@ namespace Oara\Network\Publisher;
  * @version    Release: 01.00
  *
  */
-class PostAffiliatePro extends \Oara\Network
+class PostAffiliatePro extends Network
 {
     public $_credentials = null;
     public $_session = null;
@@ -38,7 +49,7 @@ class PostAffiliatePro extends \Oara\Network
      */
     public function login($credentials)
     {
-        include \realpath(\dirname(__FILE__)) . "/PostAffiliatePro/PapApi.class.php";
+        include realpath(dirname(__FILE__)) . "/PostAffiliatePro/PapApi.class.php";
         $this->_credentials = $credentials;
     }
 
@@ -47,15 +58,15 @@ class PostAffiliatePro extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -71,8 +82,8 @@ class PostAffiliatePro extends \Oara\Network
     {
         // If not login properly the construct launch an exception
         $connection = true;
-        $session = new \Gpf_Api_Session("http://" . $this->_credentials["domain"] . "/scripts/server.php");
-        if (!@$session->login($this->_credentials ["user"], $this->_credentials ["password"], \Gpf_Api_Session::AFFILIATE)) {
+        $session = new Gpf_Api_Session("http://" . $this->_credentials["domain"] . "/scripts/server.php");
+        if (!@$session->login($this->_credentials ["user"], $this->_credentials ["password"], Gpf_Api_Session::AFFILIATE)) {
             $connection = false;
         }
         $this->_session = $session;
@@ -85,9 +96,9 @@ class PostAffiliatePro extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = array();
+        $merchants = [];
 
-        $obj = array();
+        $obj = [];
         $obj ['cid'] = "1";
         $obj ['name'] = "Post Affiliate Pro ({$this->_credentials["domain"]})";
         $merchants [] = $obj;
@@ -97,18 +108,18 @@ class PostAffiliatePro extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
 
 
         //----------------------------------------------
         // get recordset of list of transactions
-        $request = new \Pap_Api_TransactionsGrid($this->_session);
+        $request = new Pap_Api_TransactionsGrid($this->_session);
         // set filter
         $request->addFilter('dateinserted', 'D>=', $dStartDate->format("Y-m-d"));
         $request->addFilter('dateinserted', 'D<=', $dEndDate->format("Y-m-d"));
@@ -119,13 +130,13 @@ class PostAffiliatePro extends \Oara\Network
         $recordset = $grid->getRecordset();
         // iterate through the records
         foreach ($recordset as $rec) {
-            $transaction = Array();
+            $transaction = [];
             $transaction ['merchantId'] = 1;
             $transaction ['uniqueId'] = $rec->get('t_orderid');
             $transaction ['date'] = $rec->get('dateinserted');
-            $transaction ['status'] = \Oara\Utilities::STATUS_CONFIRMED;
-            $transaction ['amount'] = \Oara\Utilities::parseDouble($rec->get('totalcost'));
-            $transaction ['commission'] = \Oara\Utilities::parseDouble($rec->get('commission'));
+            $transaction ['status'] = Utilities::STATUS_CONFIRMED;
+            $transaction ['amount'] = Utilities::parseDouble($rec->get('totalcost'));
+            $transaction ['commission'] = Utilities::parseDouble($rec->get('commission'));
             $totalTransactions [] = $transaction;
         }
         //----------------------------------------------
@@ -135,7 +146,7 @@ class PostAffiliatePro extends \Oara\Network
         $totalRecords = $grid->getTotalCount();
         $maxRecords = $recordset->getSize();
         if ($maxRecords > 0) {
-            $cycles = \ceil($totalRecords / $maxRecords);
+            $cycles = ceil($totalRecords / $maxRecords);
             for ($i = 1; $i < $cycles; $i++) {
                 // now get next 30 records
                 $request->setLimit($i * $maxRecords, $maxRecords);
@@ -143,19 +154,19 @@ class PostAffiliatePro extends \Oara\Network
                 $recordset = $request->getGrid()->getRecordset();
                 // iterate through the records
                 foreach ($recordset as $rec) {
-                    $transaction = Array();
+                    $transaction = [];
                     $transaction ['merchantId'] = 1;
                     $transaction ['uniqueId'] = $rec->get('t_orderid');
                     $transaction ['date'] = $rec->get('dateinserted');
                     if ($rec->get('rstatus') == 'D') {
-                        $transaction ['status'] = \Oara\Utilities::STATUS_DECLINED;
-                    } else if ($rec->get('rstatus') == 'P') {
-                        $transaction ['status'] = \Oara\Utilities::STATUS_PENDING;
-                    } else if ($rec->get('rstatus') == 'A') {
-                        $transaction ['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                        $transaction ['status'] = Utilities::STATUS_DECLINED;
+                    } elseif ($rec->get('rstatus') == 'P') {
+                        $transaction ['status'] = Utilities::STATUS_PENDING;
+                    } elseif ($rec->get('rstatus') == 'A') {
+                        $transaction ['status'] = Utilities::STATUS_CONFIRMED;
                     }
-                    $transaction ['amount'] = \Oara\Utilities::parseDouble($rec->get('totalcost'));
-                    $transaction ['commission'] = \Oara\Utilities::parseDouble($rec->get('commission'));
+                    $transaction ['amount'] = Utilities::parseDouble($rec->get('totalcost'));
+                    $transaction ['commission'] = Utilities::parseDouble($rec->get('commission'));
                     $totalTransactions [] = $transaction;
                 }
             }

@@ -1,9 +1,12 @@
 <?php
-include_once (dirname(__FILE__) . '/../settings.php');
 
-$network = new \Oara\Network\Publisher\Publicidees();
+use Oara\Network\Publisher\Publicidees;
+
+include_once(dirname(__FILE__) . '/../settings.php');
+
+$network = new Publicidees();
 $credentialsNeeded = $network->getNeededCredentials();
-$credentials = array();
+$credentials = [];
 $credentials["user"] = "";
 $credentials["password"] = "";
 $credentials['accountid'] = "";
@@ -16,16 +19,16 @@ try {
         //$network->getPaymentHistory();
         //$merchantList = array();
         $merchantList = $network->getMerchantList();
-        $startDate = new \DateTime('2017-04-21');
-        $endDate = new \DateTime('2017-04-24');
+        $startDate = new DateTime('2017-04-21');
+        $endDate = new DateTime('2017-04-24');
         $transactionList = $network->getTransactionList($merchantList, $startDate, $endDate);
         var_dump($transactionList);
     } else {
         echo "Network credentials not valid \n";
     }
-} catch (\Exception $e) {
+} catch (Exception $e) {
     //echo "stepE ";
-    echo "<br><br>errore: ".$e->getMessage()."<br><br>";
+    echo "<br><br>errore: " . $e->getMessage() . "<br><br>";
     var_dump($e->getTraceAsString());
     //throw new \Exception($e);
 }

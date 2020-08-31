@@ -15,7 +15,12 @@
             </v-row>
 
             <v-row>
-                <v-col cols="12" md="4" sm="12" v-if="!disableMin[sel_network][0]">
+                <v-col
+                    v-if="!disableMin[sel_network][0]"
+                    cols="12"
+                    md="4"
+                    sm="12"
+                >
                     <div>Sale $Amount</div>
                     <div class="d-flex align-center">
                         <v-text-field
@@ -32,23 +37,35 @@
                             label="Max"
                             type="number"
                             :disabled="disableMin[sel_network][0]"
-                            @keyup.enter="searchData"
                             clearable
+                            @keyup.enter="searchData"
                         ></v-text-field>
                     </div>
                 </v-col>
 
-                <v-col cols="12" md="4" sm="12" v-if="!disableMin[sel_network][1]">
-                    <div v-if="sel_network !== 'shareasale.com'">Popularity</div>
-                    <div v-if="sel_network === 'shareasale.com'">Powerrank Top 100</div>
-                    <div class="d-flex align-center" v-if="sel_network !== 'shareasale.com'">
+                <v-col
+                    v-if="!disableMin[sel_network][1]"
+                    cols="12"
+                    md="4"
+                    sm="12"
+                >
+                    <div v-if="sel_network !== 'shareasale.com'">
+                        Popularity
+                    </div>
+                    <div v-if="sel_network === 'shareasale.com'">
+                        Powerrank Top 100
+                    </div>
+                    <div
+                        v-if="sel_network !== 'shareasale.com'"
+                        class="d-flex align-center"
+                    >
                         <v-text-field
                             v-model="pop_min"
                             label="Min"
                             type="number"
                             :disabled="disableMin[sel_network][1]"
-                            @keyup.enter="searchData"
                             clearable
+                            @keyup.enter="searchData"
                         ></v-text-field>
                         <div class="pl-2 pr-2">-</div>
                         <v-text-field
@@ -56,11 +73,14 @@
                             label="Max"
                             type="number"
                             :disabled="disableMin[sel_network][1]"
-                            @keyup.enter="searchData"
                             clearable
+                            @keyup.enter="searchData"
                         ></v-text-field>
                     </div>
-                    <div class="d-flex align-center" v-if="sel_network === 'shareasale.com'">
+                    <div
+                        v-if="sel_network === 'shareasale.com'"
+                        class="d-flex align-center"
+                    >
                         <v-select
                             v-model="pop_max"
                             :items="['', 'Yes', 'No']"
@@ -91,47 +111,77 @@
                         :loading="searchStart"
                         loading-text="Loading... Please wait"
                     >
-                        <template v-slot:item.name="{ item }">
-                            <div class="py-2 cursor-pointer" @click="showDialog(item.network, item.id)">
+                        <template #[`item.name`]="{ item }">
+                            <div
+                                class="py-2 cursor-pointer"
+                                @click="showDialog(item.network, item.id)"
+                            >
                                 <div class="text--primary text-sm-body-1">
                                     {{ item.name }}
                                 </div>
                                 <div class="text--secondary text-sm-caption">
                                     {{ item.full_category }}
                                 </div>
-                                <div class="mt-2 text--secondary text-sm-caption">
+                                <div
+                                    class="mt-2 text--secondary text-sm-caption"
+                                >
                                     {{ item.p_description }}
                                 </div>
                             </div>
                         </template>
-                        <template v-slot:item.sale="{ item }">
-                            <div class="py-2 cursor-pointer" @click="showDialog(item.network, item.id)">
-                                <SaleCJComponent v-if="item.network === 'cj.com'" :item="item"/>
+                        <template #[`item.sale`]="{ item }">
+                            <div
+                                class="py-2 cursor-pointer"
+                                @click="showDialog(item.network, item.id)"
+                            >
+                                <SaleCJComponent
+                                    v-if="item.network === 'cj.com'"
+                                    :item="item"
+                                />
 
-                                <SaleCBComponent v-if="item.network === 'clickbank.com'" :item="item"/>
+                                <SaleCBComponent
+                                    v-if="item.network === 'clickbank.com'"
+                                    :item="item"
+                                />
 
-                                <SaleSSComponent v-if="item.network === 'shareasale.com'" :item="item"/>
+                                <SaleSSComponent
+                                    v-if="item.network === 'shareasale.com'"
+                                    :item="item"
+                                />
                             </div>
                         </template>
-                        <template v-slot:item.popularity="{ item }">
-                            <div class="py-2 cursor-pointer" @click="showDialog(item.network, item.id)">
+                        <template #[`item.popularity`]="{ item }">
+                            <div
+                                class="py-2 cursor-pointer"
+                                @click="showDialog(item.network, item.id)"
+                            >
                                 <span v-if="item.network !== 'shareasale.com'">
                                     {{ item.popularity }}
                                 </span>
                                 <span v-if="item.network === 'shareasale.com'">
-                                    Powerrank TOP 100: {{ item.popularity ? 'Yes' : 'No' }}<br/>
-                                    Average Commission: ${{ item.popular_rank }}<br/>
+                                    Powerrank TOP 100:
+                                    {{ item.popularity ? 'Yes' : 'No' }}<br />
+                                    Average Commission: ${{ item.popular_rank
+                                    }}<br />
                                     Reversal Rate: {{ item.child_category }}%
                                 </span>
                             </div>
                         </template>
-                        <template v-slot:item.network="{ item }">
-                            <div class="py-2 cursor-pointer" @click="showDialog(item.network, item.id)">
+                        <template #[`item.network`]="{ item }">
+                            <div
+                                class="py-2 cursor-pointer"
+                                @click="showDialog(item.network, item.id)"
+                            >
                                 {{ item.network }}
                             </div>
                         </template>
-                        <template v-slot:item.sign_up="{ item }">
-                            <a v-if="!disableMin[sel_network][2]" :href="item.sign_up" target="_blank">Sign Up</a>
+                        <template #[`item.sign_up`]="{ item }">
+                            <a
+                                v-if="!disableMin[sel_network][2]"
+                                :href="item.sign_up"
+                                target="_blank"
+                                >Sign Up</a
+                            >
                         </template>
                     </v-data-table>
                     <v-row>
@@ -148,7 +198,12 @@
             </v-row>
         </v-container>
         <v-container class="v-overlay--absolute">
-            <v-dialog v-model="cj_dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+            <v-dialog
+                v-model="cj_dialog"
+                fullscreen
+                hide-overlay
+                transition="dialog-bottom-transition"
+            >
                 <v-card>
                     <v-toolbar dark color="primary">
                         <v-btn icon dark @click="cj_dialog = false">
@@ -168,31 +223,41 @@
                                 :loading="cSearchStart"
                                 loading-text="Loading... Please wait"
                             >
-                                <template v-slot:item.name="{ item }">
+                                <template #[`item.name`]="{ item }">
                                     <div class="py-1">
-                                        <div class="text--primary text-sm-body-1">
+                                        <div
+                                            class="text--primary text-sm-body-1"
+                                        >
                                             {{ item.title }}
                                         </div>
-                                        <div class="text--secondary text-sm-caption">
+                                        <div
+                                            class="text--secondary text-sm-caption"
+                                        >
                                             {{ item.brand }}
                                         </div>
-                                        <div class="mt-2 text--secondary text-sm-caption">
+                                        <div
+                                            class="mt-2 text--secondary text-sm-caption"
+                                        >
                                             {{ item.description }}
                                         </div>
                                     </div>
                                 </template>
-                                <template v-slot:item.sale="{ item }">
+                                <template #[`item.sale`]="{ item }">
                                     <div class="py-1">
                                         <div>
-                                            Price: {{ item.p_amount }} {{ item.p_currency }}
+                                            Price: {{ item.p_amount }}
+                                            {{ item.p_currency }}
                                         </div>
                                         <div class="mt-2">
-                                            Sale: {{ item.s_amount }} {{ item.s_currency }}
+                                            Sale: {{ item.s_amount }}
+                                            {{ item.s_currency }}
                                         </div>
                                     </div>
                                 </template>
-                                <template v-slot:item.sign_up="{ item }">
-                                    <a :href="item.sign_up" target="_blank">Sign Up</a>
+                                <template #[`item.sign_up`]="{ item }">
+                                    <a :href="item.sign_up" target="_blank"
+                                        >Sign Up</a
+                                    >
                                 </template>
                             </v-data-table>
                             <v-row>
@@ -214,155 +279,189 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex'
-    import SaleCJComponent from "../components/SaleCJComponent";
-    import SaleCBComponent from "../components/SaleCBComponent";
-    import SaleSSComponent from "../components/SaleSSComponent";
+import { mapGetters } from 'vuex';
+import SaleCJComponent from '../components/SaleCJComponent';
+import SaleCBComponent from '../components/SaleCBComponent';
+import SaleSSComponent from '../components/SaleSSComponent';
 
-    export default {
-        name: "offer-scout",
-        components: {SaleSSComponent, SaleCBComponent, SaleCJComponent},
-        data() {
-            return {
-                search_str: '',
-                sale_min: '',
-                sale_max: '',
-                pop_min: '',
-                pop_max: '',
-                sel_network: 'All Networks',
-                searchStart: false,
-                disableMin: {
-                    'All Networks': [false, false, false],
-                    'clickbank.com': [false, false, false],
-                    'cj.com': [false, false, false],
-                    'Rakuten Linkshare': [false, false, false],
-                    'maxbounty.com': [false, false, false],
-                    'jvzoo.com': [false, false, false],
-                    'shareasale.com': [false, false, false],
+export default {
+    name: 'OfferScout',
+    components: { SaleSSComponent, SaleCBComponent, SaleCJComponent },
+    data() {
+        return {
+            search_str: '',
+            sale_min: '',
+            sale_max: '',
+            pop_min: '',
+            pop_max: '',
+            sel_network: 'All Networks',
+            searchStart: false,
+            disableMin: {
+                'All Networks': [false, false, false],
+                'clickbank.com': [false, false, false],
+                'cj.com': [false, false, false],
+                'Rakuten Linkshare': [false, false, false],
+                'maxbounty.com': [false, false, false],
+                'jvzoo.com': [false, false, false],
+                'shareasale.com': [false, false, false],
+            },
+            page: 1,
+            pageCount: 0,
+            itemsPerPage: 25,
+            headers: [
+                { text: 'Offer Name', value: 'name', width: '35%' },
+                { text: '$ Sale', value: 'sale', width: '25%' },
+                {
+                    text: 'Popularity(Is it selling well)',
+                    value: 'popularity',
+                    align: 'center',
+                    width: '20%',
                 },
-                page: 1,
-                pageCount: 0,
-                itemsPerPage: 25,
-                headers: [
-                    {text: 'Offer Name', value: 'name', width: '35%'},
-                    {text: '$ Sale', value: 'sale', width: '25%'},
-                    {text: 'Popularity(Is it selling well)', value: 'popularity', align: 'center', width: '20%'},
-                    {text: 'Network', value: 'network', sortable: false, width: '12%'},
-                    {text: 'Sign Up', value: 'sign_up', sortable: false, width: '8%'},
-                ],
-                desserts: [],
-                cj_dialog: false,
-                c_headers: [
-                    {text: 'Product', value: 'name', width: '35%'},
-                    {text: '$ Sale', value: 'sale', width: '25%'},
-                    {text: 'Network', value: 'network', sortable: false, width: '20%'},
-                    {text: 'Sign Up', value: 'sign_up', sortable: false, width: '20%'},
-                ],
-                c_page: 1,
-                c_pageCount: 0,
-                cItemsPerPage: 25,
-                cSearchStart: false,
-                c_deserts: []
+                {
+                    text: 'Network',
+                    value: 'network',
+                    sortable: false,
+                    width: '12%',
+                },
+                {
+                    text: 'Sign Up',
+                    value: 'sign_up',
+                    sortable: false,
+                    width: '8%',
+                },
+            ],
+            desserts: [],
+            cj_dialog: false,
+            c_headers: [
+                { text: 'Product', value: 'name', width: '35%' },
+                { text: '$ Sale', value: 'sale', width: '25%' },
+                {
+                    text: 'Network',
+                    value: 'network',
+                    sortable: false,
+                    width: '20%',
+                },
+                {
+                    text: 'Sign Up',
+                    value: 'sign_up',
+                    sortable: false,
+                    width: '20%',
+                },
+            ],
+            c_page: 1,
+            c_pageCount: 0,
+            cItemsPerPage: 25,
+            cSearchStart: false,
+            c_deserts: [],
+        };
+    },
+    // ===Computed properties for the component
+    computed: {
+        ...mapGetters({
+            scout_network: 'getNetworkList',
+        }),
+    },
+    mounted() {
+        this.getSalesData();
+    },
+    methods: {
+        showDialog(network, id) {
+            if (network === 'cj.com') {
+                this.cj_dialog = true;
+
+                this.getChildData(id);
             }
         },
-        // ===Computed properties for the component
-        computed: {
-            ...mapGetters({
-                scout_network: 'getNetworkList',
-            })
+        getChildData(id) {
+            this.page = 1;
+            this.cSearchStart = true;
+
+            const params = {
+                search_str: this.search_str,
+                sale_min: this.sale_min,
+                sale_max: this.sale_max,
+                limit: this.cItemsPerPage,
+                parent_id: id,
+            };
+
+            this.$http
+                .post('/child-data', params)
+                .then((r) => {
+                    if (r.data.result === 'success') {
+                        // console.log(r)
+                        this.c_deserts = r.data.rows;
+                        this.c_pageCount = r.data.pageCount;
+                    }
+
+                    this.cSearchStart = false;
+                })
+                // eslint-disable-next-line no-unused-vars
+                .catch(() => {
+                    this.cSearchStart = false;
+                });
         },
-        mounted() {
+        searchData() {
+            this.page = 1;
             this.getSalesData();
         },
-        methods: {
-            showDialog(network, id) {
-                if (network === 'cj.com') {
-                    this.cj_dialog = true;
+        getSalesData() {
+            this.searchStart = true;
+            const params = {
+                search_str: this.search_str,
+                sel_network: this.sel_network,
+                sale_min: this.sale_min,
+                sale_max: this.sale_max,
+                popular_min: this.pop_min,
+                popular_max: this.pop_max,
+                page: this.page,
+                limit: this.itemsPerPage,
+            };
 
-                    this.getChildData(id);
-                }
-            },
-            getChildData(id) {
-                this.page = 1;
-                this.cSearchStart = true;
-
-                const params = {
-                    search_str: this.search_str,
-                    sale_min: this.sale_min,
-                    sale_max: this.sale_max,
-                    limit: this.cItemsPerPage,
-                    parent_id: id,
-                }
-
-                this.$http.post('/api/child-data', params).then((r) => {
+            this.$http
+                .post('/scout-data', params)
+                .then((r) => {
                     if (r.data.result === 'success') {
                         // console.log(r)
-                        this.c_deserts = r.data.rows
-                        this.c_pageCount = r.data.pageCount
-                    }
-
-                    this.cSearchStart = false;
-                }).catch((e) => {
-                    this.cSearchStart = false;
-                })
-            },
-            searchData() {
-                this.page = 1;
-                this.getSalesData();
-            },
-            getSalesData() {
-                this.searchStart = true;
-                const params = {
-                    search_str: this.search_str,
-                    sel_network: this.sel_network,
-                    sale_min: this.sale_min,
-                    sale_max: this.sale_max,
-                    popular_min: this.pop_min,
-                    popular_max: this.pop_max,
-                    page: this.page,
-                    limit: this.itemsPerPage,
-                }
-
-                this.$http.post('/api/scout-data', params).then((r) => {
-                    if (r.data.result === 'success') {
-                        // console.log(r)
-                        this.desserts = r.data.rows
-                        this.pageCount = r.data.pageCount
+                        this.desserts = r.data.rows;
+                        this.pageCount = r.data.pageCount;
                     }
                     this.searchStart = false;
-                }).catch((e) => {
-                    this.searchStart = false;
                 })
-            }
-        }
-    }
+                // eslint-disable-next-line no-unused-vars
+                .catch((e) => {
+                    this.searchStart = false;
+                });
+        },
+    },
+};
 </script>
+
 <style lang="scss">
-    .v-dialog.v-dialog--fullscreen {
-        position: fixed;
-        width: 100%;
-        top: 0;
-        left: 0;
-        height: 100vh;
-    }
+.v-dialog.v-dialog--fullscreen {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 100vh;
+}
 
-    .v-dialog.v-dialog--fullscreen .v-card {
-        width: 100%;
-        height: 100vh;
-    }
+.v-dialog.v-dialog--fullscreen .v-card {
+    width: 100%;
+    height: 100vh;
+}
 
-    .cursor-pointer {
-        cursor: pointer;
-    }
+.cursor-pointer {
+    cursor: pointer;
+}
 
-    .v-toolbar.primary .v-toolbar__content {
-        display: flex;
-        align-items: center;
-    }
+.v-toolbar.primary .v-toolbar__content {
+    display: flex;
+    align-items: center;
+}
 
-    .v-dialog.v-dialog--fullscreen .v-data-table__wrapper {
-        height: 70vh;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
+.v-dialog.v-dialog--fullscreen .v-data-table__wrapper {
+    height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 </style>

@@ -1,24 +1,36 @@
 <?php
+
 namespace Oara\Network\Publisher;
-    /**
-     * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
-     * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
-     *
-     * Copyright (C) 2016  Fubra Limited
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU Affero General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or any later version.
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU Affero General Public License for more details.
-     * You should have received a copy of the GNU Affero General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     *
-     * Contact
-     * ------------
-     * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
-     **/
+use DateTime;
+use Oara\Network;
+use Oara\Utilities;
+use function curl_close;
+use function curl_exec;
+use function curl_init;
+use function curl_setopt;
+use function is_array;
+use function json_decode;
+
+/**
+ * The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set
+ * of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.
+ *
+ * Copyright (C) 2016  Fubra Limited
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contact
+ * ------------
+ * Fubra Limited <support@fubra.com> , +44 (0)1252 367 200
+ **/
+
 /**
  * Api Class
  *
@@ -29,7 +41,7 @@ namespace Oara\Network\Publisher;
  *
  *
  */
-class VigLink extends \Oara\Network
+class VigLink extends Network
 {
     private $_apiPassword = null;
 
@@ -48,13 +60,40 @@ class VigLink extends \Oara\Network
     {
         $connection = false;
 
-        $now = new \DateTime();
+        $now = new DateTime();
         $apiURL = "https://www.viglink.com/service/v1/cuidRevenue?lastDate={$now->format("Y/m/d")}&period=month&secret={$this->_apiPassword}";
         $response = self::call($apiURL);
-        if (\is_array($response)) {
+        if (is_array($response)) {
             $connection = true;
         }
         return $connection;
+    }
+
+    private function call($apiUrl)
+    {
+
+        // Initiate the REST call via curl
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:26.0) Gecko/20100101 Firefox/26.0");
+        curl_setopt($ch, CURLOPT_FAILONERROR, true);
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, false);
+        // Set the HTTP method to GET
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        // Don't return headers
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        // Return data after call is made
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // Execute the REST call
+        $response = curl_exec($ch);
+        $array = json_decode($response, true);
+        // Close the connection
+        curl_close($ch);
+        return $array;
     }
 
     /**
@@ -62,15 +101,15 @@ class VigLink extends \Oara\Network
      */
     public function getNeededCredentials()
     {
-        $credentials = array();
+        $credentials = [];
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "User Log in";
         $parameter["required"] = true;
         $parameter["name"] = "User";
         $credentials["user"] = $parameter;
 
-        $parameter = array();
+        $parameter = [];
         $parameter["description"] = "Password to Log in";
         $parameter["required"] = true;
         $parameter["name"] = "Password";
@@ -84,8 +123,8 @@ class VigLink extends \Oara\Network
      */
     public function getMerchantList()
     {
-        $merchants = array();
-        $obj = Array();
+        $merchants = [];
+        $obj = [];
         $obj ['cid'] = 1;
         $obj ['name'] = "VIgLink";
         $merchants [] = $obj;
@@ -94,23 +133,23 @@ class VigLink extends \Oara\Network
 
     /**
      * @param null $merchantList
-     * @param \DateTime|null $dStartDate
-     * @param \DateTime|null $dEndDate
+     * @param DateTime|null $dStartDate
+     * @param DateTime|null $dEndDate
      * @return array
      */
-    public function getTransactionList($merchantList = null, \DateTime $dStartDate = null, \DateTime $dEndDate = null)
+    public function getTransactionList($merchantList = null, DateTime $dStartDate = null, DateTime $dEndDate = null)
     {
-        $totalTransactions = array();
+        $totalTransactions = [];
         $apiURL = "https://www.viglink.com/service/v1/cuidRevenue?lastDate={$dEndDate->format("Y/m/d")}&period=month&secret={$this->_apiPassword}";
         $response = self::call($apiURL);
         foreach ($response as $date => $transactionApi) {
             foreach ($transactionApi[1] as $sale) {
                 if ($sale != 0) {
-                    $transaction = Array();
+                    $transaction = [];
                     $transaction['merchantId'] = "1";
-                    $transactionDate = \DateTime::createFromFormat("Y/m/d H:i:s", $date. " 00:00:00");
+                    $transactionDate = DateTime::createFromFormat("Y/m/d H:i:s", $date . " 00:00:00");
                     $transaction['date'] = $transactionDate->format("Y-m-d H:i:s");
-                    $transaction['status'] = \Oara\Utilities::STATUS_CONFIRMED;
+                    $transaction['status'] = Utilities::STATUS_CONFIRMED;
                     $transaction['amount'] = $sale;
                     $transaction['commission'] = $sale;
                     $totalTransactions[] = $transaction;
@@ -118,32 +157,5 @@ class VigLink extends \Oara\Network
             }
         }
         return $totalTransactions;
-    }
-
-    private function call($apiUrl)
-    {
-
-        // Initiate the REST call via curl
-        $ch = \curl_init($apiUrl);
-        \curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:26.0) Gecko/20100101 Firefox/26.0");
-        \curl_setopt($ch, CURLOPT_FAILONERROR, true);
-        \curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-        \curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-        \curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        \curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        \curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        \curl_setopt($ch, CURLOPT_VERBOSE, false);
-        // Set the HTTP method to GET
-        \curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-        // Don't return headers
-        \curl_setopt($ch, CURLOPT_HEADER, false);
-        // Return data after call is made
-        \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // Execute the REST call
-        $response = \curl_exec($ch);
-        $array = \json_decode($response, true);
-        // Close the connection
-        \curl_close($ch);
-        return $array;
     }
 }

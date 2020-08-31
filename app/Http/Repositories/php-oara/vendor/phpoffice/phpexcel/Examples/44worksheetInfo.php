@@ -29,7 +29,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
 
-define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+define('EOL', (PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
 
 date_default_timezone_set('Europe/London');
 
@@ -38,7 +38,7 @@ require_once dirname(__FILE__) . '/../Classes/PHPExcel/IOFactory.php';
 
 
 if (!file_exists("05featuredemo.xlsx")) {
-	exit("Please run 05featuredemo.php first." . EOL);
+    exit("Please run 05featuredemo.php first." . EOL);
 }
 
 $inputFileName = "05featuredemo.xlsx";

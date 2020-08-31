@@ -25,7 +25,7 @@ class ApiAuthorization implements IAuthorization
     /**
      * zanox connect ID
      *
-     * @var     string      $connectId          zanox connect id
+     * @var     string $connectId zanox connect id
      *
      * @access  private
      */
@@ -35,7 +35,7 @@ class ApiAuthorization implements IAuthorization
     /**
      * zanox shared secret key
      *
-     * @var     string      $secrectKey         secret key to sign messages
+     * @var     string $secrectKey secret key to sign messages
      * @access  private
      */
     private $secretKey = '';
@@ -44,7 +44,7 @@ class ApiAuthorization implements IAuthorization
     /**
      * zanox public key
      *
-     * @var     string      $applicationId      application id for oauth
+     * @var     string $applicationId application id for oauth
      * @access  private
      */
     private $publicKey = '';
@@ -53,7 +53,7 @@ class ApiAuthorization implements IAuthorization
     /**
      * Timestamp of the message
      *
-     * @var     string      $timestamp          timestamp to sign the message
+     * @var     string $timestamp timestamp to sign the message
      * @access  private
      */
     private $timestamp = false;
@@ -62,7 +62,7 @@ class ApiAuthorization implements IAuthorization
     /**
      * api version
      *
-     * @var     string      $version            api version
+     * @var     string $version api version
      * @access  private
      */
     private $version = false;
@@ -77,7 +77,6 @@ class ApiAuthorization implements IAuthorization
     private $msg_security = false;
 
 
-
     /**
      * Contructor
      *
@@ -85,63 +84,42 @@ class ApiAuthorization implements IAuthorization
      *
      * @return     void
      */
-    function __construct() {}
-
-
-
-    /**
-     * Set connectId
-     *
-     * @param      string      $timestamp      time stamp
-     *
-     * @access     public
-     * @final
-     *
-     * @return     void
-     */
-    final public function setTimestamp( $timestamp )
+    function __construct()
     {
-        $this->timestamp = $timestamp;
     }
 
-
-
-   /**
+    /**
      * Returns the current REST timestamp.
      *
      * If there hasn't already been set a datetime we create one automatically.
      * As a format the HTTP Header protocol RFC format is taken.
      *
+     * @return     string                      message timestamp
      * @see        see HTTP RFC for the datetime format
      *
      * @access     public
      * @final
      *
-     * @return     string                      message timestamp
      */
     final public function getTimestamp()
     {
         return $this->timestamp;
     }
 
-
-
     /**
-     * Set the connectId
+     * Set connectId
      *
-     * @param      string      $connectId      zanox connectId
+     * @param string $timestamp time stamp
      *
      * @access     public
      * @final
      *
      * @return     void
      */
-    final public function setConnectId( $connectId )
+    final public function setTimestamp($timestamp)
     {
-        $this->connectId = $connectId;
+        $this->timestamp = $timestamp;
     }
-
-
 
     /**
      * Returns the connectId
@@ -156,24 +134,20 @@ class ApiAuthorization implements IAuthorization
         return $this->connectId;
     }
 
-
-
     /**
-     * Sets the public key.
+     * Set the connectId
      *
-     * @param      string      $publicKey      public key
+     * @param string $connectId zanox connectId
      *
      * @access     public
      * @final
      *
      * @return     void
      */
-    final public function setPublicKey( $publicKey )
+    final public function setConnectId($connectId)
     {
-        $this->publicKey = $publicKey;
+        $this->connectId = $connectId;
     }
-
-
 
     /**
      * Returns the public key
@@ -188,40 +162,51 @@ class ApiAuthorization implements IAuthorization
         return $this->publicKey;
     }
 
-
-
     /**
-     * Set SecretKey
+     * Sets the public key.
      *
-     * @param      string      $secretKey      zanox secret key
+     * @param string $publicKey public key
      *
      * @access     public
      * @final
      *
      * @return     void
      */
-    final public function setSecretKey( $secretKey )
+    final public function setPublicKey($publicKey)
+    {
+        $this->publicKey = $publicKey;
+    }
+
+    /**
+     * Set SecretKey
+     *
+     * @param string $secretKey zanox secret key
+     *
+     * @access     public
+     * @final
+     *
+     * @return     void
+     */
+    final public function setSecretKey($secretKey)
     {
         $this->secretKey = $secretKey;
     }
 
 
-
     /**
      * Sets the API version to use.
      *
-     * @param      string      $version        API version
+     * @param string $version API version
      *
      * @access     public
      * @final
      *
      * @return     void
      */
-    final public function setVersion( $version )
+    final public function setVersion($version)
     {
         $this->version = $version;
     }
-
 
 
     /**
@@ -235,11 +220,10 @@ class ApiAuthorization implements IAuthorization
      *
      * @return     void
      */
-    final public function setSecureApiCall( $status = false )
+    final public function setSecureApiCall($status = false)
     {
         $this->msg_security = $status;
     }
-
 
 
     /**
@@ -259,7 +243,6 @@ class ApiAuthorization implements IAuthorization
     }
 
 
-
     /**
      * Returns the crypted hash signature for the message.
      *
@@ -267,35 +250,80 @@ class ApiAuthorization implements IAuthorization
      * and the timestamp of the message. Be aware of the 15 minutes timeframe
      * when setting the time manually.
      *
-     * @param      string      $service        service name or restful action
-     * @param      string      $method         method or uri
-     * @param      string      $nonce          nonce of request
+     * @param string $service service name or restful action
+     * @param string $method method or uri
+     * @param string $nonce nonce of request
      *
      * @access     public
      * @final
      *
      * @return     string                      encoded string
      */
-    final public function getSignature( $service, $method, $nonce )
+    final public function getSignature($service, $method, $nonce)
     {
         $sign = $service . strtolower($method) . $this->timestamp;
 
-        if ( !empty($nonce) )
-        {
+        if (!empty($nonce)) {
             $sign .= $nonce;
         }
 
         $hmac = $this->hmac($sign);
 
-        if ( $hmac )
-        {
+        if ($hmac) {
             return $hmac;
         }
 
         return false;
     }
 
+    /**
+     * Creates secured HMAC signature of the message parameters.
+     *
+     * Uses the hash_hmac function if available (PHP needs to be >= 5.1.2).
+     * Otherwise it uses the PEAR/CRYP_HMAC library to sign and crypt the
+     * message. Make sure you have at least one of the options working on your
+     * system.
+     *
+     * @param string $message message to sign
+     *
+     * @access     private
+     *
+     * @return     string                          signed sha1 message hash
+     */
+    private function hmac($mesgparams)
+    {
+        if (function_exists('hash_hmac')) {
+            $hmac = hash_hmac('sha1', utf8_encode($mesgparams), $this->secretKey);
+            $hmac = $this->encodeBase64($hmac);
+        } else {
+            require_once 'Crypt/HMAC.php';
 
+            $hashobj = new Crypt_HMAC($this->secretKey, "sha1");
+            $hmac = $this->encodeBase64($hashobj->hash(utf8_encode($mesgparams)));
+        }
+
+        return $hmac;
+    }
+
+    /**
+     * Encodes the given message parameters with Base64.
+     *
+     * @param string $str string to encode
+     *
+     * @access     private
+     *
+     * @return                                     encoded string
+     */
+    private function encodeBase64($str)
+    {
+        $encode = '';
+
+        for ($i = 0; $i < strlen($str); $i += 2) {
+            $encode .= chr(hexdec(substr($str, $i, 2)));
+        }
+
+        return base64_encode($encode);
+    }
 
     /**
      * Returns hash based nonce.
@@ -307,68 +335,12 @@ class ApiAuthorization implements IAuthorization
      *
      * @return     string                           md5 hash-based nonce
      */
-    final public function getNonce ()
+    final public function getNonce()
     {
-        $mt   = microtime();
+        $mt = microtime();
         $rand = mt_rand();
 
         return md5($mt . $rand);
-    }
-
-
-
-    /**
-     * Encodes the given message parameters with Base64.
-     *
-     * @param      string          $str            string to encode
-     *
-     * @access     private
-     *
-     * @return                                     encoded string
-     */
-    private function encodeBase64( $str )
-    {
-        $encode = '';
-
-        for ($i=0; $i < strlen($str); $i+=2){
-            $encode .= chr(hexdec(substr($str, $i, 2)));
-        }
-
-        return base64_encode($encode);
-    }
-
-
-
-    /**
-     * Creates secured HMAC signature of the message parameters.
-     *
-     * Uses the hash_hmac function if available (PHP needs to be >= 5.1.2).
-     * Otherwise it uses the PEAR/CRYP_HMAC library to sign and crypt the
-     * message. Make sure you have at least one of the options working on your
-     * system.
-     *
-     * @param      string      $message            message to sign
-     *
-     * @access     private
-     *
-     * @return     string                          signed sha1 message hash
-     */
-    private function hmac( $mesgparams )
-    {
-        if ( function_exists('hash_hmac') )
-        {
-            $hmac = hash_hmac('sha1', utf8_encode($mesgparams), $this->secretKey);
-            $hmac = $this->encodeBase64($hmac);
-        }
-        else
-        {
-            require_once 'Crypt/HMAC.php';
-
-            $hashobj = new Crypt_HMAC($this->secretKey, "sha1");
-            $hmac = $this->encodeBase64($hashobj->hash(utf8_encode($mesgparams)));
-        }
-
-        return $hmac;
     }
 
 

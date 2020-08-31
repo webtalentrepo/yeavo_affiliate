@@ -35,12 +35,38 @@ class PHPExcel_Linear_Best_Fit extends PHPExcel_Best_Fit
      *
      * @var    string
      **/
-    protected $bestFitType        = 'linear';
+    protected $bestFitType = 'linear';
+
+    /**
+     * Define the regression and calculate the goodness of fit for a set of X and Y data values
+     *
+     * @param float[] $yValues The set of Y-values for this regression
+     * @param float[] $xValues The set of X-values for this regression
+     * @param boolean $const
+     */
+    public function __construct($yValues, $xValues = [], $const = true)
+    {
+        if (parent::__construct($yValues, $xValues) !== false) {
+            $this->linearRegression($yValues, $xValues, $const);
+        }
+    }
+
+    /**
+     * Execute the regression and calculate the goodness of fit for a set of X and Y data values
+     *
+     * @param float[] $yValues The set of Y-values for this regression
+     * @param float[] $xValues The set of X-values for this regression
+     * @param boolean $const
+     */
+    private function linearRegression($yValues, $xValues, $const)
+    {
+        $this->leastSquareFit($yValues, $xValues, $const);
+    }
 
     /**
      * Return the Y-Value for a specified value of X
      *
-     * @param     float        $xValue            X-Value
+     * @param float $xValue X-Value
      * @return     float                        Y-Value
      **/
     public function getValueOfYForX($xValue)
@@ -51,7 +77,7 @@ class PHPExcel_Linear_Best_Fit extends PHPExcel_Best_Fit
     /**
      * Return the X-Value for a specified value of Y
      *
-     * @param     float        $yValue            Y-Value
+     * @param float $yValue Y-Value
      * @return     float                        X-Value
      **/
     public function getValueOfXForY($yValue)
@@ -59,11 +85,10 @@ class PHPExcel_Linear_Best_Fit extends PHPExcel_Best_Fit
         return ($yValue - $this->getIntersect()) / $this->getSlope();
     }
 
-
     /**
      * Return the Equation of the best-fit line
      *
-     * @param     int        $dp        Number of places of decimal precision to display
+     * @param int $dp Number of places of decimal precision to display
      * @return     string
      **/
     public function getEquation($dp = 0)
@@ -72,31 +97,5 @@ class PHPExcel_Linear_Best_Fit extends PHPExcel_Best_Fit
         $intersect = $this->getIntersect($dp);
 
         return 'Y = ' . $intersect . ' + ' . $slope . ' * X';
-    }
-
-    /**
-     * Execute the regression and calculate the goodness of fit for a set of X and Y data values
-     *
-     * @param     float[]    $yValues    The set of Y-values for this regression
-     * @param     float[]    $xValues    The set of X-values for this regression
-     * @param     boolean    $const
-     */
-    private function linearRegression($yValues, $xValues, $const)
-    {
-        $this->leastSquareFit($yValues, $xValues, $const);
-    }
-
-    /**
-     * Define the regression and calculate the goodness of fit for a set of X and Y data values
-     *
-     * @param    float[]        $yValues    The set of Y-values for this regression
-     * @param    float[]        $xValues    The set of X-values for this regression
-     * @param    boolean        $const
-     */
-    public function __construct($yValues, $xValues = array(), $const = true)
-    {
-        if (parent::__construct($yValues, $xValues) !== false) {
-            $this->linearRegression($yValues, $xValues, $const);
-        }
     }
 }

@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-undef
 const mix = require('laravel-mix');
+// eslint-disable-next-line no-undef
 require('vuetifyjs-mix-extension');
 
 /*
@@ -13,10 +15,18 @@ require('vuetifyjs-mix-extension');
  */
 
 const options = {
-    progressiveImages: true
-}
+    progressiveImages: true,
+};
 
 mix.js('resources/js/app.js', 'public/js')
     .vuetify('vuetify-loader', options)
     .sass('resources/sass/app.scss', 'public/css')
-    .extract(['vue', 'axios', 'vue-axios', 'jquery', 'vuex', 'vue-router', 'bootstrap']);
+    .extract([
+        'vue',
+        'axios',
+        'vue-axios',
+        'jquery',
+        'vuex',
+        'vue-router',
+        'bootstrap',
+    ]);

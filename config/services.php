@@ -30,6 +30,15 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'passport' => [
+        'login_end_point'        => env('PASSPORT_LOGIN_ENDPOINT'),
+        'login_client_end_point' => env('PASSPORT_CLIENT_ENDPOINT'),
+        'passport_client_id'     => env('PASSPORT_CLIENT_ID'),
+        'passport_client_secret' => env('PASSPORT_CLIENT_SECRET'),
+        'expires_hours'          => 8,
+        'expires_remember_me'    => 2,
+    ],
+
     'clickbank' => [
         'dev_key' => env('CLICKBANK_DEV_KEY'),
         'clerk_key' => env('CLICKBANK_CLERK_KEY')

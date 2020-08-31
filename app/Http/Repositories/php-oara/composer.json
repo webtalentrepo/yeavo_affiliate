@@ -1,17 +1,15 @@
 {
     "name": "padosoft/php-oara",
     "description": "The goal of the Open Affiliate Report Aggregator (OARA) is to develop a set of PHP classes that can download affiliate reports from a number of affiliate networks, and store the data in a common format.",
-
     "require": {
         "php": ">=5.3.0",
         "phpoffice/phpexcel": "1.8.*",
         "ext-curl": "*",
         "zendframework/zend-dom": "*"
     },
-
     "autoload": {
-        "psr-0" : {
-            "Oara" : ""
+        "psr-0": {
+            "Oara": ""
         }
     }
 }
