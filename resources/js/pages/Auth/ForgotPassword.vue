@@ -6,7 +6,7 @@
                     <form>
                         <v-row
                             v-if="!sent_email"
-                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text text-center"
+                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text text-center ml-0 mr-0"
                             justify="center"
                         >
                             Fear not. We’ll email you instructions to reset your
@@ -15,7 +15,7 @@
 
                         <v-row
                             v-if="sent_email"
-                            class="mt-md-10 mt-sm-8 pb-4 green--text text-center"
+                            class="mt-md-10 mt-sm-8 pb-4 green--text text-center ml-0 mr-0"
                             justify="center"
                         >
                             Success!<br />
@@ -39,7 +39,11 @@
                             ></v-text-field>
                         </ValidationProvider>
 
-                        <v-row justify="center" align="center">
+                        <v-row
+                            justify="center"
+                            align="center"
+                            class="ml-0 mr-0"
+                        >
                             <v-btn class="mr-4" @click="submit">Send</v-btn>
                             <router-link
                                 to="/login"

@@ -5,7 +5,7 @@
                 <v-col cols="12" md="6" sm="12" lg="5" xl="4">
                     <form>
                         <v-row
-                            class="mt-md-10 mt-sm-8 pb-2 blue-grey--text"
+                            class="mt-md-10 mt-sm-8 pb-2 blue-grey--text ml-0 mr-0"
                             justify="center"
                         ></v-row>
                         <ValidationProvider
@@ -100,7 +100,11 @@
                             </v-checkbox>
                         </ValidationProvider>
 
-                        <v-row justify="center" align="center">
+                        <v-row
+                            justify="center"
+                            align="center"
+                            class="ml-0 mr-0"
+                        >
                             <v-btn class="mr-4" @click="submit">Sign Up</v-btn>
                         </v-row>
                     </form>

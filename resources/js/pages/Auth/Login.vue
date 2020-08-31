@@ -5,7 +5,7 @@
                 <v-col cols="12" md="5" sm="10" xs="12" lg="4" xl="3">
                     <form>
                         <v-row
-                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text"
+                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text ml-0 mr-0"
                             justify="center"
                         >
                             Please Log In, or Sign Up to Get Started
@@ -43,7 +43,11 @@
                             ></v-text-field>
                         </ValidationProvider>
 
-                        <v-row justify="center" align="center">
+                        <v-row
+                            justify="center"
+                            align="center"
+                            class="ml-0 mr-0"
+                        >
                             <v-btn class="mr-4" @click="submit">Log In</v-btn>
                             <router-link
                                 class="ml-1 blue-grey--text text-decoration-underline"
@@ -53,7 +57,7 @@
                         </v-row>
 
                         <v-row
-                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text"
+                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text ml-0 mr-0"
                             justify="center"
                         >
                             <span>Don't have an account,</span>

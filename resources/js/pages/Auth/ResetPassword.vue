@@ -5,7 +5,7 @@
                 <v-col cols="12" md="6" sm="12" lg="5" xl="4">
                     <form>
                         <v-row
-                            class="mt-md-10 mt-sm-8 pb-2 blue-grey--text text-center text-sm-h6"
+                            class="mt-md-10 mt-sm-8 pb-2 blue-grey--text text-center text-sm-h6 ml-0 mr-0"
                             justify="center"
                             >Set New Password
                         </v-row>
@@ -45,7 +45,11 @@
                             ></v-text-field>
                         </ValidationProvider>
 
-                        <v-row justify="center" align="center">
+                        <v-row
+                            justify="center"
+                            align="center"
+                            class="ml-0 mr-0"
+                        >
                             <v-btn class="mr-4" @click="submit">Reset</v-btn>
 
                             <router-link
