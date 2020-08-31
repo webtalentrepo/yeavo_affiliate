@@ -121,7 +121,9 @@ const actions = {
                 axios
                     .get('/users/me')
                     .then((response) => {
-                        commit('setUserInfo', response.data);
+                        if (response.data.result === 'success') {
+                            commit('setUserInfo', response.data.userInfo);
+                        }
 
                         resolve(response);
                     })

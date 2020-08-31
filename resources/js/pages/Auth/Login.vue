@@ -121,8 +121,6 @@ export default {
                                 this.getUserData()
                                     .then(() => {
                                         window.Ls.remove('DB-Auth-Remember');
-                                        // alert('done');
-                                        // window.location.href = '/home';
                                         this.$router.push({
                                             name: 'Home',
                                         });

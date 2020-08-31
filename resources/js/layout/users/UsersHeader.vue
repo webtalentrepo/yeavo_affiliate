@@ -22,9 +22,11 @@
             <div class="px-10">Video Tutorials</div>
 
             <v-list-item-avatar>
-                <v-icon large color="#f0f0f0"
+                <v-icon v-if="!user" large color="#f0f0f0"
                     >mdi-account-circle-outline
                 </v-icon>
+
+                <v-img v-if="user" :src="user.profile.image_ext" />
             </v-list-item-avatar>
         </v-app-bar>
     </div>
@@ -33,6 +35,13 @@
 <script>
 export default {
     name: 'UsersHeader',
+    computed: {
+        user: {
+            get() {
+                return this.$store.state.userData;
+            },
+        },
+    },
 };
 </script>
 

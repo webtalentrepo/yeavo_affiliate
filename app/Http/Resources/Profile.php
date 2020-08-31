@@ -15,12 +15,15 @@ class Profile extends JsonResource
      */
     public function toArray($request)
     {
+        $user_email = $this->user->email;
+        $photo = (!is_null($this->image_ext) && !empty($this->image_ext)) ? $this->image_ext : 'https://www.gravatar.com/avatar/' . md5($user_email) . '.jpg?s=60&d=mm';
+
         return [
             'id'             => $this->id,
             'activated'      => $this->activated,
             'banned'         => $this->banned,
             'current_plan'   => $this->current_plan,
-            'image_ext'      => $this->image_ext,
+            'image_ext'      => $photo,
             'company'        => $this->company,
             'address'        => $this->address,
             'city'           => $this->city,
