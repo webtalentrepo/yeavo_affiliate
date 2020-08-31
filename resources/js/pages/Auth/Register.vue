@@ -168,8 +168,11 @@ export default {
                                     isAdmin: isAdmin,
                                 });
 
-                                this.$router.push('/');
-                                this.$forceUpdate();
+                                this.$nextTick(() => {
+                                    this.$router.push('/');
+
+                                    this.$forceUpdate();
+                                });
                             } else {
                                 console.log('email exist');
                                 // this.destroyAccessToken();

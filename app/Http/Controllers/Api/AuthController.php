@@ -196,11 +196,14 @@ class AuthController extends Controller
 
                         DB::table('password_resets')->where('email', $user->email)->delete();
 
+                        $user = new UserResource($user);
+
                         return response()->json([
                             'result'      => 'success',
                             'accessToken' => $tokenObject->accessToken,
                             'expiresIn'   => $tokenObject->token->expires_at->diffInSeconds(now()),
-                            'isAdmin'     => checkSupperAdmin($user->email)
+                            'isAdmin'     => checkSupperAdmin($user->email),
+                            'userInfo'    => $user,
                         ], 200);
                     }
                 }

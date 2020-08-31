@@ -88,6 +88,7 @@ export default {
     methods: {
         ...mapMutations({
             setAccessToken: 'setAccessToken',
+            setUserInfo: 'setUserInfo',
         }),
 
         ...mapActions({
@@ -105,7 +106,10 @@ export default {
                                     accessToken,
                                     expiresIn,
                                     isAdmin,
+                                    userInfo,
                                 } = response.data;
+
+                                this.setUserInfo(userInfo);
 
                                 this.setAccessToken({
                                     token: accessToken,
@@ -115,6 +119,8 @@ export default {
 
                                 this.$nextTick(() => {
                                     this.$router.push('/');
+
+                                    this.$forceUpdate();
                                 });
                             }
                         })
