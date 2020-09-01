@@ -19,6 +19,16 @@ const layouts = [
             auth: true,
         },
     },
+    {
+        path: '/privacy',
+        name: 'Offer Scout',
+        // eslint-disable-next-line no-undef
+        component: (resolve) => require(['../layout/users/index'], resolve),
+        meta: {
+            title: 'Offer Scout',
+            auth: true,
+        },
+    },
 ];
 
 export default layouts;
