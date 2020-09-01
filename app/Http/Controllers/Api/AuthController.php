@@ -274,4 +274,9 @@ class AuthController extends Controller
             'result'      => 'success'
         ], 200);
     }
+
+    public function oauth()
+    {
+
+    }
 }
