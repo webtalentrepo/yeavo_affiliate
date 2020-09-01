@@ -92,9 +92,12 @@
                                             >Terms of Service</a
                                         >
                                         and
-                                        <a class="blue-grey--text"
-                                            >Privacy Policy</a
-                                        >
+                                        <router-link
+                                            to="/privacy"
+                                            class="blue-grey--text"
+                                            target="_blank"
+                                            >Privacy Policy
+                                        </router-link>
                                     </div>
                                 </template>
                             </v-checkbox>
