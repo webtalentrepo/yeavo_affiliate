@@ -23,7 +23,7 @@ const layouts = [
         path: '/privacy',
         name: 'Offer Scout',
         // eslint-disable-next-line no-undef
-        component: (resolve) => require(['../layout/users/index'], resolve),
+        component: (resolve) => require(['../layout/users/privacy'], resolve),
         meta: {
             title: 'Offer Scout',
             auth: false,
