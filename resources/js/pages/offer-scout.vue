@@ -185,13 +185,24 @@
                         </template>
                     </v-data-table>
                     <v-row>
-                        <v-col cols="12">
+                        <v-col cols="12" md="10">
                             <v-pagination
                                 v-model="page"
                                 :length="pageCount"
                                 :total-visible="10"
                             ></v-pagination>
-                            <!--                            @input="getSalesData"-->
+                        </v-col>
+
+                        <v-col cols="12" md="2">
+                            <v-text-field
+                                v-model="page1"
+                                type="number"
+                                label="Go to Page"
+                                width="60px"
+                                min="1"
+                                outlined
+                                @input="page = parseInt(page1)"
+                            ></v-text-field>
                         </v-col>
                     </v-row>
                 </v-col>
@@ -306,6 +317,7 @@ export default {
                 'shareasale.com': [false, false, false],
             },
             page: 1,
+            page1: 1,
             pageCount: 0,
             itemsPerPage: 25,
             headers: [

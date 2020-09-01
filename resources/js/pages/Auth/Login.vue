@@ -34,12 +34,13 @@
                         >
                             <v-text-field
                                 v-model="credentials.password"
+                                :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                                :type="show1 ? 'text' : 'password'"
                                 :error-messages="errors"
-                                type="password"
                                 label="Password"
                                 solo
-                                clearable
                                 required
+                                @click:append="show1 = !show1"
                             ></v-text-field>
                         </ValidationProvider>
 
@@ -90,6 +91,7 @@ export default {
             password: '',
             remember_me: false,
         },
+        show1: false,
     }),
     mounted() {
         if (window.BCookie.get('DB-Auth-Email')) {
