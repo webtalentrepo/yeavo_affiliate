@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <v-row justify="center" align="center">
-            <v-col cols="10" class="text-center">
+            <v-col cols="10">
                 <h2>Deadbeat Affiliate Toolkit Privacy Policy</h2>
 
                 <p>
