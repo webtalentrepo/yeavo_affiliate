@@ -26,7 +26,7 @@ const layouts = [
         component: (resolve) => require(['../layout/users/index'], resolve),
         meta: {
             title: 'Offer Scout',
-            auth: true,
+            auth: false,
         },
     },
 ];
