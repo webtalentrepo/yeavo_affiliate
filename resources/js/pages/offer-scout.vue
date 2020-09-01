@@ -201,6 +201,7 @@
                                 width="60px"
                                 min="1"
                                 outlined
+                                dense
                                 @input="page = parseInt(page1)"
                             ></v-text-field>
                         </v-col>
