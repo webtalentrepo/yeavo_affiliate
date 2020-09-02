@@ -323,12 +323,12 @@ export default {
             itemsPerPage: 25,
             headers: [
                 { text: 'Offer Name', value: 'name', width: '35%' },
-                { text: '$ Sale', value: 'sale', width: '25%' },
+                { text: '$ Sale', value: 'sale', width: '23%' },
                 {
                     text: 'Popularity(Is it selling well)',
                     value: 'popularity',
                     align: 'center',
-                    width: '20%',
+                    width: '18%',
                 },
                 {
                     text: 'Network',
@@ -340,7 +340,7 @@ export default {
                     text: 'Sign Up',
                     value: 'sign_up',
                     sortable: false,
-                    width: '8%',
+                    width: '12%',
                 },
             ],
             desserts: [],
