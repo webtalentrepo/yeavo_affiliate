@@ -1,8 +1,8 @@
 <template>
-    <v-container>
+    <v-app>
         <v-container>
-            <v-row>
-                <v-col cols="12">
+            <v-row justify="center">
+                <v-col cols="10">
                     <v-text-field
                         v-model="search_str"
                         filled
@@ -14,11 +14,11 @@
                 </v-col>
             </v-row>
 
-            <v-row>
+            <v-row justify="center">
                 <v-col
                     v-if="!disableMin[sel_network][0]"
-                    cols="12"
-                    md="4"
+                    cols="10"
+                    md="3"
                     sm="12"
                 >
                     <div>Sale $Amount</div>
@@ -45,8 +45,8 @@
 
                 <v-col
                     v-if="!disableMin[sel_network][1]"
-                    cols="12"
-                    md="4"
+                    cols="10"
+                    md="3"
                     sm="12"
                 >
                     <div v-if="sel_network !== 'shareasale.com'">
@@ -89,7 +89,7 @@
                     </div>
                 </v-col>
 
-                <v-col cols="12" md="4" sm="12">
+                <v-col cols="10" md="4" sm="12">
                     <div>Network</div>
                     <v-select
                         v-model="sel_network"
@@ -99,8 +99,8 @@
                 </v-col>
             </v-row>
 
-            <v-row>
-                <v-col cols="12">
+            <v-row justify="center">
+                <v-col cols="10">
                     <v-data-table
                         :headers="headers"
                         :items="desserts"
@@ -223,8 +223,8 @@
                         </v-btn>
                         <v-toolbar-title>Products</v-toolbar-title>
                     </v-toolbar>
-                    <v-row class="overflow-auto">
-                        <v-col cols="12" class="overflow-auto">
+                    <v-row class="overflow-auto" justify="center">
+                        <v-col cols="10" class="overflow-auto">
                             <v-data-table
                                 :headers="c_headers"
                                 :items="c_deserts"
@@ -287,7 +287,7 @@
                 </v-card>
             </v-dialog>
         </v-container>
-    </v-container>
+    </v-app>
 </template>
 
 <script>

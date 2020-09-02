@@ -123,25 +123,7 @@ class ScoutRepository
                         ->orWhere('p_description', 'like', '%' . $keyStr . '%');
                 }
             });
-
-//            $qry = $qry->with(['child_products' => function ($q) use ($params, $keyStr) {
-//                if ($keyStr == '') {
-//                    $q->where('title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
-//                        ->orWhere('description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
-//                        ->orWhere('brand', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%');
-//                } else {
-//                    $q->where('title', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
-//                        ->orWhere('description', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
-//                        ->orWhere('brand', 'like', '%' . str_replace(' ', '%', $params['keywords']) . '%')
-//                        ->orWhere('title', 'like', '%' . $keyStr . '%')
-//                        ->orWhere('description', 'like', '%' . $keyStr . '%')
-//                        ->orWhere('brand', 'like', '%' . $keyStr . '%');
-//                }
-//            }]);
         }
-//        else {
-////            $qry = $qry->with('child_products');
-//        }
 
         $s_min = 0;
         $s_max = 0;
@@ -154,11 +136,19 @@ class ScoutRepository
         }
 
         if ($s_min != 0) {
-            $qry = $qry->where('p_commission', '>=', $s_min);
+            if ($sel_network == 'clickbank.com') {
+                $qry = $qry->where('three_month_epc', '>=', $s_min)->where('seven_day_epc', '>=', $s_min);
+            } else {
+                $qry = $qry->where('p_commission', '>=', $s_min);
+            }
         }
 
         if ($s_max != 0) {
-            $qry = $qry->where('p_commission', '<=', $s_max);
+            if ($sel_network == 'clickbank.com') {
+                $qry = $qry->where('three_month_epc', '<=', $s_max)->where('three_month_epc', '<=', $s_max);
+            } else {
+                $qry = $qry->where('p_commission', '<=', $s_max);
+            }
         }
 
         if ($sel_network != 'shareasale.com') {
