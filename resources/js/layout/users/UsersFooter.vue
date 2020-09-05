@@ -3,8 +3,9 @@
         horizontal
         fixed
         height="48px"
-        background-color="#272727"
+        background-color="grey darken-3"
         color="#f5f5f5"
+        dark
         class="app-footer"
     >
         <div class="px-10">About Us</div>

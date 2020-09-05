@@ -216,6 +216,7 @@
                                 v-model="page"
                                 :length="pageCount"
                                 :total-visible="10"
+                                circle
                             ></v-pagination>
                         </v-col>
 
@@ -304,6 +305,7 @@
                                         v-model="c_page"
                                         :length="c_pageCount"
                                         :total-visible="10"
+                                        circle
                                     ></v-pagination>
                                     <!--                            @input="getSalesData"-->
                                 </v-col>

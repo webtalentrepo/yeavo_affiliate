@@ -79,3 +79,31 @@ export default {
     },
 };
 </script>
+
+<style lang="scss">
+.v-list {
+    .v-list-item--active {
+        position: relative;
+
+        &:before {
+            display: none;
+        }
+
+        &:after {
+            content: ' ';
+            width: 10px;
+            height: 10px !important;
+            color: #363636;
+            background: black;
+            border: 0;
+            border-radius: 10px;
+            line-height: 10px;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            max-height: 10px;
+            min-height: 10px;
+        }
+    }
+}
+</style>

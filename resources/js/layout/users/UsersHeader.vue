@@ -1,12 +1,11 @@
 <template>
     <div class="users-header">
         <v-app-bar
-            color="#f5f5f5 accent-4"
+            color="grey darken-3"
             dense
             dark
             flat
             absolute
-            background-color="#363636"
         >
             <v-toolbar-title class="app-logo"
                 >{{ $store.state.siteName }}
