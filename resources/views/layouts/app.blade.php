@@ -35,6 +35,5 @@
 <script type="text/javascript" src="{{ url(mix('js/vendor.js')) }}"></script>
 <script type="text/javascript" src="{{ url(mix('js/app.js')) }}" defer></script>
 
-{{--<script src="https://www.anrdoezrs.net/am/100197611/include/allCj/impressions/page/am.js"></script>--}}
 </body>
 </html>

@@ -1,12 +1,14 @@
 <template>
     <v-app>
         <v-container>
+            <PageHeader></PageHeader>
+
             <v-row justify="center">
-                <v-col cols="10">
+                <v-col cols="8">
                     <v-text-field
                         v-model="search_str"
-                        filled
-                        label="Enter keyword, or leave blank if you don't have a keyword yet."
+                        solo
+                        label="Search"
                         append-icon="mdi-search-web"
                         @keyup.enter="searchData"
                         @click:append="searchData"
@@ -14,88 +16,112 @@
                 </v-col>
             </v-row>
 
-            <v-row justify="center">
+            <v-row justify="center" align="center">
                 <v-col
                     v-if="!disableMin[sel_network][0]"
-                    cols="10"
-                    md="3"
-                    sm="12"
+                    cols="8"
+                    md="8"
+                    sm="10"
+                    xs="12"
                 >
-                    <div>Sale $Amount</div>
-                    <div class="d-flex align-center">
-                        <v-text-field
-                            v-model="sale_min"
-                            label="Min"
-                            type="number"
-                            clearable
-                            :disabled="disableMin[sel_network][0]"
-                            @keyup.enter="searchData"
-                        ></v-text-field>
-                        <div class="pl-2 pr-2">-</div>
-                        <v-text-field
-                            v-model="sale_max"
-                            label="Max"
-                            type="number"
-                            :disabled="disableMin[sel_network][0]"
-                            clearable
-                            @keyup.enter="searchData"
-                        ></v-text-field>
-                    </div>
-                </v-col>
+                    <v-row justify="center" align="center" class="search-row">
+                        <v-col
+                            v-if="!disableMin[sel_network][0]"
+                            cols="3"
+                            md="3"
+                            sm="12"
+                        >
+                            <div class="text-center mb-4">Sale $Amount</div>
+                            <div class="d-flex align-center">
+                                <v-text-field
+                                    v-model="sale_min"
+                                    label="Min"
+                                    type="number"
+                                    solo
+                                    dense
+                                    :disabled="disableMin[sel_network][0]"
+                                    @keyup.enter="searchData"
+                                ></v-text-field>
+                                <div class="pl-4 pr-4">-</div>
+                                <v-text-field
+                                    v-model="sale_max"
+                                    label="Max"
+                                    type="number"
+                                    :disabled="disableMin[sel_network][0]"
+                                    solo
+                                    dense
+                                    @keyup.enter="searchData"
+                                ></v-text-field>
+                            </div>
+                        </v-col>
 
-                <v-col
-                    v-if="!disableMin[sel_network][1]"
-                    cols="10"
-                    md="3"
-                    sm="12"
-                >
-                    <div v-if="sel_network !== 'shareasale.com'">
-                        Popularity
-                    </div>
-                    <div v-if="sel_network === 'shareasale.com'">
-                        Powerrank Top 100
-                    </div>
-                    <div
-                        v-if="sel_network !== 'shareasale.com'"
-                        class="d-flex align-center"
-                    >
-                        <v-text-field
-                            v-model="pop_min"
-                            label="Min"
-                            type="number"
-                            :disabled="disableMin[sel_network][1]"
-                            clearable
-                            @keyup.enter="searchData"
-                        ></v-text-field>
-                        <div class="pl-2 pr-2">-</div>
-                        <v-text-field
-                            v-model="pop_max"
-                            label="Max"
-                            type="number"
-                            :disabled="disableMin[sel_network][1]"
-                            clearable
-                            @keyup.enter="searchData"
-                        ></v-text-field>
-                    </div>
-                    <div
-                        v-if="sel_network === 'shareasale.com'"
-                        class="d-flex align-center"
-                    >
-                        <v-select
-                            v-model="pop_max"
-                            :items="['', 'Yes', 'No']"
-                            @change="getSalesData()"
-                        ></v-select>
-                    </div>
-                </v-col>
+                        <v-col
+                            v-if="!disableMin[sel_network][1]"
+                            cols="3"
+                            md="3"
+                            sm="12"
+                        >
+                            <div
+                                v-if="sel_network !== 'shareasale.com'"
+                                class="text-center mb-4"
+                            >
+                                Popularity
+                            </div>
+                            <div
+                                v-if="sel_network === 'shareasale.com'"
+                                class="text-center mb-4"
+                            >
+                                Powerrank Top 100
+                            </div>
+                            <div
+                                v-if="sel_network !== 'shareasale.com'"
+                                class="d-flex align-center"
+                            >
+                                <v-text-field
+                                    v-model="pop_min"
+                                    label="Min"
+                                    type="number"
+                                    :disabled="disableMin[sel_network][1]"
+                                    solo
+                                    dense
+                                    @keyup.enter="searchData"
+                                ></v-text-field>
+                                <div class="pl-4 pr-4">-</div>
+                                <v-text-field
+                                    v-model="pop_max"
+                                    label="Max"
+                                    type="number"
+                                    :disabled="disableMin[sel_network][1]"
+                                    solo
+                                    dense
+                                    @keyup.enter="searchData"
+                                ></v-text-field>
+                            </div>
+                            <div
+                                v-if="sel_network === 'shareasale.com'"
+                                class="d-flex align-center"
+                            >
+                                <v-select
+                                    solo
+                                    dense
+                                    v-model="pop_max"
+                                    :items="['', 'Yes', 'No']"
+                                    @change="getSalesData()"
+                                ></v-select>
+                            </div>
+                        </v-col>
 
-                <v-col cols="10" md="4" sm="12">
-                    <div>Network</div>
-                    <v-select
-                        v-model="sel_network"
-                        :items="scout_network"
-                        @change="getSalesData()"
-                    ></v-select>
+                        <v-col cols="4" md="4" sm="12">
+                            <div class="text-center mb-4">Network</div>
+                            <v-select
+                                v-model="sel_network"
+                                :items="scout_network"
+                                solo
+                                dense
+                                @change="getSalesData()"
+                            ></v-select>
+                        </v-col>
+                    </v-row>
                 </v-col>
             </v-row>
 
@@ -295,10 +321,16 @@ import { mapGetters } from 'vuex';
 import SaleCJComponent from '../components/SaleCJComponent';
 import SaleCBComponent from '../components/SaleCBComponent';
 import SaleSSComponent from '../components/SaleSSComponent';
+import PageHeader from '../layout/users/PageHeader';
 
 export default {
     name: 'OfferScout',
-    components: { SaleSSComponent, SaleCBComponent, SaleCJComponent },
+    components: {
+        PageHeader,
+        SaleSSComponent,
+        SaleCBComponent,
+        SaleCJComponent,
+    },
     data() {
         return {
             search_str: '',
@@ -476,5 +508,46 @@ export default {
     height: 70vh;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.search-row {
+    .v-text-field {
+        .v-label {
+            font-size: 13px !important;
+            width: 100%;
+            text-align: center;
+        }
+
+        input {
+            font-size: 13px !important;
+            padding: 0 !important;
+            text-align: center;
+        }
+
+        &.v-text-field--solo {
+            &.v-input--dense {
+                > .v-input__control {
+                    min-height: 35px !important;
+
+                    > .v-input__slot {
+                        padding: 0 4px !important;
+                    }
+                }
+            }
+        }
+
+        &.v-text-field--enclosed {
+            .v-text-field__details {
+                margin: 0 !important;
+                min-height: 0 !important;
+                display: none;
+
+                .v-messages {
+                    min-height: 0 !important;
+                    display: none;
+                }
+            }
+        }
+    }
 }
 </style>
