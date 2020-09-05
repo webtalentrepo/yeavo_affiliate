@@ -217,6 +217,8 @@
                                 :length="pageCount"
                                 :total-visible="10"
                                 circle
+                                dark
+                                color="white"
                             ></v-pagination>
                         </v-col>
 
@@ -306,6 +308,7 @@
                                         :length="c_pageCount"
                                         :total-visible="10"
                                         circle
+                                        color="grey darken-3"
                                     ></v-pagination>
                                     <!--                            @input="getSalesData"-->
                                 </v-col>
@@ -555,6 +558,14 @@ export default {
                 }
             }
         }
+    }
+}
+
+.theme--dark.v-pagination {
+    .v-pagination__item--active {
+        color: #424242 !important;
+        outline: 0 !important;
+        box-shadow: none !important;
     }
 }
 </style>
