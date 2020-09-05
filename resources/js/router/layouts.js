@@ -20,8 +20,18 @@ const layouts = [
         },
     },
     {
+        path: '/keyword-tool',
+        name: '? Keyword',
+        // eslint-disable-next-line no-undef
+        component: (resolve) => require(['../pages/keyword-tool'], resolve),
+        meta: {
+            title: 'Keyword Tool',
+            auth: true,
+        },
+    },
+    {
         path: '/privacy',
-        name: 'Offer Scout',
+        name: 'Privacy Policy',
         // eslint-disable-next-line no-undef
         component: (resolve) => require(['../layout/users/privacy'], resolve),
         meta: {
