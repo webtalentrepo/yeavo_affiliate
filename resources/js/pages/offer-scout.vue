@@ -3,7 +3,7 @@
         <v-container>
             <PageHeader></PageHeader>
 
-            <v-row justify="center">
+            <v-row justify="center" class="search-box-row">
                 <v-col cols="8">
                     <v-text-field
                         v-model="search_str"
@@ -102,9 +102,9 @@
                                 class="d-flex align-center"
                             >
                                 <v-select
+                                    v-model="pop_max"
                                     solo
                                     dense
-                                    v-model="pop_max"
                                     :items="['', 'Yes', 'No']"
                                     @change="getSalesData()"
                                 ></v-select>
@@ -510,6 +510,24 @@ export default {
     overflow-x: hidden;
 }
 
+.search-box-row,
+.search-row {
+    .v-text-field {
+        &.v-text-field--enclosed {
+            .v-text-field__details {
+                margin: 0 !important;
+                min-height: 0 !important;
+                display: none;
+
+                .v-messages {
+                    min-height: 0 !important;
+                    display: none;
+                }
+            }
+        }
+    }
+}
+
 .search-row {
     .v-text-field {
         .v-label {
@@ -532,19 +550,6 @@ export default {
                     > .v-input__slot {
                         padding: 0 4px !important;
                     }
-                }
-            }
-        }
-
-        &.v-text-field--enclosed {
-            .v-text-field__details {
-                margin: 0 !important;
-                min-height: 0 !important;
-                display: none;
-
-                .v-messages {
-                    min-height: 0 !important;
-                    display: none;
                 }
             }
         }
