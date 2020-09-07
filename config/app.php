@@ -175,6 +175,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        SchulzeFelix\AdWords\AdWordsServiceProvider::class,
+
     ],
 
     /*
@@ -228,6 +230,8 @@ return [
         'View'         => Illuminate\Support\Facades\View::class,
 
         'MyConfig' => App\Facades\MyConfig::class,
+
+        'AdWords' => SchulzeFelix\AdWords\AdWordsFacade::class,
 
     ],
 

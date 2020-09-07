@@ -277,6 +277,8 @@ class AuthController extends Controller
 
     public function oauth()
     {
-
+        return response()->json([
+            'result' => 'success'
+        ]);
     }
 }

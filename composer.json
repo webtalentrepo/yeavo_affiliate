@@ -22,6 +22,7 @@
         "laravel/passport": "^9.3",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.1",
+        "schulzefelix/laravel-adwords-targeting-idea-service": "^1.6",
         "yajra/laravel-datatables": "^1.5"
     },
     "require-dev": {
