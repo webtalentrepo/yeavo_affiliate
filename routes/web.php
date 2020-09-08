@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'IndexController@index')->name('index');
-//Route::get('/test-call', 'Api\ScoutsController@getTestCall');
+Route::get('/test-call', 'Api\GoogleAdsApiController@searchVolumes');
 
 Route::get('{all}', 'IndexController@index')->name('index')->where(['all' => '.*']);
 

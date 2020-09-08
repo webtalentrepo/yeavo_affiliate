@@ -7,6 +7,8 @@ use App\Http\Repositories\UsersRepository;
 use App\Http\Resources\User as UserResource;
 use App\Notifications\ResetPasswordLinkSent;
 use App\User;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -275,10 +277,38 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function oauth()
+    public function oauth(Request $request)
     {
-        return response()->json([
-            'result' => 'success'
-        ]);
+        try {
+            if ($request->has('code')) {
+                $code = $request->input('code');
+//                $client = new \Google_Client();
+//                $client->authenticate($code);
+//                $access_token = $client->getAccessToken();
+//                var_dump($access_token);
+
+                var_dump($code);
+
+//                $client = new Client();
+//
+//                $response = $client->request('POST', 'https://www.googleapis.com/oauth2/v4/token', [
+//                    'body' => json_encode([
+//                        'code'          => $code,
+//                        'client_id'     => env('ADWORDS_CLIENT_ID'),
+//                        'client_secret' => env('ADWORDS_CLIENT_SECRET'),
+//                        'grant_type'    => 'authorization_code',
+//                        'redirect_uri'  => env('BACKEND_URL') . 'api/oauth'
+//                    ])
+//                ]);
+//
+//                $access = json_decode($response->getBody()->getContents(), true);
+//
+//                var_dump($access);
+
+                exit;
+            }
+        } catch (GuzzleException $e) {
+            var_dump($e->getMessage());
+        }
     }
 }

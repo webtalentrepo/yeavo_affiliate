@@ -175,8 +175,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        SchulzeFelix\AdWords\AdWordsServiceProvider::class,
-
     ],
 
     /*
@@ -231,8 +229,8 @@ return [
 
         'MyConfig' => App\Facades\MyConfig::class,
 
-        'AdWords' => SchulzeFelix\AdWords\AdWordsFacade::class,
-
     ],
 
+    'google_ads_php_path' => realpath(storage_path('app/public/google_ads_php.ini')),
+    'adsapi_php_path'     => realpath(storage_path('app/public/adsapi_php.ini')),
 ];

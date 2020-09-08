@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Repositories\ScoutRepository;
-use App\Http\Repositories\ShareSale;
 use Illuminate\Http\Request;
 
 class ScoutsController extends Controller
@@ -106,9 +105,13 @@ class ScoutsController extends Controller
 
     public function getTestCall()
     {
-        $cj = new ShareSale();
-        $c_detail = $cj->getMerchants([]);
+//        $cj = new ShareSale();
+//        $c_detail = $cj->getMerchants([]);
+//
+//        var_dump($c_detail['merchantSearchrecord']);
 
-        var_dump($c_detail['merchantSearchrecord']);
+//        $searchVolumes = AdWordsFacade::searchVolumes(['cheesecake', 'coffee']);
+
+//        var_dump($searchVolumes);
     }
 }

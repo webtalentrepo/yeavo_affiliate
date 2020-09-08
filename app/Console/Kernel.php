@@ -5,6 +5,8 @@ namespace App\Console;
 use App\Console\Commands\ChildProductsInsert;
 use App\Console\Commands\ScoutsDataInsert;
 use App\Console\Commands\ShareASaleInsert;
+use App\Console\Commands\GoogleAdsAuth;
+use App\Console\Commands\GoogleAdsGetToken;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -20,6 +22,8 @@ class Kernel extends ConsoleKernel
         ScoutsDataInsert::class,
         ChildProductsInsert::class,
         ShareASaleInsert::class,
+        GoogleAdsGetToken::class,
+        GoogleAdsAuth::class,
     ];
 
     /**
