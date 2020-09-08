@@ -155,9 +155,15 @@ html {
 }
 
 .app-logo {
-    font-family: 'LEADvilleASTROnaut System', sans-serif;
-    font-weight: normal;
+    /*font-family: 'LEADvilleASTROnaut System', sans-serif;*/
+    /*font-weight: normal;*/
     font-style: normal;
+    font-weight: bold;
+    font-size: 1.4rem !important;
+
+    .sub-title {
+        font-size: 0.9rem !important;
+    }
 }
 
 .text-align-center {

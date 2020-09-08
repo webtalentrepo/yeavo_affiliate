@@ -1,7 +1,8 @@
 import BCookie from '../utils/BCookie';
 
 const state = {
-    siteName: 'Deadbeat Affiliate Scout',
+    siteName: 'Tewl Kit',
+    siteSubName: 'Market Data Demystified',
     accessToken: BCookie.check('DBAccessToken')
         ? BCookie.get('DBAccessToken')
         : null,
