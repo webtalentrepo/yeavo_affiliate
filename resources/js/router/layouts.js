@@ -21,11 +21,11 @@ const layouts = [
     },
     {
         path: '/keyword-tool',
-        name: '? Keyword',
+        name: 'QuestionTail',
         // eslint-disable-next-line no-undef
         component: (resolve) => require(['../pages/keyword-tool'], resolve),
         meta: {
-            title: 'Keyword Tool',
+            title: 'QuestionTail',
             auth: true,
         },
     },

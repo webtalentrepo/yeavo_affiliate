@@ -16,7 +16,7 @@ const menuItems = [
         link: '/offer-scout',
     },
     {
-        title: '? Keyword',
+        title: 'QuestionTail',
         icon: 'mdi-search-web',
         link: '/keyword-tool',
     },
