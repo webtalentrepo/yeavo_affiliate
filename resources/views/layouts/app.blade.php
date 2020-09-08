@@ -7,6 +7,8 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <meta name="msvalidate.01" content="973927609BDC7E8D54DCF448F395A91D"/>
+
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
