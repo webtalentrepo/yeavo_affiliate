@@ -19,6 +19,7 @@ const options = {
 };
 
 mix.js('resources/js/app.js', 'public/js')
+    .copy('resources/assets', 'public/assets')
     .vuetify('vuetify-loader', options)
     .sass('resources/sass/app.scss', 'public/css')
     .extract([

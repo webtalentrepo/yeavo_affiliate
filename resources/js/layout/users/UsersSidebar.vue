@@ -30,7 +30,8 @@
                     :to="item.link"
                 >
                     <v-list-item-icon>
-                        <v-icon>{{ item.icon }}</v-icon>
+                        <!--                        <v-icon>{{ item.icon }}</v-icon>-->
+                        <img :src="`assets/icons/${item.icon}`" alt="" />
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -103,6 +104,19 @@ export default {
             right: 25px;
             max-height: 10px;
             min-height: 10px;
+        }
+    }
+
+    .v-list-item {
+        .v-list-item__icon {
+            width: 20px;
+            display: flex;
+            align-items: center;
+
+            img {
+                width: 18px;
+                height: 18px;
+            }
         }
     }
 }

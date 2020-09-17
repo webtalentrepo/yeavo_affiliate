@@ -4,7 +4,7 @@
         align="center"
         class="mr-0 ml-0 text-lg-h3 text-md-h4 text-sm-h5 font-weight-thin page-header-title"
     >
-        <v-icon size="3rem" color="#282828">{{ icon }}</v-icon>
+        <img :src="`assets/icons/${icon}`" alt="" class="header-img" />
         <div class="pt-5 pb-5 ml-3">
             {{ $route.name }}
         </div>
@@ -40,15 +40,22 @@ export default {
 .page-header-title {
     color: #282828;
 
-    @media (max-width: 480px) {
-        .v-icon {
-            font-size: 1.2rem !important;
-        }
+    .header-img {
+        width: 45px;
+        height: 45px;
     }
 
     @media (max-width: 1024px) {
-        .v-icon {
-            font-size: 2rem !important;
+        .header-img {
+            width: 30px;
+            height: 30px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-img {
+            width: 20px;
+            height: 20px;
         }
     }
 }

@@ -9,10 +9,17 @@
                         v-model="search_str"
                         solo
                         label="Search"
-                        append-icon="mdi-search-web"
                         @keyup.enter="searchData"
                         @click:append="searchData"
-                    ></v-text-field>
+                    >
+                        <template #append>
+                            <img
+                                src="assets/icons/search.png"
+                                alt=""
+                                class="append-icon"
+                            />
+                        </template>
+                    </v-text-field>
                 </v-col>
             </v-row>
 

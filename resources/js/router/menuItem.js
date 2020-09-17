@@ -1,33 +1,33 @@
 const menuItems = [
-    { title: 'Home', icon: 'mdi-home-outline', link: '/' },
+    { title: 'Home', icon: 'home-icon.png', link: '/' },
     {
         title: 'Domain Ideas',
-        icon: 'mdi-lightbulb-on-outline',
+        icon: 'domain-ideas.png',
         link: '/domain-ideas',
     },
     {
         title: 'Domain Sniper',
-        icon: 'mdi-target',
+        icon: 'domain-sniper.png',
         link: '/domain-sniper',
     },
     {
         title: 'Offer Scout',
-        icon: 'mdi-tag-outline',
+        icon: 'offer-scout.png',
         link: '/offer-scout',
     },
     {
         title: 'QuestionTail',
-        icon: 'mdi-search-web',
+        icon: 'question-tail.png',
         link: '/keyword-tool',
     },
     {
         title: 'Viral Content',
-        icon: 'mdi-bomb',
+        icon: 'viral-content.png',
         link: '/viral-content',
     },
     {
         title: 'Competitor Spy',
-        icon: 'mdi-incognito',
+        icon: 'competitor-spy.png',
         link: '/competitor-spy',
     },
 ];
