@@ -13,8 +13,9 @@
                     <v-img :src="user.profile.image_ext" />
                 </v-list-item-avatar>
 
-                <v-list-item-title v-if="user"
-                    >{{ user.name }}
+                <v-list-item-title v-if="user">
+                    {{ user.name }}
+                    <div class="text-xl-subtitle-1">User</div>
                 </v-list-item-title>
 
                 <v-btn icon @click.stop="mini = !mini">
@@ -82,6 +83,14 @@ export default {
 </script>
 
 <style lang="scss">
+.app-sidebar {
+    .text-xl-subtitle-1 {
+        font-size: 0.75rem;
+        color: #474343;
+        font-style: italic;
+    }
+}
+
 .v-list {
     .v-list-item--active {
         position: relative;
