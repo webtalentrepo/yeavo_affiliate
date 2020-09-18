@@ -372,13 +372,13 @@ export default {
             pageCount: 0,
             itemsPerPage: 25,
             headers: [
-                { text: 'Offer Name', value: 'name', width: '35%' },
+                { text: 'Offer Name', value: 'name', width: '33%' },
                 { text: '$ Sale', value: 'sale', width: '23%' },
                 {
-                    text: 'Popularity(Is it selling well)',
+                    text: 'Popularity (Is it selling well)',
                     value: 'popularity',
                     align: 'center',
-                    width: '18%',
+                    width: '20%',
                 },
                 {
                     text: 'Network',
