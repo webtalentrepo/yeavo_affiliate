@@ -139,7 +139,7 @@
             </v-row>
 
             <v-row justify="center">
-                <v-col cols="12" md="12" sm="12" lg="11" xl="10">
+                <v-col cols="12" md="12" sm="12" lg="11" xl="10" class="content-table">
                     <v-data-table
                         :headers="headers"
                         :items="desserts"
@@ -219,6 +219,7 @@
                                 v-if="!disableMin[sel_network][2]"
                                 :href="item.sign_up"
                                 target="_blank"
+                                class="v-btn v-btn--outlined sign-up-link"
                                 >Sign Up</a
                             >
                         </template>
