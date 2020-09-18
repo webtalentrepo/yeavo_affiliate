@@ -106,7 +106,7 @@ export default {
             border-radius: 10px;
             line-height: 10px;
             position: absolute;
-            top: 15px;
+            top: 20px;
             right: 25px;
             max-height: 10px;
             min-height: 10px;
