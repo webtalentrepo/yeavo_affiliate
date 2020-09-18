@@ -54,6 +54,8 @@ return [
     'share_a_sale' => [
         'key' => env('SHARE_A_SALE_KEY'),
         'sec' => env('SHARE_A_SALE_SEC')
-    ]
+    ],
+
+    'bing_api_key' => env('BING_WEBMASTER_KEY')
 
 ];
