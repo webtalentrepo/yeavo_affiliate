@@ -44,6 +44,20 @@
     }
 }
 
+.search-box-row {
+    .v-text-field.v-text-field--enclosed:not(.v-text-field--rounded) {
+        > .v-input__control {
+            > .v-input__slot, .v-text-field.v-text-field--enclosed .v-text-field__details {
+                padding: 0 20px;
+            }
+        }
+    }
+
+    .v-text-field.v-text-field--solo .v-input__control {
+        min-height: 40px;
+    }
+}
+
 .search-row {
     .v-text-field {
         .v-label {
@@ -61,12 +75,48 @@
         &.v-text-field--solo {
             &.v-input--dense {
                 > .v-input__control {
-                    min-height: 35px !important;
+                    min-height: 32px !important;
 
                     > .v-input__slot {
-                        padding: 0 4px !important;
+                        padding: 0 7px !important;
                     }
                 }
+            }
+        }
+    }
+
+    .min-max-box {
+        width: 120px;
+        margin: 0 auto;
+
+        .between-bar {
+            padding: 0 7px;
+        }
+
+        .v-application--is-ltr .v-text-field .v-input__append-inner {
+            padding: 0;
+
+            .v-input__icon {
+                min-width: 10px;
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        .v-select.v-input--dense {
+            .v-select__selection--comma {
+                font-size: 13px;
+            }
+        }
+    }
+
+    .min-max-select-box {
+        width: 145px;
+        margin: 0 auto;
+
+        .v-select.v-input--dense {
+            .v-select__selection--comma {
+                font-size: 13px;
             }
         }
     }

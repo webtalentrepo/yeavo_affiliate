@@ -39,7 +39,9 @@
                             sm="12"
                         >
                             <div class="text-center mb-4">Sale $Amount</div>
-                            <div class="d-flex align-center">
+                            <div
+                                class="d-flex align-center justify-center min-max-box"
+                            >
                                 <v-text-field
                                     v-model="sale_min"
                                     label="Min"
@@ -49,7 +51,7 @@
                                     :disabled="disableMin[sel_network][0]"
                                     @keyup.enter="searchData"
                                 ></v-text-field>
-                                <div class="pl-4 pr-4">-</div>
+                                <div class="between-bar">-</div>
                                 <v-text-field
                                     v-model="sale_max"
                                     label="Max"
@@ -82,7 +84,7 @@
                             </div>
                             <div
                                 v-if="sel_network !== 'shareasale.com'"
-                                class="d-flex align-center"
+                                class="d-flex align-center justify-center min-max-box"
                             >
                                 <v-text-field
                                     v-model="pop_min"
@@ -93,7 +95,7 @@
                                     dense
                                     @keyup.enter="searchData"
                                 ></v-text-field>
-                                <div class="pl-4 pr-4">-</div>
+                                <div class="between-bar">-</div>
                                 <v-text-field
                                     v-model="pop_max"
                                     label="Max"
@@ -106,7 +108,7 @@
                             </div>
                             <div
                                 v-if="sel_network === 'shareasale.com'"
-                                class="d-flex align-center"
+                                class="d-flex align-center justify-center min-max-box"
                             >
                                 <v-select
                                     v-model="pop_max"
@@ -120,13 +122,17 @@
 
                         <v-col cols="4" md="4" sm="12">
                             <div class="text-center mb-4">Network</div>
-                            <v-select
-                                v-model="sel_network"
-                                :items="scout_network"
-                                solo
-                                dense
-                                @change="getSalesData()"
-                            ></v-select>
+                            <div
+                                class="d-flex align-center justify-center min-max-select-box"
+                            >
+                                <v-select
+                                    v-model="sel_network"
+                                    :items="scout_network"
+                                    solo
+                                    dense
+                                    @change="getSalesData()"
+                                ></v-select>
+                            </div>
                         </v-col>
                     </v-row>
                 </v-col>
