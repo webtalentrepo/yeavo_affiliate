@@ -139,7 +139,14 @@
             </v-row>
 
             <v-row justify="center">
-                <v-col cols="12" md="12" sm="12" lg="11" xl="10" class="content-table">
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="content-table"
+                >
                     <v-data-table
                         :headers="headers"
                         :items="desserts"
@@ -224,7 +231,7 @@
                             >
                         </template>
                     </v-data-table>
-                    <v-row>
+                    <v-row class="mt-10">
                         <v-col cols="10" md="8">
                             <v-pagination
                                 v-model="page"
@@ -259,7 +266,7 @@
                 hide-overlay
                 transition="dialog-bottom-transition"
             >
-                <v-card>
+                <v-card class="overflow-hidden">
                     <v-toolbar dark color="primary">
                         <v-btn icon dark @click="cj_dialog = false">
                             <v-icon>mdi-close</v-icon>
@@ -267,7 +274,7 @@
                         <v-toolbar-title>Products</v-toolbar-title>
                     </v-toolbar>
                     <v-row class="overflow-auto" justify="center">
-                        <v-col cols="10" class="overflow-auto">
+                        <v-col cols="10" class="overflow-auto content-table">
                             <v-data-table
                                 :headers="c_headers"
                                 :items="c_deserts"
@@ -315,7 +322,7 @@
                                     >
                                 </template>
                             </v-data-table>
-                            <v-row>
+                            <v-row class="mt-10">
                                 <v-col cols="12">
                                     <v-pagination
                                         v-model="c_page"

@@ -24,7 +24,14 @@
             </v-row>
 
             <v-row justify="center">
-                <v-col cols="10">
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="content-table"
+                >
                     <v-data-table
                         :headers="headers"
                         :items="desserts"
@@ -38,7 +45,7 @@
                 </v-col>
             </v-row>
 
-            <v-row>
+            <v-row class="mt-10">
                 <v-col cols="10" md="8">
                     <v-pagination
                         v-model="page"
