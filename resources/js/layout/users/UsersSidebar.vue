@@ -9,18 +9,14 @@
             <v-list-item class="px-2">
                 <v-spacer v-if="!user"></v-spacer>
 
-                <v-list-item-avatar v-if="user">
+                <v-list-item-avatar v-if="user" size="62">
                     <v-img :src="user.profile.image_ext" />
                 </v-list-item-avatar>
 
-                <v-list-item-title v-if="user">
-                    {{ user.name }}
-                    <div class="text-xl-subtitle-1">User</div>
-                </v-list-item-title>
-
-                <v-btn icon @click.stop="mini = !mini">
-                    <v-icon>mdi-chevron-left</v-icon>
-                </v-btn>
+                <v-list-item-content v-if="user">
+                    <v-list-item-title>{{ user.name }}</v-list-item-title>
+                    <v-list-item-subtitle>User</v-list-item-subtitle>
+                </v-list-item-content>
             </v-list-item>
 
             <v-list dense class="pt-10">
@@ -84,10 +80,11 @@ export default {
 
 <style lang="scss">
 .app-sidebar {
-    .text-xl-subtitle-1 {
-        font-size: 0.75rem;
-        color: #474343;
-        font-style: italic;
+    .v-list-item__content {
+        .v-list-item__subtitle {
+            font-style: italic;
+            font-size: 0.75rem;
+        }
     }
 }
 
@@ -117,14 +114,26 @@ export default {
     }
 
     .v-list-item {
+        padding: 0 16px 0 30px !important;
+        height: 50px;
+
         .v-list-item__icon {
-            width: 20px;
+            width: 24px;
             display: flex;
             align-items: center;
+            margin-right: 8px;
+            height: 32px;
 
             img {
-                width: 18px;
-                height: 18px;
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        &__content {
+            .v-list-item__title {
+                font-size: 1rem;
+                font-weight: 100;
             }
         }
     }

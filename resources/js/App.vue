@@ -4,13 +4,13 @@
         <!--        <users-header v-if="!userInfo" :user="userInfo"></users-header>-->
 
         <div
-            class="app-body d-flex justify-center align-content-center align-center"
+            class="app-body d-flex justify-space-between align-content-center align-center"
         >
             <users-sidebar v-if="!isAdmin" :user="userInfo"></users-sidebar>
 
-            <v-container class="app-container">
+            <v-app class="app-container">
                 <router-view :user="userInfo"></router-view>
-            </v-container>
+            </v-app>
         </div>
 
         <users-footer v-if="!isAdmin"></users-footer>
@@ -116,57 +116,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-html {
-    overflow: hidden !important;
-
-    *:not(i) {
-        font-family: 'Poppins', sans-serif;
-    }
-}
-
-[v-cloak] * {
-    display: none;
-}
-
-.app-sidebar,
-.app-container {
-    height: calc(100vh - 96px);
-    margin-top: 48px;
-}
-
-.app-container {
-    overflow: auto;
-}
-
-@font-face {
-    font-family: 'LEADvilleASTROnaut System';
-    src: url('../sass/fonts/LEADvilleASTROnautSystem.eot');
-    src: url('../sass/fonts/LEADvilleASTROnautSystem.eot?#iefix')
-            format('embedded-opentype'),
-        url('../sass/fonts/LEADvilleASTROnautSystem.woff2') format('woff2'),
-        url('../sass/fonts/LEADvilleASTROnautSystem.woff') format('woff'),
-        url('../sass/fonts/LEADvilleASTROnautSystem.ttf') format('truetype'),
-        url('../sass/fonts/LEADvilleASTROnautSystem.svg#LEADvilleASTROnautSystem')
-            format('svg');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-.app-logo {
-    /*font-family: 'LEADvilleASTROnaut System', sans-serif;*/
-    /*font-weight: normal;*/
-    font-style: normal;
-    font-weight: bold;
-    font-size: 1.4rem !important;
-
-    .sub-title {
-        font-size: 0.9rem !important;
-    }
-}
-
-.text-align-center {
-    text-align: center;
-}
-</style>
+<style lang="scss" src="../sass/pages/_main.scss"></style>

@@ -1,6 +1,6 @@
 <template>
     <ValidationObserver ref="observer">
-        <v-container>
+        <v-container class="login-container">
             <v-row justify="center">
                 <v-col cols="12" md="6" sm="12" lg="5" xl="4">
                     <form>
@@ -50,7 +50,13 @@
                             align="center"
                             class="ml-0 mr-0"
                         >
-                            <v-btn class="mr-4" @click="submit">Reset</v-btn>
+                            <v-btn
+                                class="mr-4"
+                                light
+                                color="white"
+                                @click="submit"
+                                >Reset</v-btn
+                            >
 
                             <router-link
                                 to="/login"
@@ -137,3 +143,10 @@ export default {
     },
 };
 </script>
+<style lang="scss" scoped>
+.login-container {
+    *:not(i) {
+        font-weight: 100;
+    }
+}
+</style>

@@ -1,6 +1,6 @@
 <template>
     <ValidationObserver ref="observer">
-        <v-container>
+        <v-container class="login-container">
             <v-row justify="center">
                 <v-col cols="12" md="5" sm="10" xs="12" lg="4" xl="3">
                     <form>
@@ -44,7 +44,13 @@
                             align="center"
                             class="ml-0 mr-0"
                         >
-                            <v-btn class="mr-4" @click="submit">Send</v-btn>
+                            <v-btn
+                                class="mr-4"
+                                light
+                                color="white"
+                                @click="submit"
+                                >Send</v-btn
+                            >
                             <router-link
                                 to="/login"
                                 class="ml-1 blue-grey--text text-decoration-underline"
@@ -100,3 +106,10 @@ export default {
     },
 };
 </script>
+<style lang="scss" scoped>
+.login-container {
+    *:not(i) {
+        font-weight: 100;
+    }
+}
+</style>

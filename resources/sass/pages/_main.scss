@@ -1,0 +1,59 @@
+html {
+    overflow: hidden !important;
+
+    *:not(i) {
+        font-family: 'Poppins', sans-serif !important;
+    }
+}
+
+[v-cloak] * {
+    display: none;
+}
+
+.app-sidebar,
+.app-container {
+    height: calc(100vh - 96px);
+    margin-top: 48px;
+}
+
+.app-container {
+    overflow: auto;
+    width: calc(100vw - 245px);
+}
+
+@font-face {
+    font-family: 'LEADvilleASTROnaut System';
+    src: url('../../sass/fonts/LEADvilleASTROnautSystem.eot');
+    src: url('../../sass/fonts/LEADvilleASTROnautSystem.eot?#iefix') format('embedded-opentype'),
+    url('../../sass/fonts/LEADvilleASTROnautSystem.woff2') format('woff2'),
+    url('../../sass/fonts/LEADvilleASTROnautSystem.woff') format('woff'),
+    url('../../sass/fonts/LEADvilleASTROnautSystem.ttf') format('truetype'),
+    url('../../sass/fonts/LEADvilleASTROnautSystem.svg#LEADvilleASTROnautSystem') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.app-logo {
+    /*font-family: 'LEADvilleASTROnaut System', sans-serif;*/
+    /*font-weight: normal;*/
+    font-style: normal;
+    font-weight: bold;
+    font-size: 1.4rem !important;
+
+    .sub-title {
+        font-size: 0.9rem !important;
+    }
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+.v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)
+> .v-input__control
+> .v-input__slot,
+.v-btn--contained {
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2), 0 0 5px -4px rgba(0, 0, 0, 0.14),
+    0 0px 6px 4px rgba(0, 0, 0, 0.12);
+}

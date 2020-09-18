@@ -1,6 +1,6 @@
 <template>
     <ValidationObserver ref="observer">
-        <v-container>
+        <v-container class="login-container">
             <v-row justify="center">
                 <v-col cols="12" md="5" sm="10" xs="12" lg="4" xl="3">
                     <form>
@@ -49,16 +49,17 @@
                             align="center"
                             class="ml-0 mr-0"
                         >
-                            <v-btn class="mr-4" @click="submit">Log In</v-btn>
-                            <router-link
-                                class="ml-1 blue-grey--text text-decoration-underline"
-                                to="/forgot-password"
-                                >Forgot Password?
-                            </router-link>
+                            <v-btn
+                                class="mr-4"
+                                light
+                                color="white"
+                                @click="submit"
+                                >Log In
+                            </v-btn>
                         </v-row>
 
                         <v-row
-                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text ml-0 mr-0"
+                            class="mt-md-10 mt-sm-8 blue-grey--text ml-0 mr-0"
                             justify="center"
                         >
                             <span>Don't have an account,</span>
@@ -66,6 +67,18 @@
                                 class="ml-1 blue-grey--text text-decoration-underline"
                                 to="/register"
                                 >Sign Up Here
+                            </router-link>
+                        </v-row>
+
+                        <v-row
+                            justify="center"
+                            align="center"
+                            class="mt-md-10 mt-sm-8 ml-0 mr-0"
+                        >
+                            <router-link
+                                class="ml-1 blue-grey--text text-decoration-underline"
+                                to="/forgot-password"
+                                >Forgot Password?
                             </router-link>
                         </v-row>
                     </form>
@@ -161,3 +174,10 @@ export default {
     },
 };
 </script>
+<style lang="scss" scoped>
+.login-container {
+    *:not(i) {
+        font-weight: 100;
+    }
+}
+</style>
