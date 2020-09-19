@@ -88,17 +88,17 @@ export default {
         pageCount: 0,
         itemsPerPage: 25,
         headers: [
-            { text: 'Keyword', value: 'keyword', width: '35%' },
-            { text: 'Volume', value: 'volume', align: 'center', width: '13%' },
+            { text: 'Keywords', value: 'keyword', width: '35%' },
+            { text: 'Trends', value: 'trends', align: 'center', width: '13%' },
             {
-                text: 'Competition',
-                value: 'competition',
+                text: 'Broad Impressions',
+                value: 'broad_impressions',
                 align: 'center',
                 width: '13%',
             },
             {
-                text: 'IAAT',
-                value: 'anchor',
+                text: 'Impressions',
+                value: 'impressions',
                 align: 'center',
                 width: '13%',
             },
@@ -118,7 +118,25 @@ export default {
         desserts: [],
     }),
     methods: {
-        searchData() {},
+        searchData() {
+            this.searchStart = true;
+            const params = {
+                search_str: this.search_str,
+            };
+
+            this.$http
+                .post('/keyword-data', params)
+                .then((r) => {
+                    console.log(r.data);
+                    this.desserts = r.data.result;
+                    this.pageCount = r.data.pageCount;
+                    this.searchStart = false;
+                })
+                // eslint-disable-next-line no-unused-vars
+                .catch((e) => {
+                    this.searchStart = false;
+                });
+        },
     },
 };
 </script>
