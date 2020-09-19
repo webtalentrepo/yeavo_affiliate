@@ -88,8 +88,8 @@ export default {
         pageCount: 0,
         itemsPerPage: 10,
         headers: [
-            { text: 'Keywords', value: 'keyword', width: '35%' },
-            { text: 'Trends', value: 'trends', align: 'center', width: '13%' },
+            { text: 'Keywords', value: 'keyword', width: '33%' },
+            { text: 'Trends', value: 'trends', align: 'center', width: '20%' },
             {
                 text: 'Broad Impressions',
                 value: 'broad_impressions',
@@ -100,7 +100,7 @@ export default {
                 text: 'Impressions',
                 value: 'impressions',
                 align: 'center',
-                width: '13%',
+                width: '11%',
             },
             {
                 text: 'Social media on front page?',
@@ -112,7 +112,7 @@ export default {
                 text: 'Exact match?',
                 value: 'exact',
                 align: 'center',
-                width: '13%',
+                width: '10%',
             },
         ],
         desserts: [],
