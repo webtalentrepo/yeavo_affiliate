@@ -86,7 +86,7 @@ export default {
         page: 1,
         page1: 1,
         pageCount: 0,
-        itemsPerPage: 25,
+        itemsPerPage: 10,
         headers: [
             { text: 'Keywords', value: 'keyword', width: '35%' },
             { text: 'Trends', value: 'trends', align: 'center', width: '13%' },
@@ -127,9 +127,10 @@ export default {
             this.$http
                 .post('/keyword-data', params)
                 .then((r) => {
-                    console.log(r.data);
                     this.desserts = r.data.result;
-                    this.pageCount = r.data.pageCount;
+                    this.pageCount = Math.ceil(
+                        r.data.pageCount / this.itemsPerPage,
+                    );
                     this.searchStart = false;
                 })
                 // eslint-disable-next-line no-unused-vars
