@@ -67,7 +67,7 @@ export default {
     height: 70px;
 
     div {
-        height: 50px;
+        height: 70px;
     }
 }
 </style>
