@@ -53,7 +53,8 @@ class KeywordsController extends Controller
                         foreach ($stats as $key1 => $row1) {
                             $str = $row1->Date;
                             $str = preg_replace('/\D/', '', $str);
-                            $re[$key]['stats']['date'][$key1] = date('d M Y', $str);
+//                            $re[$key]['stats']['date'][$key1] = date('d M Y', $str);
+                            $re[$key]['stats']['date'][$key1] = date('d M Y', intval($str) / 1000);
                             $re[$key]['stats']['impressions'][$key1] = $row1->Impressions;
                         }
                     }

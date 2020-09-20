@@ -47,6 +47,13 @@
                                 {{ item.keyword }}
                             </div>
                         </template>
+                        <template #[`item.trends`]="{ item }">
+                            <div @click="clickData(item.keyword)">
+                                <keyword-trends
+                                    :chart-data="getChartData(item.stats)"
+                                ></keyword-trends>
+                            </div>
+                        </template>
                         <template #[`item.broad_impressions`]="{ item }">
                             <div @click="clickData(item.keyword)">
                                 {{ item.broad_impressions }}
@@ -92,10 +99,11 @@
 
 <script>
 import PageHeader from '../layout/users/PageHeader';
+import KeywordTrends from '../components/KeywordTrends';
 
 export default {
     name: 'KeywordTool',
-    components: { PageHeader },
+    components: { KeywordTrends, PageHeader },
     data: () => ({
         search_str: '',
         searchStart: false,
@@ -160,6 +168,23 @@ export default {
                 .catch((e) => {
                     this.searchStart = false;
                 });
+        },
+        getChartData(item) {
+            return {
+                labels: item.date,
+                datasets: [
+                    {
+                        label: 'Impressions',
+                        backgroundColor: 'rgba(220, 236, 255, 0.8)',
+                        data: item.impressions,
+                        lineTension: 0.2,
+                        pointRadius: 1,
+                        pointHoverRadius: 2,
+                        borderColor: '#3392FF',
+                        borderWidth: 1,
+                    },
+                ],
+            };
         },
     },
 };

@@ -64,10 +64,10 @@ export default {
 <style scoped lang="scss">
 .keywords-trends {
     width: 100%;
-    height: 30px;
+    height: 45px;
 
     div {
-        height: 30px;
+        height: 45px;
     }
 }
 </style>
