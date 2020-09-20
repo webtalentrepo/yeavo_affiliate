@@ -16,7 +16,7 @@
                             <img
                                 src="assets/icons/search.png"
                                 alt=""
-                                class="append-icon"
+                                class="append-icon cursor-pointer"
                                 @click="searchData"
                             />
                         </template>
