@@ -17,6 +17,7 @@
                                 src="assets/icons/search.png"
                                 alt=""
                                 class="append-icon"
+                                @click="searchData"
                             />
                         </template>
                     </v-text-field>
