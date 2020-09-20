@@ -22,7 +22,7 @@ export default {
             responsive: true,
             maintainAspectRatio: false,
             tooltip: {
-                position: 'nearest',
+                position: 'right',
                 mode: 'index',
                 intersect: false,
                 yPadding: 1,
