@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use bingWebmaster\actions\GetKeyword;
 use bingWebmaster\actions\GetKeywordStats;
 use bingWebmaster\actions\GetRelatedKeywords;
 use GuzzleHttp\Client;
@@ -17,12 +16,12 @@ class KeywordsController extends Controller
 
         $webMaster = new \bingWebmaster\client(config('services.bing_api_key'), $client);
 
-        $keywords_1 = $webMaster->request(new GetKeyword('diet', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
+//        $keywords_1 = $webMaster->request(new GetKeyword('diet', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
 
-//        $keywords = $webMaster->request(new GetRelatedKeywords('weight loss', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
+        $keywords = $webMaster->request(new GetKeywordStats('weight loss', '', ''));
 
-        print_r($keywords_1);
-//        print_r($keywords);
+//        print_r($keywords_1);
+        print_r($keywords);
     }
 
     public function getKeywordData(Request $request)
@@ -48,7 +47,16 @@ class KeywordsController extends Controller
                     $re[$key]['broad_impressions'] = $row->BroadImpressions;
                     $re[$key]['impressions'] = $row->Impressions;
 
-                    $re[$key]['stats'] = $webMaster->request(new GetKeywordStats($row->Query, '', ''));
+                    $stats = $webMaster->request(new GetKeywordStats($row->Query, '', ''));
+                    $re[$key]['stats'] = [];
+                    if ($stats) {
+                        foreach ($stats as $key1 => $row1) {
+                            $str = $row1->Date;
+                            $str = preg_replace('/\D/', '', $str);
+                            $re[$key]['stats']['date'][$key1] = date('d M Y', $str);
+                            $re[$key]['stats']['impressions'][$key1] = $row1->Impressions;
+                        }
+                    }
                 }
             }
         }
