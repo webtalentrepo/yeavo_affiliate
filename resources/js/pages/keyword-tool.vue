@@ -41,7 +41,23 @@
                         class="elevation-1"
                         :loading="searchStart"
                         loading-text="Loading... Please wait"
-                    ></v-data-table>
+                    >
+                        <template #[`item.keyword`]="{ item }">
+                            <div @click="clickData(item.keyword)">
+                                {{ item.keyword }}
+                            </div>
+                        </template>
+                        <template #[`item.broad_impressions`]="{ item }">
+                            <div @click="clickData(item.keyword)">
+                                {{ item.broad_impressions }}
+                            </div>
+                        </template>
+                        <template #[`item.impressions`]="{ item }">
+                            <div @click="clickData(item.keyword)">
+                                {{ item.impressions }}
+                            </div>
+                        </template>
+                    </v-data-table>
                 </v-col>
             </v-row>
 
@@ -88,36 +104,43 @@ export default {
         pageCount: 0,
         itemsPerPage: 10,
         headers: [
-            { text: 'Keywords', value: 'keyword', width: '33%' },
-            { text: 'Trends', value: 'trends', align: 'center', width: '20%' },
+            { text: 'Keywords', value: 'keyword', width: '35%' },
+            { text: 'Trends', value: 'trends', align: 'center', width: '25%' },
             {
                 text: 'Broad Impressions',
                 value: 'broad_impressions',
                 align: 'center',
-                width: '13%',
+                width: '20%',
             },
             {
                 text: 'Impressions',
                 value: 'impressions',
                 align: 'center',
-                width: '11%',
+                width: '20%',
             },
-            {
-                text: 'Social media on front page?',
-                value: 'social',
-                align: 'center',
-                width: '13%',
-            },
-            {
-                text: 'Exact match?',
-                value: 'exact',
-                align: 'center',
-                width: '10%',
-            },
+            // {
+            //     text: 'Social media on front page?',
+            //     value: 'social',
+            //     align: 'center',
+            //     width: '13%',
+            // },
+            // {
+            //     text: 'Exact match?',
+            //     value: 'exact',
+            //     align: 'center',
+            //     width: '10%',
+            // },
         ],
         desserts: [],
     }),
     methods: {
+        clickData(query) {
+            this.search_str = query;
+
+            this.desserts = [];
+
+            this.searchData();
+        },
         searchData() {
             this.searchStart = true;
             const params = {
