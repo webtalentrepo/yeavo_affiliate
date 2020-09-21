@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use bingWebmaster\actions\GetKeywordStats;
-use bingWebmaster\actions\GetQueryTrafficStats;
-use bingWebmaster\actions\GetRankAndTrafficStats;
 use bingWebmaster\actions\GetRelatedKeywords;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+
+//use bingWebmaster\actions\GetQueryTrafficStats;
+//use bingWebmaster\actions\GetRankAndTrafficStats;
+
+//use bingWebmaster\actions\GetQueryTrafficStats;
+//use bingWebmaster\actions\GetRankAndTrafficStats;
 
 class KeywordsController extends Controller
 {
@@ -82,6 +86,40 @@ class KeywordsController extends Controller
         return response()->json([
             'result'    => $re,
             'pageCount' => sizeof($re)
+        ]);
+    }
+
+    public function getKeywordTrends(Request $request)
+    {
+        $keyword = $request->input('keyword');
+
+        $re = [];
+        $re['date'] = [];
+        $re['impressions'] = [];
+
+        if (Cache::has($keyword . '_COL_Stats')) {
+            $re = json_decode(Cache::get($keyword . '_COL_Stats'));
+        } else {
+            $client = new Client();
+
+            $webMaster = new \bingWebmaster\client(config('services.bing_api_key'), $client);
+
+            $stats = $webMaster->request(new GetKeywordStats($keyword, '', ''));
+
+            if ($stats) {
+                foreach ($stats as $key1 => $row1) {
+                    $str = $row1->Date;
+                    $str = preg_replace('/\D/', '', $str);
+                    $re['date'][$key1] = date('d M', intval($str) / 1000) . ': ' . $row1->Impressions;
+                    $re['impressions'][$key1] = $row1->Impressions;
+                }
+            }
+
+            Cache::add($keyword . '_COL_Stats', json_encode($re), 1440);
+        }
+
+        return response()->json([
+            'result' => $re
         ]);
     }
 }

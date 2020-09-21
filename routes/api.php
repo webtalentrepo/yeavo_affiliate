@@ -42,4 +42,5 @@ Route::group([
     Route::get('/scout-data', 'Api\ScoutsController@index');
     Route::get('/keyword-data', 'Api\KeywordsController@getKeywordData');
     Route::post('/keyword-data', 'Api\KeywordsController@getKeywordData');
+    Route::post('/keyword-data-trends', 'Api\KeywordsController@getKeywordTrends');
 });

@@ -49,11 +49,13 @@
                             </div>
                         </template>
                         <template #[`item.trends`]="{ item }">
-                            <div @click="clickData(item.keyword)">
-                                <keyword-trends
-                                    :chart-data="getChartData(item.stats)"
-                                ></keyword-trends>
-                            </div>
+                            <v-btn
+                                light
+                                color="white"
+                                small
+                                @click="showTrendsData(item.keyword)"
+                                >Show
+                            </v-btn>
                         </template>
                         <template #[`item.broad_impressions`]="{ item }">
                             <div @click="clickData(item.keyword)">
@@ -95,6 +97,26 @@
                 </v-col>
             </v-row>
         </v-container>
+        <v-dialog v-model="dialog" persistent max-width="400" width="400">
+            <v-card>
+                <v-card-title class="headline">{{ keyword_str }}</v-card-title>
+                <v-card-text>
+                    <v-row justify="center" align="center">
+                        <v-col cols="10">
+                            <keyword-trends
+                                :chart-data="chart_data"
+                            ></keyword-trends>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="green darken-1" text @click="dialog = false"
+                        >Close
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-app>
 </template>
 
@@ -141,6 +163,9 @@ export default {
             // },
         ],
         desserts: [],
+        dialog: false,
+        keyword_str: '',
+        chart_data: {},
     }),
     methods: {
         clickData(query) {
@@ -179,13 +204,40 @@ export default {
                         backgroundColor: 'rgba(220, 236, 255, 0.8)',
                         data: item.impressions,
                         lineTension: 0.2,
-                        pointRadius: 1,
+                        pointRadius: 2,
                         pointHoverRadius: 2,
                         borderColor: '#3392FF',
                         borderWidth: 1,
                     },
                 ],
             };
+        },
+        showTrendsData(keyword) {
+            this.chart_data = {
+                labels: [],
+                datasets: [],
+            };
+            this.dialog = true;
+
+            const params = {
+                keyword: keyword,
+            };
+
+            this.$http
+                .post('/keyword-data-trends', params)
+                .then((r) => {
+                    this.keyword_str = keyword;
+                    this.chart_data = this.getChartData(r.data.result);
+                })
+                // eslint-disable-next-line no-unused-vars
+                .catch((e) => {
+                    this.chart_data = {
+                        labels: [],
+                        datasets: [],
+                    };
+
+                    this.dialog = false;
+                });
         },
     },
 };
