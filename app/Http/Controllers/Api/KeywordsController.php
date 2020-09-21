@@ -41,7 +41,7 @@ class KeywordsController extends Controller
                 $webMaster = new \bingWebmaster\client(config('services.bing_api_key'), $client);
 
                 $cur_date = date('Y-m-d');
-                $calc_date = date('Y-m-d', strtotime('+7 days', strtotime($cur_date)));
+                $calc_date = date('Y-m-d', strtotime('+1 days', strtotime($cur_date)));
                 $end_date = date('Y-m-d', strtotime('-1 days', strtotime($cur_date))) . 'T00:00:00.000Z';
                 $start_date = date('Y-m-d', strtotime('-6 months', strtotime($calc_date))) . 'T00:00:00.000Z';
 
@@ -50,7 +50,7 @@ class KeywordsController extends Controller
 
 //                exit;
 
-                $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', '2020-03-28T00:00:00.000Z', '2020-09-20T00:00:00.000Z'));
+                $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', $start_date, $end_date));
 //                $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', $start_date, $end_date));
 
                 if ($keywords) {
@@ -59,7 +59,7 @@ class KeywordsController extends Controller
                         $re[$key]['broad_impressions'] = $row->BroadImpressions;
                         $re[$key]['impressions'] = $row->Impressions;
 
-                        $stats = $webMaster->request(new GetKeywordStats(htmlspecialchars(urlencode($row->Query)), '', ''));
+//                        $stats = $webMaster->request(new GetKeywordStats($row->Query, '', ''));
                         $re[$key]['stats'] = [];
                         $re[$key]['stats']['date'] = [];
                         $re[$key]['stats']['impressions'] = [];
