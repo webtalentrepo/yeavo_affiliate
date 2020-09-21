@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use bingWebmaster\actions\GetKeywordStats;
+use bingWebmaster\actions\GetQueryTrafficStats;
+use bingWebmaster\actions\GetRankAndTrafficStats;
 use bingWebmaster\actions\GetRelatedKeywords;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -53,6 +55,8 @@ class KeywordsController extends Controller
 
                         $stats = $webMaster->request(new GetKeywordStats($row->Query, '', ''));
                         $re[$key]['stats'] = [];
+                        $re[$key]['stats']['date'] = [];
+                        $re[$key]['stats']['impressions'] = [];
                         if ($stats) {
                             foreach ($stats as $key1 => $row1) {
                                 $str = $row1->Date;
