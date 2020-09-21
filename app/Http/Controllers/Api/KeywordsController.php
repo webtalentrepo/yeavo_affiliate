@@ -59,19 +59,19 @@ class KeywordsController extends Controller
                         $re[$key]['broad_impressions'] = $row->BroadImpressions;
                         $re[$key]['impressions'] = $row->Impressions;
 
-                        $stats = $webMaster->request(new GetKeywordStats($row->Query, '', ''));
+//                        $stats = $webMaster->request(new GetKeywordStats($row->Query, '', ''));
                         $re[$key]['stats'] = [];
                         $re[$key]['stats']['date'] = [];
                         $re[$key]['stats']['impressions'] = [];
-                        if ($stats) {
-                            foreach ($stats as $key1 => $row1) {
-                                $str = $row1->Date;
-                                $str = preg_replace('/\D/', '', $str);
-//                            $re[$key]['stats']['date'][$key1] = date('d M Y', $str);
-                                $re[$key]['stats']['date'][$key1] = date('d M', intval($str) / 1000) . ': ' . $row1->Impressions;
-                                $re[$key]['stats']['impressions'][$key1] = $row1->Impressions;
-                            }
-                        }
+//                        if ($stats) {
+//                            foreach ($stats as $key1 => $row1) {
+//                                $str = $row1->Date;
+//                                $str = preg_replace('/\D/', '', $str);
+////                            $re[$key]['stats']['date'][$key1] = date('d M Y', $str);
+//                                $re[$key]['stats']['date'][$key1] = date('d M', intval($str) / 1000) . ': ' . $row1->Impressions;
+//                                $re[$key]['stats']['impressions'][$key1] = $row1->Impressions;
+//                            }
+//                        }
                     }
                 }
 
