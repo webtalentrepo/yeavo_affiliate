@@ -152,12 +152,12 @@ export default {
         },
         searchData() {
             this.searchStart = true;
-            // const params = {
-            //     search_str: this.search_str,
-            // };
+            const params = {
+                search_str: this.search_str,
+            };
 
             this.$http
-                .get(`/keyword-data?search_str=${this.search_str}`)
+                .post('/keyword-data', params)
                 .then((r) => {
                     this.desserts = r.data.result;
                     this.pageCount = Math.ceil(
