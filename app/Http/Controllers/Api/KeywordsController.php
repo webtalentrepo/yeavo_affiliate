@@ -53,7 +53,7 @@ class KeywordsController extends Controller
                         $re[$key]['broad_impressions'] = $row->BroadImpressions;
                         $re[$key]['impressions'] = $row->Impressions;
 
-                        $stats = $webMaster->request(new GetKeywordStats($row->Query, '', ''));
+                        $stats = $webMaster->request(new GetKeywordStats(htmlspecialchars(urlencode($row->Query)), '', ''));
                         $re[$key]['stats'] = [];
                         $re[$key]['stats']['date'] = [];
                         $re[$key]['stats']['impressions'] = [];
