@@ -36,7 +36,7 @@ class KeywordsController extends Controller
             if (Cache::has($keyword)) {
                 $re = json_decode(Cache::get($keyword));
             } else {
-                $client = new Client();
+                $client = new \GuzzleHttp\Client();
 
                 $webMaster = new \bingWebmaster\client(config('services.bing_api_key'), $client);
 
@@ -45,7 +45,8 @@ class KeywordsController extends Controller
                 $end_date = $cur_date . 'T00:00:00.000Z';
                 $start_date = date('Y-m-d', strtotime('-3 months', strtotime($calc_date))) . 'T00:00:00.000Z';
 
-                $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', $start_date, $end_date));
+//                $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', $start_date, $end_date));
+                $keywords = $webMaster->request(new GetRelatedKeywords('weight loss', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
 
                 if ($keywords) {
                     foreach ($keywords as $key => $row) {
