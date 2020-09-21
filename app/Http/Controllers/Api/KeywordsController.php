@@ -21,7 +21,7 @@ class KeywordsController extends Controller
 
 //        $keywords_1 = $webMaster->request(new GetKeyword('diet', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
 
-        $keywords = $webMaster->request(new GetKeywordStats('weight loss', '', ''));
+        $keywords = $webMaster->request(new GetRelatedKeywords('weight loss', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
 
 //        print_r($keywords_1);
         print_r($keywords);
@@ -41,9 +41,9 @@ class KeywordsController extends Controller
                 $webMaster = new \bingWebmaster\client(config('services.bing_api_key'), $client);
 
                 $cur_date = date('Y-m-d');
-                $calc_date = date('Y-m-d', strtotime('+7 days', strtotime($cur_date)));
+                $calc_date = date('Y-m-d', strtotime('+3 days', strtotime($cur_date)));
                 $end_date = $cur_date . 'T00:00:00.000Z';
-                $start_date = date('Y-m-d', strtotime('-6 months', strtotime($calc_date))) . 'T00:00:00.000Z';
+                $start_date = date('Y-m-d', strtotime('-3 months', strtotime($calc_date))) . 'T00:00:00.000Z';
 
                 $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', $start_date, $end_date));
 
