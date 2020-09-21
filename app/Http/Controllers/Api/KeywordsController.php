@@ -21,7 +21,7 @@ class KeywordsController extends Controller
 
 //        $keywords_1 = $webMaster->request(new GetKeyword('diet', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
 
-        $keywords = $webMaster->request(new GetRelatedKeywords('weight loss', '', '', '2020-03-28T00:00:00.000Z', '2020-09-20T00:00:00.000Z'));
+        $keywords = $webMaster->request(new GetRelatedKeywords('weight loss', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
 
 //        print_r($keywords_1);
         print_r($keywords);
