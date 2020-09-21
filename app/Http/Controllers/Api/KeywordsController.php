@@ -51,7 +51,7 @@ class KeywordsController extends Controller
 //                exit;
 
 //                $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', $start_date, $end_date));
-                $keywords = $webMaster->request(new GetRelatedKeywords('web hosting', '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
+                $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', '2020-06-18T00:00:00.000Z', '2020-09-18T00:00:00.000Z'));
 
                 if ($keywords) {
                     foreach ($keywords as $key => $row) {
