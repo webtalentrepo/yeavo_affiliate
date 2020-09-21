@@ -45,6 +45,11 @@ class KeywordsController extends Controller
                 $end_date = date('Y-m-d', strtotime('-1 days', strtotime($cur_date))) . 'T00:00:00.000Z';
                 $start_date = date('Y-m-d', strtotime('-6 months', strtotime($calc_date))) . 'T00:00:00.000Z';
 
+                var_dump($start_date);
+                var_dump($end_date);
+
+                exit;
+
                 $keywords = $webMaster->request(new GetRelatedKeywords($keyword, '', '', $start_date, $end_date));
 
                 if ($keywords) {
