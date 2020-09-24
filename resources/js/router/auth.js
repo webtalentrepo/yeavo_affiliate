@@ -4,8 +4,10 @@ const Login = () =>
     import(/* webpackChunkName: "login" */ '../pages/Auth/Login.vue');
 const Logout = () =>
     import(/* webpackChunkName: "logout" */ '../pages/Auth/Logout.vue');
-const Register = () =>
-    import(/* webpackChunkName: "register" */ '../pages/Auth/Register.vue');
+// const Register = () =>
+//     import(/* webpackChunkName: "register" */ '../pages/Auth/Register.vue');
+const Activate = () =>
+    import(/* webpackChunkName: "activate" */ '../pages/Auth/Activate.vue');
 const ForgotPassword = () =>
     import(
         /* webpackChunkName: "forgotpassword" */ '../pages/Auth/ForgotPassword.vue'
@@ -51,15 +53,15 @@ const auth_routes = [
             auth: false,
         },
     },
-    {
-        path: '/register',
-        name: 'Register',
-        component: Register,
-        meta: {
-            title: 'Sign up',
-            auth: false,
-        },
-    },
+    // {
+    //     path: '/register',
+    //     name: 'Register',
+    //     component: Register,
+    //     meta: {
+    //         title: 'Sign up',
+    //         auth: false,
+    //     },
+    // },
     {
         path: '/forgot-password',
         name: 'ForgotPassword',
@@ -75,6 +77,15 @@ const auth_routes = [
         component: ResetPassword,
         meta: {
             title: 'Reset Password',
+            auth: false,
+        },
+    },
+    {
+        path: '/activate/:token',
+        name: 'Activate',
+        component: Activate,
+        meta: {
+            title: 'Activate',
             auth: false,
         },
     },

@@ -19,7 +19,7 @@ class CreateUserProfilesTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->boolean('activated');
-            $table->string('activation_code', 100)->index();
+            $table->string('activation_code', 190)->index();
             $table->boolean('banned');
             $table->string('api_key', 100);
             $table->bigInteger('current_plan')->index();

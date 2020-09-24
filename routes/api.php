@@ -21,6 +21,7 @@ Route::group([
     Route::post('/send-reset-password-link', 'Api\AuthController@sendResetPasswordLink');
     Route::post('/reset-password-by-token', 'Api\AuthController@setNewPasswordByToken');
     Route::get('/oauth', 'Api\AuthController@oauth');
+    Route::get('/kajabi', 'Api\KajabiController@index');
 });
 
 Route::group([

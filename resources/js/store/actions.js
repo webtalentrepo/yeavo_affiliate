@@ -175,6 +175,20 @@ const actions = {
                 });
         });
     },
+
+    // eslint-disable-next-line no-unused-vars
+    getEmailByToken({ commit }, token) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post('/get-email-by-token', { token: token })
+                .then((response) => {
+                    resolve(response);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    },
 };
 
 export default actions;
