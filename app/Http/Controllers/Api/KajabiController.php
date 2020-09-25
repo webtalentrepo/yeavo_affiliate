@@ -30,14 +30,19 @@ class KajabiController extends Controller
                 $email = $payload['member_email'];
                 $name = $payload['member_name'];
 
-                $user = new User();
-                $user->name = $name;
-                $user->email = $email;
-                $user->password = $this->hasher->make('12345678');
-                $user->save();
+                $user_check = User::where('email', $email)->count();
 
-                $userRepo = new UsersRepository();
-                $userRepo->creatByKajabi($user);
+                if (!$user_check) {
+                    $user = new User();
+                    $user->name = $name;
+                    $user->email = $email;
+                    $user->password = $this->hasher->make('12345678');
+                    $user->save();
+
+                    $userRepo = new UsersRepository();
+                    $userRepo->creatByKajabi($user);
+                }
+
             }
         } catch (\Exception $exception) {
             return response($exception->getMessage(), 400);
