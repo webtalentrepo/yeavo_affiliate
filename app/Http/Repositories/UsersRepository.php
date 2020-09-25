@@ -9,6 +9,7 @@
 namespace App\Http\Repositories;
 
 use App\Notifications\WelcomeToOurSoftware;
+use App\Notifications\WelcomeToTewlKitPurchase;
 use App\User;
 use Illuminate\Support\Facades\DB;
 
@@ -128,6 +129,49 @@ class UsersRepository extends Repository
         } else {
             return DB::table('plans')->where('product_id', '=', $product_id)->first();
         }
+    }
+
+    public function creatByKajabi($user)
+    {
+        $user->roles()->attach(1);
+
+        $plan = $this->getPlan();
+
+        $user_plans = [
+            'payment_status'    => 'success',
+            'status'            => 'Active',
+            'activated_on'      => DB::raw('NOW()'),
+            'payment_method'    => 'Stripe',
+            'free_flag'         => $plan->free_plan,
+            'duration'          => $plan->duration,
+            'duration_schedule' => $plan->duration_schedule,
+            'amount'            => $plan->amount,
+        ];
+
+        // User free plan register
+        $user->plans()->attach($plan->id, $user_plans);
+
+        // User profile register
+        $userPlan = $user->user_plans()->orderBy('id', 'desc')->first();
+
+        $activation_code = encrypt($user->email . $user->name, false);
+
+        $ins_data = [
+            'activated'       => 0,
+            'activation_code' => $activation_code,
+            'current_plan'    => $userPlan->id,
+            'company'         => '',
+            'address'         => '',
+            'city'            => '',
+            'postal_code'     => '',
+            'country'         => '',
+            'state_code'      => '',
+            'phone'           => '',
+        ];
+
+        $user->user_profile()->create($ins_data);
+
+        $user->notify(new WelcomeToTewlKitPurchase($user, $activation_code));
     }
 
     /**

@@ -41,7 +41,7 @@ class WelcomeToOurSoftware extends Notification
      * Get the mail representation of the notification.
      *
      * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      * @throws \Exception
      */
     public function toMail($notifiable)
@@ -52,7 +52,7 @@ class WelcomeToOurSoftware extends Notification
                 ->greeting('Hi ' . $this->user->name)
                 ->line('Your new account is ready! Thank you for joining ' . config('app.name') . '.')
                 ->line('Your Login Email is "' . htmlspecialchars($this->user->email) . '" and Password is "' . htmlspecialchars($this->password) . '"')
-                ->action('Visit to ' . config('app.name'), url('/'))
+                ->action('Visit to ' . config('app.name'), url('https://toolkit.yeavo.com/'))
                 ->line('For any help you can contact our customer support at ' . htmlspecialchars(getConfig('support_email')))
                 ->line('Thank you for using ' . config('app.name') . '!');
         } catch (\Exception $e) {
