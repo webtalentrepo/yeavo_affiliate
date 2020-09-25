@@ -28,7 +28,7 @@
                 >
                     <v-list-item-icon>
                         <!--                        <v-icon>{{ item.icon }}</v-icon>-->
-                        <img :src="`assets/icons/${item.icon}`" alt="" />
+                        <img :src="`/assets/icons/${item.icon}`" alt="" />
                     </v-list-item-icon>
 
                     <v-list-item-content>

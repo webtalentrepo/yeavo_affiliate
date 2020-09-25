@@ -4,7 +4,7 @@
         align="center"
         class="mr-0 ml-0 font-weight-thin page-header-title"
     >
-        <img :src="`assets/icons/${icon}`" alt="" class="header-img" />
+        <img :src="`/assets/icons/${icon}`" alt="" class="header-img" />
         <div class="pt-5 pb-5 ml-3">
             {{ $route.name }}
         </div>

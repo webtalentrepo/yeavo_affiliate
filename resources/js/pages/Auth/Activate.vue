@@ -5,9 +5,17 @@
                 <v-col cols="12" md="6" sm="12" lg="5" xl="4">
                     <form>
                         <v-row
-                            class="mt-md-10 mt-sm-8 pb-2 blue-grey--text ml-0 mr-0"
+                            class="mt-md-10 mt-sm-8 pb-2 red--text ml-0 mr-0"
                             justify="center"
-                        ></v-row>
+                        >
+                            <v-col
+                                v-if="invalid_account"
+                                cols="12"
+                                class="text-align-center font-weight-black"
+                            >
+                                Invalid Activation Token!
+                            </v-col>
+                        </v-row>
                         <ValidationProvider
                             v-slot="{ errors }"
                             name="Name"
@@ -24,20 +32,13 @@
                             ></v-text-field>
                         </ValidationProvider>
 
-                        <ValidationProvider
-                            v-slot="{ errors }"
-                            name="Email"
-                            rules="required|email"
-                        >
-                            <v-text-field
-                                v-model="credentials.email"
-                                :error-messages="errors"
-                                label="Email"
-                                solo
-                                clearable
-                                required
-                            ></v-text-field>
-                        </ValidationProvider>
+                        <v-text-field
+                            v-model="credentials.email"
+                            label="Email"
+                            solo
+                            clearable
+                            readonly
+                        ></v-text-field>
 
                         <ValidationProvider
                             v-slot="{ errors }"
@@ -113,7 +114,7 @@
                                 light
                                 color="white"
                                 @click="submit"
-                                >Sign Up
+                                >Activate
                             </v-btn>
                         </v-row>
                     </form>
@@ -143,6 +144,7 @@ export default {
             agree_tos: null,
             token: '',
         },
+        invalid_account: false,
     }),
 
     mounted() {
