@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\UsersRepository;
 use App\User;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Support\Facades\Log;
 
 class KajabiController extends Controller
 {
@@ -21,6 +22,8 @@ class KajabiController extends Controller
         try {
             $inputData = json_decode(file_get_contents('php://input'), true);
 
+            Log::info(json_encode($inputData));
+
             if (isset($inputData['event']) && isset($inputData['payload']) && $inputData['event'] == 'purchase.created') {
                 $payload = $inputData['payload'];
 
@@ -34,7 +37,7 @@ class KajabiController extends Controller
                 $user->save();
 
                 $userRepo = new UsersRepository();
-                $userRepo->createFreeUserDetails($user, '12345678');
+                $userRepo->creatByKajabi($user);
             }
         } catch (\Exception $exception) {
             return response($exception->getMessage(), 400);
