@@ -154,7 +154,7 @@ class UsersRepository extends Repository
         // User profile register
         $userPlan = $user->user_plans()->orderBy('id', 'desc')->first();
 
-        $activation_code = encrypt($user->email . $user->name, false);
+        $activation_code = md5(encrypt($user->email . $user->name, false));
 
         $ins_data = [
             'activated'       => 0,
