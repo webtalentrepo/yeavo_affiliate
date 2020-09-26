@@ -96,6 +96,43 @@
                     ></v-text-field>
                 </v-col>
             </v-row>
+
+            <v-row justify="center">
+                <v-col cols="12" md="12" sm="12" lg="11" xl="10"
+                    >Top 10 url ranking on this keyword
+                </v-col>
+            </v-row>
+            <v-row justify="center">
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="content-table"
+                >
+                    <v-data-table
+                        :headers="top_headers"
+                        :items="desserts1"
+                        :page.sync="top_page"
+                        :items-per-page="itemsPerPage1"
+                        hide-default-footer
+                        class="elevation-1"
+                    >
+                        <template #[`item.url`]="{ item }">
+                            <div>{{ item.Name }}</div>
+                            <div>
+                                <a target="_blank" :href="item.Url">{{
+                                    item.Url
+                                }}</a>
+                            </div>
+                        </template>
+                        <template #[`item.topics`]="{ item }">
+                            <div>{{ item.Topics }}</div>
+                        </template>
+                    </v-data-table>
+                </v-col>
+            </v-row>
         </v-container>
         <v-dialog v-model="dialog" persistent max-width="400" width="400">
             <v-card>
@@ -149,29 +186,26 @@ export default {
                 align: 'center',
                 width: '20%',
             },
-            // {
-            //     text: 'Social media on front page?',
-            //     value: 'social',
-            //     align: 'center',
-            //     width: '13%',
-            // },
-            // {
-            //     text: 'Exact match?',
-            //     value: 'exact',
-            //     align: 'center',
-            //     width: '10%',
-            // },
         ],
         desserts: [],
         dialog: false,
         keyword_str: '',
         chart_data: {},
+        top_page: 1,
+        pageCount1: 0,
+        itemsPerPage1: 10,
+        top_headers: [
+            { text: 'Title & URL', value: 'url', width: '55%' },
+            { text: 'Topics', value: 'topics', align: 'right', width: '45%' },
+        ],
+        desserts1: [],
     }),
     methods: {
         clickData(query) {
             this.search_str = query;
 
             this.desserts = [];
+            this.desserts1 = [];
 
             this.searchData();
         },
@@ -185,6 +219,7 @@ export default {
                 .post('/keyword-data', params)
                 .then((r) => {
                     this.desserts = r.data.result;
+                    this.desserts1 = r.data.rank.TopUrls;
                     this.pageCount = Math.ceil(
                         r.data.pageCount / this.itemsPerPage,
                     );
