@@ -23,6 +23,7 @@ Route::group([
     Route::get('/oauth', 'Api\AuthController@oauth');
     Route::get('/kajabi', 'Api\KajabiController@index');
     Route::post('/kajabi', 'Api\KajabiController@index');
+    Route::post('/get-email-by-token', 'Api\AuthController@getUserByActivateToken');
 });
 
 Route::group([

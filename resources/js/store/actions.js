@@ -155,6 +155,22 @@ const actions = {
         });
     },
 
+    // eslint-disable-next-line no-unused-vars
+    getEmailByCode({ commit }, token) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post('/get-email-by-token', {
+                    activation_code: token,
+                })
+                .then((response) => {
+                    resolve(response);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    },
+
     /**
      * Reset New Password
      *

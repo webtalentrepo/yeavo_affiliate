@@ -7,7 +7,7 @@ use App\Http\Repositories\UsersRepository;
 use App\Http\Resources\User as UserResource;
 use App\Notifications\ResetPasswordLinkSent;
 use App\User;
-use GuzzleHttp\Client;
+use App\UserProfile;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Http\Request;
@@ -248,18 +248,22 @@ class AuthController extends Controller
     {
         $this->validate($request, [
             'name'     => 'required|string|max:191',
-            'email'    => 'required|string|email|max:191|unique:users',
+            'email'    => 'required|string|email|max:191',
             'password' => 'required|string|min:6',
         ]);
 
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = $this->hasher->make($request->password);
+//        $user = new User();
+        $user = User::where('email', $request->input('email'))->first();
+        if (!$user) {
+            $user = new User();
+        }
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->password = $this->hasher->make($request->input('password'));
         $user->save();
 
-        $userRepo = new UsersRepository();
-        $userRepo->createFreeUserDetails($user, $request->password);
+//        $userRepo = new UsersRepository();
+//        $userRepo->createFreeUserDetails($user, $request->input('password'));
 
         $tokenObject = $this->createTokenForUser($user);
 
@@ -275,6 +279,26 @@ class AuthController extends Controller
             'isAdmin'     => checkSupperAdmin($user->email),
             'result'      => 'success'
         ], 200);
+    }
+
+    public function getUserByActivateToken(Request $request)
+    {
+        $activation_code = $request->input('activation_code');
+
+        $userProfile = UserProfile::where('activation_code', $activation_code)->first();
+
+        $email = '';
+        $name = '';
+
+        if ($userProfile) {
+            $email = $userProfile->user->email;
+            $name = $userProfile->user->name;
+        }
+
+        return response()->json([
+            'email' => $email,
+            'name'  => $name
+        ]);
     }
 
     public function oauth(Request $request)

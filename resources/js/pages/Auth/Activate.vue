@@ -36,7 +36,6 @@
                             v-model="credentials.email"
                             label="Email"
                             solo
-                            clearable
                             readonly
                         ></v-text-field>
 
@@ -147,8 +146,10 @@ export default {
         invalid_account: false,
     }),
 
-    mounted() {
+    created() {
         this.credentials.token = this.$route.params.token;
+
+        this.getEmailAndName();
     },
 
     methods: {
@@ -160,7 +161,15 @@ export default {
 
         ...mapActions({
             registerUser: 'registerUser',
+            getEmailByCode: 'getEmailByCode',
         }),
+
+        getEmailAndName() {
+            this.getEmailByCode(this.credentials.token).then((r) => {
+                this.credentials.name = r.data.name;
+                this.credentials.email = r.data.email;
+            });
+        },
 
         submit() {
             this.$refs.observer.validate().then((r) => {
