@@ -8,6 +8,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <meta name="msvalidate.01" content="E609F18415240C86FD92B60DA20A9014" />
+    <meta name="msvalidate.01" content="FE5A808EE5CBC333A64544E214FDD82F" />
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
