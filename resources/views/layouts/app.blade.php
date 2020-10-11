@@ -10,6 +10,8 @@
     <meta name="msvalidate.01" content="E609F18415240C86FD92B60DA20A9014" />
     <meta name="msvalidate.01" content="FE5A808EE5CBC333A64544E214FDD82F" />
 
+    <meta name="google-site-verification" content="5QrAQ3qUtmTD2RwJ02qDDaTfnh4SPa9Ph33FcfGmA8k" />
+
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
