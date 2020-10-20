@@ -43,29 +43,22 @@
                         :loading="searchStart"
                         loading-text="Loading... Please wait"
                     >
-                        <template #[`item.keyword`]="{ item }">
-                            <div @click="clickData(item.keyword)">
-                                {{ item.keyword }}
+                        <!--                        <template #[`item.keyword`]="{ item }">-->
+                        <!--                            <div>-->
+                        <!--                                {{ item.keyword }}-->
+                        <!--                            </div>-->
+                        <!--                        </template>-->
+                        <template #[`item.bid_low`]="{ item }">
+                            <div v-if="item.bid_low === 'NA'">
+                                {{ item.bid_low }}
                             </div>
+                            <div v-else>${{ item.bid_low }}</div>
                         </template>
-                        <template #[`item.trends`]="{ item }">
-                            <v-btn
-                                light
-                                color="white"
-                                small
-                                @click="showTrendsData(item.keyword)"
-                                >Show
-                            </v-btn>
-                        </template>
-                        <template #[`item.broad_impressions`]="{ item }">
-                            <div @click="clickData(item.keyword)">
-                                {{ item.broad_impressions }}
+                        <template #[`item.bid_high`]="{ item }">
+                            <div v-if="item.bid_high === 'NA'">
+                                {{ item.bid_high }}
                             </div>
-                        </template>
-                        <template #[`item.impressions`]="{ item }">
-                            <div @click="clickData(item.keyword)">
-                                {{ item.impressions }}
-                            </div>
+                            <div v-else>${{ item.bid_high }}</div>
                         </template>
                     </v-data-table>
                 </v-col>
@@ -134,36 +127,15 @@
                 </v-col>
             </v-row>
         </v-container>
-        <v-dialog v-model="dialog" persistent max-width="400" width="400">
-            <v-card>
-                <v-card-title class="headline">{{ keyword_str }}</v-card-title>
-                <v-card-text>
-                    <v-row justify="center" align="center">
-                        <v-col cols="10">
-                            <keyword-trends
-                                :chart-data="chart_data"
-                            ></keyword-trends>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="green darken-1" text @click="dialog = false"
-                        >Close
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </v-app>
 </template>
 
 <script>
 import PageHeader from '../layout/users/PageHeader';
-import KeywordTrends from '../components/KeywordTrends';
 
 export default {
     name: 'KeywordTool',
-    components: { KeywordTrends, PageHeader },
+    components: { PageHeader },
     data: () => ({
         search_str: '',
         searchStart: false,
@@ -172,19 +144,36 @@ export default {
         pageCount: 0,
         itemsPerPage: 10,
         headers: [
-            { text: 'Keywords', value: 'keyword', width: '35%' },
-            { text: 'Trends', value: 'trends', align: 'center', width: '25%' },
+            { text: 'Keyword(by relevance)', value: 'name', width: '35%' },
             {
-                text: 'Broad Impressions',
-                value: 'broad_impressions',
-                align: 'center',
-                width: '20%',
+                text: 'Avg. monthly searches',
+                value: 'month_search',
+                align: 'right',
+                width: '17%',
             },
             {
-                text: 'Impressions',
-                value: 'impressions',
-                align: 'center',
-                width: '20%',
+                text: 'Competition',
+                value: 'competition',
+                align: 'left',
+                width: '12%',
+            },
+            {
+                text: 'Top of page bid(low range)',
+                value: 'bid_low',
+                align: 'right',
+                width: '12%',
+            },
+            {
+                text: 'Top of page bid(high range)',
+                value: 'bid_high',
+                align: 'right',
+                width: '12%',
+            },
+            {
+                text: 'Competition(indexed value)',
+                value: 'competition_index',
+                align: 'left',
+                width: '12%',
             },
         ],
         desserts: [],
