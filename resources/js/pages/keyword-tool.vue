@@ -63,7 +63,7 @@
                             <v-text-field
                                 v-model="search"
                                 append-icon="mdi-magnify"
-                                label="Filter Keywords"
+                                label="Filter Keyword"
                                 single-line
                                 hide-details
                             ></v-text-field>
