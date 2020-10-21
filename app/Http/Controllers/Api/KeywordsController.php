@@ -39,8 +39,8 @@ class KeywordsController extends Controller
                 $re = $data['keywords'];
                 $re_keys = $data['related_keywords'];
 
-                Cache::add($keyword, json_encode($re), 1440);
-                Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 1440);
+                Cache::add($keyword, json_encode($re), 172800);
+                Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 172800);
             }
 
             if (Cache::has('RANK_COL_KEYWORD_' . $keyword)) {
@@ -48,7 +48,7 @@ class KeywordsController extends Controller
             } else {
                 $rank_re = $this->fetchTopLinks($keyword);
 
-                Cache::add('RANK_COL_KEYWORD_' . $keyword, json_encode($rank_re), 1440);
+                Cache::add('RANK_COL_KEYWORD_' . $keyword, json_encode($rank_re), 172800);
             }
         }
 
