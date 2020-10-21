@@ -259,6 +259,10 @@ export default {
                 search_str: this.search_str,
             };
 
+            this.refine_keys = [];
+            this.desserts = [];
+            this.desserts1 = [];
+
             this.$http
                 .post('/keyword-data', params)
                 .then((r) => {
