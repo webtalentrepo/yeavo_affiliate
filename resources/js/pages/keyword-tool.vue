@@ -24,6 +24,31 @@
                 </v-col>
             </v-row>
 
+            <v-row v-if="refine_keys && refine_keys.length" justify="center">
+                <v-col
+                    v-for="(rItem, rKey) in refine_keys"
+                    :key="`rKey${rKey}`"
+                    cols="12"
+                    xl="2"
+                    lg="2"
+                    md="5"
+                    sm="5"
+                >
+                    <label class="font-weight-black refine-key-label">{{
+                        rItem.name
+                    }}</label>
+                    <div v-if="rItem.value && rItem.value.length">
+                        <div
+                            v-for="(cRItem, cRI) in rItem.value"
+                            :key="`cRItem${cRI}`"
+                        >
+                            <span>{{ cRItem.name }}: </span>
+                            <span>{{ cRItem.value }}</span>
+                        </div>
+                    </div>
+                </v-col>
+            </v-row>
+
             <v-row justify="center">
                 <v-col
                     cols="12"
@@ -33,34 +58,62 @@
                     xl="10"
                     class="content-table"
                 >
-                    <v-data-table
-                        :headers="headers"
-                        :items="desserts"
-                        :page.sync="page"
-                        :items-per-page="itemsPerPage"
-                        hide-default-footer
-                        class="elevation-1"
-                        :loading="searchStart"
-                        loading-text="Loading... Please wait"
-                    >
-                        <!--                        <template #[`item.keyword`]="{ item }">-->
-                        <!--                            <div>-->
-                        <!--                                {{ item.keyword }}-->
-                        <!--                            </div>-->
-                        <!--                        </template>-->
-                        <template #[`item.bid_low`]="{ item }">
-                            <div v-if="item.bid_low === 'NA'">
-                                {{ item.bid_low }}
-                            </div>
-                            <div v-else>${{ item.bid_low }}</div>
-                        </template>
-                        <template #[`item.bid_high`]="{ item }">
-                            <div v-if="item.bid_high === 'NA'">
-                                {{ item.bid_high }}
-                            </div>
-                            <div v-else>${{ item.bid_high }}</div>
-                        </template>
-                    </v-data-table>
+                    <v-card>
+                        <v-card-title>
+                            <v-text-field
+                                v-model="search"
+                                append-icon="mdi-magnify"
+                                label="Filter Keywords"
+                                single-line
+                                hide-details
+                            ></v-text-field>
+                        </v-card-title>
+                        <v-data-table
+                            :headers="headers"
+                            :items="desserts"
+                            :page.sync="page"
+                            :items-per-page="itemsPerPage"
+                            hide-default-footer
+                            class="elevation-1"
+                            :loading="searchStart"
+                            :search="search"
+                            loading-text="Loading... Please wait"
+                        >
+                            <template #[`item.name`]="{ item }">
+                                <div>
+                                    <div
+                                        v-if="item.index === 0"
+                                        class="height-50 refine-key-label"
+                                    >
+                                        - Keyword you provided
+                                    </div>
+                                    <div
+                                        v-if="item.index === 1"
+                                        class="height-50 refine-key-label"
+                                    >
+                                        - Keyword ideas
+                                    </div>
+                                    <div
+                                        :class="{ 'height-50': item.index < 2 }"
+                                    >
+                                        {{ item.name }}
+                                    </div>
+                                </div>
+                            </template>
+                            <template #[`item.bid_low`]="{ item }">
+                                <div v-if="item.bid_low === 'NA'">
+                                    {{ item.bid_low }}
+                                </div>
+                                <div v-else>${{ item.bid_low }}</div>
+                            </template>
+                            <template #[`item.bid_high`]="{ item }">
+                                <div v-if="item.bid_high === 'NA'">
+                                    {{ item.bid_high }}
+                                </div>
+                                <div v-else>${{ item.bid_high }}</div>
+                            </template>
+                        </v-data-table>
+                    </v-card>
                 </v-col>
             </v-row>
 
@@ -137,6 +190,7 @@ export default {
     name: 'KeywordTool',
     components: { PageHeader },
     data: () => ({
+        search: '',
         search_str: '',
         searchStart: false,
         page: 1,
@@ -188,6 +242,7 @@ export default {
             { text: 'Topics', value: 'topics', align: 'right', width: '45%' },
         ],
         desserts1: [],
+        refine_keys: [],
     }),
     methods: {
         clickData(query) {
@@ -213,54 +268,40 @@ export default {
                         r.data.pageCount / this.itemsPerPage,
                     );
                     this.searchStart = false;
+                    const re_keys = r.data.re_keys;
+                    if (re_keys) {
+                        re_keys.map((el, key) => {
+                            this.refine_keys[key] = { name: '', value: [] };
+                            Object.keys(el).map((cKey) => {
+                                if (parseInt(cKey) === 1) {
+                                    this.refine_keys[key].name = el[cKey];
+                                } else {
+                                    if (parseInt(cKey) !== 4) {
+                                        el[cKey].map((eEl) => {
+                                            Object.keys(eEl).map((sKey) => {
+                                                if (parseInt(sKey) === 1) {
+                                                    this.refine_keys[
+                                                        key
+                                                    ].value.push({
+                                                        name: eEl[sKey],
+                                                        value: eEl[2],
+                                                    });
+                                                }
+                                            });
+                                        });
+                                    }
+                                }
+
+                                return cKey;
+                            });
+
+                            return el;
+                        });
+                    }
                 })
                 // eslint-disable-next-line no-unused-vars
                 .catch((e) => {
                     this.searchStart = false;
-                });
-        },
-        getChartData(item) {
-            return {
-                labels: item.date,
-                datasets: [
-                    {
-                        label: 'Impressions',
-                        backgroundColor: 'rgba(220, 236, 255, 0.8)',
-                        data: item.impressions,
-                        lineTension: 0.2,
-                        pointRadius: 2,
-                        pointHoverRadius: 2,
-                        borderColor: '#3392FF',
-                        borderWidth: 1,
-                    },
-                ],
-            };
-        },
-        showTrendsData(keyword) {
-            this.chart_data = {
-                labels: [],
-                datasets: [],
-            };
-            this.dialog = true;
-
-            const params = {
-                keyword: keyword,
-            };
-
-            this.$http
-                .post('/keyword-data-trends', params)
-                .then((r) => {
-                    this.keyword_str = keyword;
-                    this.chart_data = this.getChartData(r.data.result);
-                })
-                // eslint-disable-next-line no-unused-vars
-                .catch((e) => {
-                    this.chart_data = {
-                        labels: [],
-                        datasets: [],
-                    };
-
-                    this.dialog = false;
                 });
         },
     },

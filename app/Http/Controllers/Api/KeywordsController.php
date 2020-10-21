@@ -52,6 +52,20 @@ class KeywordsController extends Controller
             }
         }
 
+        if ($re && sizeof($re) > 0) {
+            $re_reset = $re;
+            $re = [];
+            foreach ($re_reset as $key => $row) {
+                $re[$key] = (array) $row;
+                $re[$key]['index'] = $key;
+                if ($key === 0) {
+                    $re[$key]['category'] = 'Keyword you provided';
+                } else {
+                    $re[$key]['category'] = 'Keyword ideas';
+                }
+            }
+        }
+
         return response()->json([
             'result'    => $re,
             'rank'      => $rank_re,
