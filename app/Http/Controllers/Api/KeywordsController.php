@@ -42,7 +42,6 @@ class KeywordsController extends Controller
                     $re_reset = $re;
                     $re = [];
                     $questions = config('services.questions');
-                    var_dump($questions);
                     $i = 0;
                     foreach ($re_reset as $key => $row) {
                         $rr = (array)$row;
