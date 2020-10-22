@@ -24,30 +24,30 @@
                 </v-col>
             </v-row>
 
-            <v-row v-if="refine_keys && refine_keys.length" justify="center">
-                <v-col
-                    v-for="(rItem, rKey) in refine_keys"
-                    :key="`rKey${rKey}`"
-                    cols="12"
-                    xl="2"
-                    lg="2"
-                    md="5"
-                    sm="5"
-                >
-                    <label class="font-weight-black refine-key-label">{{
-                        rItem.name
-                    }}</label>
-                    <div v-if="rItem.value && rItem.value.length">
-                        <div
-                            v-for="(cRItem, cRI) in rItem.value"
-                            :key="`cRItem${cRI}`"
-                        >
-                            <span>{{ cRItem.name }}: </span>
-                            <span>{{ cRItem.value }}</span>
-                        </div>
-                    </div>
-                </v-col>
-            </v-row>
+            <!--            <v-row v-if="refine_keys && refine_keys.length" justify="center">-->
+            <!--                <v-col-->
+            <!--                    v-for="(rItem, rKey) in refine_keys"-->
+            <!--                    :key="`rKey${rKey}`"-->
+            <!--                    cols="12"-->
+            <!--                    xl="2"-->
+            <!--                    lg="2"-->
+            <!--                    md="5"-->
+            <!--                    sm="5"-->
+            <!--                >-->
+            <!--                    <label class="font-weight-black refine-key-label">{{-->
+            <!--                        rItem.name-->
+            <!--                    }}</label>-->
+            <!--                    <div v-if="rItem.value && rItem.value.length">-->
+            <!--                        <div-->
+            <!--                            v-for="(cRItem, cRI) in rItem.value"-->
+            <!--                            :key="`cRItem${cRI}`"-->
+            <!--                        >-->
+            <!--                            <span>{{ cRItem.name }}: </span>-->
+            <!--                            <span>{{ cRItem.value }}</span>-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                </v-col>-->
+            <!--            </v-row>-->
 
             <v-row justify="center">
                 <v-col
