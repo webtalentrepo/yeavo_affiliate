@@ -79,27 +79,27 @@
                             :search="search"
                             loading-text="Loading... Please wait"
                         >
-                            <template #[`item.name`]="{ item }">
-                                <div>
-                                    <div
-                                        v-if="item.index === 0"
-                                        class="height-50 refine-key-label"
-                                    >
-                                        - Keyword you provided
-                                    </div>
-                                    <div
-                                        v-if="item.index === 1"
-                                        class="height-50 refine-key-label"
-                                    >
-                                        - Keyword ideas
-                                    </div>
-                                    <div
-                                        :class="{ 'height-50': item.index < 2 }"
-                                    >
-                                        {{ item.name }}
-                                    </div>
-                                </div>
-                            </template>
+                            <!--                            <template #[`item.name`]="{ item }">-->
+                            <!--                                <div>-->
+                            <!--                                    <div-->
+                            <!--                                        v-if="item.index === 0"-->
+                            <!--                                        class="height-50 refine-key-label"-->
+                            <!--                                    >-->
+                            <!--                                        - Keyword you provided-->
+                            <!--                                    </div>-->
+                            <!--                                    <div-->
+                            <!--                                        v-if="item.index === 1"-->
+                            <!--                                        class="height-50 refine-key-label"-->
+                            <!--                                    >-->
+                            <!--                                        - Keyword ideas-->
+                            <!--                                    </div>-->
+                            <!--                                    <div-->
+                            <!--                                        :class="{ 'height-50': item.index < 2 }"-->
+                            <!--                                    >-->
+                            <!--                                        {{ item.name }}-->
+                            <!--                                    </div>-->
+                            <!--                                </div>-->
+                            <!--                            </template>-->
                             <template #[`item.bid_low`]="{ item }">
                                 <div v-if="item.bid_low === 'NA'">
                                     {{ item.bid_low }}

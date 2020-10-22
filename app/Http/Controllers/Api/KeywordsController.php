@@ -37,6 +37,38 @@ class KeywordsController extends Controller
                 $data = $this->getGoogleKeywords($keyword);
 
                 $re = $data['keywords'];
+
+                if ($re && sizeof($re) > 0) {
+                    $re_reset = $re;
+                    $re = [];
+                    $questions = config('questions.list');
+                    $i = 0;
+                    foreach ($re_reset as $key => $row) {
+                        $rr = (array)$row;
+                        $exist = false;
+                        foreach ($questions as $q_row) {
+                            $s_str = strtolower($q_row);
+                            preg_match("/{$s_str}(.+)/", strtolower($rr['name']), $match);
+//                            var_dump($match);
+//                            var_dump($s_str);
+//                            var_dump($rr['name']);
+                            if (isset($match[1])) {
+                                $exist = true;
+                                break;
+                            }
+                        }
+
+                        if (!$exist) {
+                            continue;
+                        }
+
+                        $re[$i] = $rr;
+                        $re[$i]['index'] = $i;
+
+                        $i++;
+                    }
+                }
+
                 $re_keys = $data['related_keywords'];
 
                 Cache::add($keyword, json_encode($re), 172800);
@@ -49,20 +81,6 @@ class KeywordsController extends Controller
                 $rank_re = $this->fetchTopLinks($keyword);
 
                 Cache::add('RANK_COL_KEYWORD_' . $keyword, json_encode($rank_re), 172800);
-            }
-        }
-
-        if ($re && sizeof($re) > 0) {
-            $re_reset = $re;
-            $re = [];
-            foreach ($re_reset as $key => $row) {
-                $re[$key] = (array) $row;
-                $re[$key]['index'] = $key;
-                if ($key === 0) {
-                    $re[$key]['category'] = 'Keyword you provided';
-                } else {
-                    $re[$key]['category'] = 'Keyword ideas';
-                }
             }
         }
 
