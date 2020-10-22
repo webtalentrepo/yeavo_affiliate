@@ -100,6 +100,13 @@
                             <!--                                    </div>-->
                             <!--                                </div>-->
                             <!--                            </template>-->
+                            <template #[`item.trend`]="{ item }">
+                                <div>
+                                    <keyword-trends
+                                        :chart-data="getChartData(item.trends)"
+                                    ></keyword-trends>
+                                </div>
+                            </template>
                             <template #[`item.bid_low`]="{ item }">
                                 <div v-if="item.bid_low === 'NA'">
                                     {{ item.bid_low }}
@@ -185,10 +192,11 @@
 
 <script>
 import PageHeader from '../layout/users/PageHeader';
+import KeywordTrends from '../components/KeywordTrends';
 
 export default {
     name: 'KeywordTool',
-    components: { PageHeader },
+    components: { KeywordTrends, PageHeader },
     data: () => ({
         search: '',
         search_str: '',
@@ -200,34 +208,40 @@ export default {
         headers: [
             { text: 'Keyword(by relevance)', value: 'name', width: '35%' },
             {
-                text: 'Avg. monthly searches',
+                text: 'Volume',
                 value: 'month_search',
                 align: 'right',
-                width: '17%',
+                width: '10%',
             },
             {
-                text: 'Competition',
+                text: 'Trend',
+                value: 'trend',
+                align: 'left',
+                width: '15%',
+            },
+            {
+                text: 'State',
                 value: 'competition',
                 align: 'left',
-                width: '12%',
+                width: '10%',
             },
             {
-                text: 'Top of page bid(low range)',
+                text: 'BID(low)',
                 value: 'bid_low',
                 align: 'right',
-                width: '12%',
+                width: '10%',
             },
             {
-                text: 'Top of page bid(high range)',
+                text: 'BID(high)',
                 value: 'bid_high',
                 align: 'right',
-                width: '12%',
+                width: '10%',
             },
             {
-                text: 'Competition(indexed value)',
+                text: 'Com.',
                 value: 'competition_index',
                 align: 'left',
-                width: '12%',
+                width: '10%',
             },
         ],
         desserts: [],
@@ -307,6 +321,23 @@ export default {
                 .catch((e) => {
                     this.searchStart = false;
                 });
+        },
+        getChartData(item) {
+            return {
+                labels: item.name,
+                datasets: [
+                    {
+                        label: 'Volumes',
+                        backgroundColor: 'rgba(220, 236, 255, 0.8)',
+                        data: item.value,
+                        lineTension: 0.2,
+                        pointRadius: 2,
+                        pointHoverRadius: 2,
+                        borderColor: '#3392FF',
+                        borderWidth: 1,
+                    },
+                ],
+            };
         },
     },
 };

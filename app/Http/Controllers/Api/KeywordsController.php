@@ -66,6 +66,18 @@ class KeywordsController extends Controller
 
                         $re[$i] = $rr;
                         $re[$i]['index'] = $i;
+                        $re[$i]['trends'] = [];
+
+                        if (isset($rr['trends']) && sizeof($rr['trends']) > 0) {
+                            $k = 0;
+                            foreach ($rr['trends'] as $r_t) {
+                                $month = $k === 35 ? date('n/y') : date('n/y', strtotime('-' . (35 - $k) . ' months'));
+                                $re[$i]['trends']['name'][$k] = $month;
+                                $re[$i]['trends']['value'][$k] = $r_t * 1;
+
+                                $k++;
+                            }
+                        }
 
                         $i++;
                     }
@@ -74,10 +86,10 @@ class KeywordsController extends Controller
                 $re_keys = $data['related_keywords'];
 
                 if ($re && sizeof($re) > 0) {
-                    Cache::add($keyword, json_encode($re), 172800);
+                    Cache::add($keyword, json_encode($re), 259200);
                 }
 
-                Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 172800);
+                Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 259200);
             }
 
             if (Cache::has('RANK_COL_KEYWORD_' . $keyword)) {
@@ -85,7 +97,7 @@ class KeywordsController extends Controller
             } else {
                 $rank_re = $this->fetchTopLinks($keyword);
 
-                Cache::add('RANK_COL_KEYWORD_' . $keyword, json_encode($rank_re), 172800);
+                Cache::add('RANK_COL_KEYWORD_' . $keyword, json_encode($rank_re), 259200);
             }
         }
 
