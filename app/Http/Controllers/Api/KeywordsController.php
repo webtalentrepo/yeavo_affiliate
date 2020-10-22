@@ -41,20 +41,22 @@ class KeywordsController extends Controller
                 if ($re && sizeof($re) > 0) {
                     $re_reset = $re;
                     $re = [];
-                    $questions = config('questions.list');
+                    $questions = config('services.questions');
                     $i = 0;
                     foreach ($re_reset as $key => $row) {
                         $rr = (array)$row;
                         $exist = false;
-                        foreach ($questions as $q_row) {
-                            $s_str = strtolower($q_row);
-                            preg_match("/{$s_str}(.+)/", strtolower($rr['name']), $match);
-//                            var_dump($match);
-//                            var_dump($s_str);
-//                            var_dump($rr['name']);
-                            if (isset($match[1])) {
-                                $exist = true;
-                                break;
+                        if ($questions && sizeof($questions) > 0) {
+                            foreach ($questions as $q_row) {
+                                $s_str = strtolower($q_row);
+                                preg_match("/{$s_str}(.+)/", strtolower($rr['name']), $match);
+                                //                            var_dump($match);
+                                //                            var_dump($s_str);
+                                //                            var_dump($rr['name']);
+                                if (isset($match[1])) {
+                                    $exist = true;
+                                    break;
+                                }
                             }
                         }
 
@@ -71,7 +73,10 @@ class KeywordsController extends Controller
 
                 $re_keys = $data['related_keywords'];
 
-                Cache::add($keyword, json_encode($re), 172800);
+                if ($re && sizeof($re) > 0) {
+                    Cache::add($keyword, json_encode($re), 172800);
+                }
+
                 Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 172800);
             }
 
