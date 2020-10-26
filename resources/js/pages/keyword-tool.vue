@@ -48,6 +48,18 @@
             <!--                    </div>-->
             <!--                </v-col>-->
             <!--            </v-row>-->
+            <v-row justify="center" align="center">
+                <v-col cols="12" md="11" sm="12" lg="11" xl="11">
+                    <v-radio-group v-model="checked_type" row>
+                        <v-radio label="Exact Match" value="exact"></v-radio>
+                        <v-radio
+                            label="Non-Questions(Related)"
+                            value="non"
+                        ></v-radio>
+                        <v-radio label="Broad Match" value="broad"></v-radio>
+                    </v-radio-group>
+                </v-col>
+            </v-row>
 
             <v-row justify="center">
                 <v-col
@@ -257,6 +269,7 @@ export default {
         ],
         desserts1: [],
         refine_keys: [],
+        checked_type: 'exact',
     }),
     methods: {
         clickData(query) {
@@ -271,11 +284,15 @@ export default {
             this.searchStart = true;
             const params = {
                 search_str: this.search_str,
+                checked_type: this.checked_type,
             };
 
             this.refine_keys = [];
             this.desserts = [];
             this.desserts1 = [];
+            this.pageCount = 0;
+            this.page = 1;
+            this.page1 = 1;
 
             this.$http
                 .post('/keyword-data', params)
@@ -327,7 +344,7 @@ export default {
                 labels: item.name,
                 datasets: [
                     {
-                        label: 'Volumes',
+                        label: '',
                         backgroundColor: 'rgba(220, 236, 255, 0.8)',
                         data: item.value,
                         lineTension: 0.2,
