@@ -30,99 +30,100 @@ class KeywordsController extends Controller
         $checked_type = $request->input('checked_type');
         if ($request->has('search_str')) {
             $keyword = $request->input('search_str');
+            if ($keyword != '') {
+                if (Cache::has($checked_type . '_' . $keyword)) {
+                    $re = json_decode(Cache::get($checked_type . '_' . $keyword));
+                    $re_keys = json_decode(Cache::get('RE_KEYS_' . $keyword));
+                } else {
+                    $data = $this->getGoogleKeywords($keyword);
 
-            if (Cache::has($checked_type . '_' . $keyword)) {
-                $re = json_decode(Cache::get($checked_type . '_' . $keyword));
-                $re_keys = json_decode(Cache::get('RE_KEYS_' . $keyword));
-            } else {
-                $data = $this->getGoogleKeywords($keyword);
+                    $re = $data['keywords'];
 
-                $re = $data['keywords'];
+                    if ($re && sizeof($re) > 0) {
+                        $re_reset = $re;
+                        $re = [];
+                        $questions = config('services.questions');
+                        $i = 0;
+                        foreach ($re_reset as $key => $row) {
+                            $rr = (array)$row;
+                            $exist = false;
 
-                if ($re && sizeof($re) > 0) {
-                    $re_reset = $re;
-                    $re = [];
-                    $questions = config('services.questions');
-                    $i = 0;
-                    foreach ($re_reset as $key => $row) {
-                        $rr = (array)$row;
-                        $exist = false;
+                            if (!isset($rr['name'])) {
+                                break;
+                            }
 
-                        if (!isset($rr['name'])) {
-                            break;
-                        }
+                            if ($checked_type == 'exact' || $checked_type == 'non') {
+                                if ($questions && sizeof($questions) > 0) {
+                                    foreach ($questions as $q_row) {
+                                        $s_str = strtolower($q_row);
+                                        $t_ary = explode($s_str, strtolower($rr['name']));
+                                        if ($checked_type == 'exact') {
+                                            //                                $t_ary = explode('illinois ', strtolower($rr['name']));
+                                            if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
+                                                $exist = true;
 
-                        if ($checked_type == 'exact' || $checked_type == 'non') {
-                            if ($questions && sizeof($questions) > 0) {
-                                foreach ($questions as $q_row) {
-                                    $s_str = strtolower($q_row);
-                                    $t_ary = explode($s_str, strtolower($rr['name']));
-                                    if ($checked_type == 'exact') {
-                                        //                                $t_ary = explode('illinois ', strtolower($rr['name']));
-                                        if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
-                                            $exist = true;
+                                                break;
+                                            }
+                                            //                                preg_match("/{$s_str}(.+)/", strtolower($rr['name']), $match);
+                                            //                                //                            var_dump($match);
+                                            //                                //                            var_dump($s_str);
+                                            //                                //                            var_dump($rr['name']);
+                                            //                                if (isset($match[1])) {
+                                            //                                    $exist = true;
+                                            //                                    break;
+                                            //                                }
+                                        } else {
+                                            if (isset($t_ary[0]) && $t_ary[0] != '') {
+                                                $exist = true;
 
-                                            break;
-                                        }
-                                        //                                preg_match("/{$s_str}(.+)/", strtolower($rr['name']), $match);
-                                        //                                //                            var_dump($match);
-                                        //                                //                            var_dump($s_str);
-                                        //                                //                            var_dump($rr['name']);
-                                        //                                if (isset($match[1])) {
-                                        //                                    $exist = true;
-                                        //                                    break;
-                                        //                                }
-                                    } else {
-                                        if (isset($t_ary[0]) && $t_ary[0] != '') {
-                                            $exist = true;
-
-                                            break;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
+                            } else {
+                                $exist = true;
                             }
-                        } else {
-                            $exist = true;
-                        }
 
-                        if (!$exist) {
-                            continue;
-                        }
-
-                        $re[$i] = $rr;
-                        $re[$i]['index'] = $i;
-                        $re[$i]['trends'] = [];
-
-                        if (isset($rr['trends']) && sizeof($rr['trends']) > 0) {
-                            $k = 0;
-                            foreach ($rr['trends'] as $r_t) {
-                                $month = $k === 35 ? date('n/y') : date('n/y', strtotime('-' . (35 - $k) . ' months'));
-                                $re[$i]['trends']['name'][$k] = $month . '(' . round($r_t * 1 / 1000) . 'K)';
-                                $re[$i]['trends']['value'][$k] = $r_t * 1;
-
-                                $k++;
+                            if (!$exist) {
+                                continue;
                             }
-                        }
 
-                        $i++;
+                            $re[$i] = $rr;
+                            $re[$i]['index'] = $i;
+                            $re[$i]['trends'] = [];
+
+                            if (isset($rr['trends']) && sizeof($rr['trends']) > 0) {
+                                $k = 0;
+                                foreach ($rr['trends'] as $r_t) {
+                                    $month = $k === 35 ? date('n/y') : date('n/y', strtotime('-' . (35 - $k) . ' months'));
+                                    $re[$i]['trends']['name'][$k] = $month . '(' . round($r_t * 1 / 1000) . 'K)';
+                                    $re[$i]['trends']['value'][$k] = $r_t * 1;
+
+                                    $k++;
+                                }
+                            }
+
+                            $i++;
+                        }
                     }
+
+                    $re_keys = $data['related_keywords'];
+
+                    if ($re && sizeof($re) > 0) {
+                        Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
+                    }
+
+                    Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 864000);
                 }
 
-                $re_keys = $data['related_keywords'];
+                if (Cache::has('RANK_COL_KEYWORD_' . $keyword)) {
+                    $rank_re = json_decode(Cache::get('RANK_COL_KEYWORD_' . $keyword));
+                } else {
+                    $rank_re = $this->fetchTopLinks($keyword);
 
-                if ($re && sizeof($re) > 0) {
-                    Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
+                    Cache::add('RANK_COL_KEYWORD_' . $keyword, json_encode($rank_re), 864000);
                 }
-
-                Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 864000);
-            }
-
-            if (Cache::has('RANK_COL_KEYWORD_' . $keyword)) {
-                $rank_re = json_decode(Cache::get('RANK_COL_KEYWORD_' . $keyword));
-            } else {
-                $rank_re = $this->fetchTopLinks($keyword);
-
-                Cache::add('RANK_COL_KEYWORD_' . $keyword, json_encode($rank_re), 864000);
             }
         }
 

@@ -5,10 +5,29 @@
 
             <v-row justify="center" class="search-box-row">
                 <v-col cols="8">
-                    <v-text-field
+                    <!--                    <v-text-field-->
+                    <!--                        v-model="search_str"-->
+                    <!--                        solo-->
+                    <!--                        label="Search"-->
+                    <!--                        @keyup.enter="searchData"-->
+                    <!--                        @click:append="searchData"-->
+                    <!--                    >-->
+                    <!--                        <template #append>-->
+                    <!--                            <img-->
+                    <!--                                src="/assets/icons/search.png"-->
+                    <!--                                alt=""-->
+                    <!--                                class="append-icon cursor-pointer"-->
+                    <!--                                @click="searchData"-->
+                    <!--                            />-->
+                    <!--                        </template>-->
+                    <!--                    </v-text-field>-->
+                    <v-autocomplete
                         v-model="search_str"
-                        solo
+                        :items="questionItems"
                         label="Search"
+                        solo
+                        hide-no-data
+                        hide-selected
                         @keyup.enter="searchData"
                         @click:append="searchData"
                     >
@@ -20,7 +39,7 @@
                                 @click="searchData"
                             />
                         </template>
-                    </v-text-field>
+                    </v-autocomplete>
                 </v-col>
             </v-row>
 
@@ -94,27 +113,6 @@
                             :search="search"
                             loading-text="Loading... Please wait"
                         >
-                            <!--                            <template #[`item.name`]="{ item }">-->
-                            <!--                                <div>-->
-                            <!--                                    <div-->
-                            <!--                                        v-if="item.index === 0"-->
-                            <!--                                        class="height-50 refine-key-label"-->
-                            <!--                                    >-->
-                            <!--                                        - Keyword you provided-->
-                            <!--                                    </div>-->
-                            <!--                                    <div-->
-                            <!--                                        v-if="item.index === 1"-->
-                            <!--                                        class="height-50 refine-key-label"-->
-                            <!--                                    >-->
-                            <!--                                        - Keyword ideas-->
-                            <!--                                    </div>-->
-                            <!--                                    <div-->
-                            <!--                                        :class="{ 'height-50': item.index < 2 }"-->
-                            <!--                                    >-->
-                            <!--                                        {{ item.name }}-->
-                            <!--                                    </div>-->
-                            <!--                                </div>-->
-                            <!--                            </template>-->
                             <template #[`item.trend`]="{ item }">
                                 <div>
                                     <keyword-trends
@@ -273,7 +271,11 @@ export default {
         desserts1: [],
         refine_keys: [],
         checked_type: 'exact',
+        questionItems: [],
     }),
+    created() {
+        this.questionItems = this.$store.state.questions;
+    },
     methods: {
         clickData(query) {
             this.search_str = query;
