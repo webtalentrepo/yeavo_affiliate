@@ -52,25 +52,33 @@ class KeywordsController extends Controller
                             break;
                         }
 
-                        if ($checked_type == 'exact') {
+                        if ($checked_type == 'exact' || $checked_type == 'non') {
                             if ($questions && sizeof($questions) > 0) {
                                 foreach ($questions as $q_row) {
                                     $s_str = strtolower($q_row);
                                     $t_ary = explode($s_str, strtolower($rr['name']));
-    //                                $t_ary = explode('illinois ', strtolower($rr['name']));
-                                    if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
-                                        $exist = true;
+                                    if ($checked_type == 'exact') {
+                                        //                                $t_ary = explode('illinois ', strtolower($rr['name']));
+                                        if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
+                                            $exist = true;
 
-                                        break;
+                                            break;
+                                        }
+                                        //                                preg_match("/{$s_str}(.+)/", strtolower($rr['name']), $match);
+                                        //                                //                            var_dump($match);
+                                        //                                //                            var_dump($s_str);
+                                        //                                //                            var_dump($rr['name']);
+                                        //                                if (isset($match[1])) {
+                                        //                                    $exist = true;
+                                        //                                    break;
+                                        //                                }
+                                    } else {
+                                        if (isset($t_ary[0]) && $t_ary[0] != '') {
+                                            $exist = true;
+
+                                            break;
+                                        }
                                     }
-    //                                preg_match("/{$s_str}(.+)/", strtolower($rr['name']), $match);
-    //                                //                            var_dump($match);
-    //                                //                            var_dump($s_str);
-    //                                //                            var_dump($rr['name']);
-    //                                if (isset($match[1])) {
-    //                                    $exist = true;
-    //                                    break;
-    //                                }
                                 }
                             }
                         } else {
