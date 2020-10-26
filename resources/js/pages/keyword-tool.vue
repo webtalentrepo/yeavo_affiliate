@@ -5,9 +5,10 @@
 
             <v-row justify="center" class="search-box-row">
                 <v-col cols="8">
-                    <v-autocomplete
+                    <v-combobox
                         v-model="search_str"
                         :items="questionItems"
+                        value="search_str"
                         label="Search"
                         solo
                         hide-no-data
@@ -23,7 +24,7 @@
                                 @click="searchData"
                             />
                         </template>
-                    </v-autocomplete>
+                    </v-combobox>
                 </v-col>
             </v-row>
 
