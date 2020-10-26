@@ -5,22 +5,6 @@
 
             <v-row justify="center" class="search-box-row">
                 <v-col cols="8">
-                    <!--                    <v-text-field-->
-                    <!--                        v-model="search_str"-->
-                    <!--                        solo-->
-                    <!--                        label="Search"-->
-                    <!--                        @keyup.enter="searchData"-->
-                    <!--                        @click:append="searchData"-->
-                    <!--                    >-->
-                    <!--                        <template #append>-->
-                    <!--                            <img-->
-                    <!--                                src="/assets/icons/search.png"-->
-                    <!--                                alt=""-->
-                    <!--                                class="append-icon cursor-pointer"-->
-                    <!--                                @click="searchData"-->
-                    <!--                            />-->
-                    <!--                        </template>-->
-                    <!--                    </v-text-field>-->
                     <v-autocomplete
                         v-model="search_str"
                         :items="questionItems"
