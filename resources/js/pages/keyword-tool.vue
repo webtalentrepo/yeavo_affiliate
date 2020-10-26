@@ -51,7 +51,7 @@
             <v-row justify="center" align="center">
                 <v-col cols="12" md="11" sm="12" lg="11" xl="11">
                     <v-radio-group v-model="checked_type" row>
-                        <v-radio label="Exact Match" value="exact"></v-radio>
+                        <v-radio label="Questions(Exact)" value="exact"></v-radio>
                         <v-radio
                             label="Non-Questions(Related)"
                             value="non"
