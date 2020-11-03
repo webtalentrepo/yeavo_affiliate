@@ -34,17 +34,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('scoutsdata:insert')
-            ->everyFourHours()
-            ->runInBackground();
-
-        $schedule->command('childproduct:insert')
-            ->daily()
-            ->runInBackground();
-
-        $schedule->command('shareasale:insert')
-            ->weekly()
-            ->runInBackground();
+//        $schedule->command('scoutsdata:insert')
+//            ->weekly()
+//            ->runInBackground();
+//
+//        $schedule->command('childproduct:insert')
+//            ->weekly()
+//            ->runInBackground();
+//
+//        $schedule->command('shareasale:insert')
+//            ->weekly()
+//            ->runInBackground();
     }
 
     /**
