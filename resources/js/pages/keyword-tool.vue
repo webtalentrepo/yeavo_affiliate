@@ -56,7 +56,7 @@
                 <v-col cols="12" md="11" sm="12" lg="11" xl="11">
                     <v-radio-group v-model="checked_type" row>
                         <v-radio label="Exact Match" value="exact"></v-radio>
-                        <v-radio label="Related Match" value="non"></v-radio>
+                        <v-radio label="Non-Questions" value="non"></v-radio>
                         <v-radio label="Broad Match" value="broad"></v-radio>
                     </v-radio-group>
                 </v-col>
@@ -205,7 +205,7 @@ export default {
         headers: [
             { text: 'Keyword(by relevance)', value: 'name', width: '35%' },
             {
-                text: 'Volume',
+                text: 'Volume(AVG. monthly)',
                 value: 'month_search',
                 align: 'right',
                 width: '15%',

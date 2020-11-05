@@ -35,14 +35,41 @@ class KeywordsController extends Controller
                     $re = json_decode(Cache::get($checked_type . '_' . $keyword));
                     $re_keys = json_decode(Cache::get('RE_KEYS_' . $keyword));
                 } else {
-                    $data = $this->getGoogleKeywords($keyword);
+                    if (Cache::has($keyword)) {
+                        $re = json_decode(Cache::get($keyword));
+                        $re_keys = json_decode(Cache::get('RE_KEYS_' . $keyword));
+                    } else {
+                        $data = $this->getGoogleKeywords($keyword);
 
-                    $re = $data['keywords'];
+                        $re = $data['keywords'];
+                        $re_keys = $data['related_keywords'];
+
+                        if ($re && sizeof($re) > 0) {
+                            Cache::add($keyword, json_encode($re), 864000);
+                        }
+
+                        Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 864000);
+                    }
 
                     if ($re && sizeof($re) > 0) {
                         $re_reset = $re;
                         $re = [];
+                        $is_question = false;
+                        $e_str = rtrim(strtolower($keyword));
+                        $e_str = ltrim($e_str);
                         $questions = config('services.questions');
+                        if ($questions && sizeof($questions) > 0) {
+                            foreach ($questions as $q_row) {
+                                $s_str = strtolower($q_row);
+                                $t_ary1 = explode($s_str, strtolower($keyword));
+                                if (isset($t_ary1[1])) {
+                                    $is_question = true;
+                                    $e_str = $t_ary1[1];
+                                    break;
+                                }
+                            }
+                        }
+
                         $i = 0;
                         foreach ($re_reset as $key => $row) {
                             $rr = (array)$row;
@@ -52,26 +79,59 @@ class KeywordsController extends Controller
                                 break;
                             }
 
-                            if ($checked_type == 'exact') {
+                            if ($checked_type == 'broad') {
+                                $e_ary = explode(' ', $e_str);
+                                for ($j = 0; $j < count($e_ary); $j++) {
+                                    if (strpos(strtolower($rr['name']), $e_ary[$j]) !== false) {
+                                        $exist = true;
+                                        break;
+                                    }
+                                }
+                            } elseif ($checked_type == 'non') {
+                                $i_q = false;
                                 if ($questions && sizeof($questions) > 0) {
                                     foreach ($questions as $q_row) {
                                         $s_str = strtolower($q_row);
                                         $t_ary = explode($s_str, strtolower($rr['name']));
-                                        $t_ary1 = explode($s_str, strtolower($keyword));
-                                        $t_s = isset($t_ary1[1]) ? ltrim(strtolower($t_ary1[1])) : ltrim(strtolower($t_ary1[0]));
                                         if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
-                                            if (strpos(strtolower($t_ary[1]), $t_s) === false) {
-                                                $exist = false;
-                                            } else {
-                                                $exist = true;
+                                            $i_q = true;
 
-                                                break;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if ($i_q || (strpos(strtolower($rr['name']), $e_str) === false)) {
+                                    $exist = false;
+                                } else {
+                                    $exist = true;
+                                }
+                            } else {
+                                if ($is_question) {
+                                    $e_str1 = ltrim(strtolower($keyword));
+                                    $e_str1 = rtrim($e_str1);
+                                    if (strpos(strtolower($rr['name']), $e_str1) === false) {
+                                        $exist = false;
+                                    } else {
+                                        $exist = true;
+                                    }
+                                } else {
+                                    if ($questions && sizeof($questions) > 0) {
+                                        foreach ($questions as $q_row) {
+                                            $s_str = strtolower($q_row);
+                                            $t_ary = explode($s_str, strtolower($rr['name']));
+                                            if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
+                                                if (strpos(strtolower($t_ary[1]), $e_str) === false) {
+                                                    $exist = false;
+                                                } else {
+                                                    $exist = true;
+
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            } else {
-                                $exist = true;
                             }
 
                             if (!$exist) {
@@ -80,7 +140,21 @@ class KeywordsController extends Controller
 
                             $re[$i] = $rr;
                             $re[$i]['index'] = $i;
-                            $re[$i]['month'] = round($rr['month_search'] / 5000, 2) . 'K - ' . round($rr['month_search'] / 500, 2) . 'K';
+                            $start_val = round($rr['month_search'] / 5000, 2);
+                            if ($start_val > 1000) {
+                                $start_str = round($start_val / 1000, 2) . 'M';
+                            } else {
+                                $start_str = $start_val . 'K';
+                            }
+
+                            $end_val = round($rr['month_search'] / 500, 2);
+                            if ($end_val > 1000) {
+                                $end_str = round($end_val / 1000, 2) . 'M';
+                            } else {
+                                $end_str = $end_val . 'K';
+                            }
+
+                            $re[$i]['month'] = $start_str . ' - ' . $end_str;
                             $re[$i]['trends'] = [];
 
                             if (isset($rr['trends']) && sizeof($rr['trends']) > 0) {
@@ -98,13 +172,9 @@ class KeywordsController extends Controller
                         }
                     }
 
-                    $re_keys = $data['related_keywords'];
-
-                    if ($re && sizeof($re) > 0) {
-                        Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
-                    }
-
-                    Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 864000);
+//                    if ($re && sizeof($re) > 0) {
+//                        Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
+//                    }
                 }
 
                 if (Cache::has('RANK_COL_KEYWORD_' . $keyword)) {
