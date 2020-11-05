@@ -58,21 +58,9 @@ class KeywordsController extends Controller
                                         $s_str = strtolower($q_row);
                                         $t_ary = explode($s_str, strtolower($rr['name']));
                                         $t_ary1 = explode($s_str, strtolower($keyword));
-                                        if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary1[1])) {
-                                            $t_s = ltrim(strtolower($t_ary1[1]));
-                                            if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
-                                                if (strpos(strtolower($t_ary[1]), $t_s) === false) {
-                                                    $exist = false;
-                                                } else {
-                                                    $exist = true;
-
-                                                    break;
-                                                }
-                                            }
-                                        } else {
-                                            $t_s = ltrim(strtolower($t_ary1[0]));
-
-                                            if (strpos(strtolower(strtolower($rr['name'])), $t_s) === false) {
+                                        $t_s = isset($t_ary1[1]) ? ltrim(strtolower($t_ary1[1])) : ltrim(strtolower($t_ary1[0]));
+                                        if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
+                                            if (strpos(strtolower($t_ary[1]), $t_s) === false) {
                                                 $exist = false;
                                             } else {
                                                 $exist = true;
