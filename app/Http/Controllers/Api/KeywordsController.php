@@ -52,25 +52,15 @@ class KeywordsController extends Controller
                                 break;
                             }
 
-                            if ($checked_type == 'exact' || $checked_type == 'non') {
+                            if ($checked_type == 'exact') {
                                 if ($questions && sizeof($questions) > 0) {
                                     foreach ($questions as $q_row) {
                                         $s_str = strtolower($q_row);
                                         $t_ary = explode($s_str, strtolower($rr['name']));
-                                        if ($checked_type == 'exact') {
-                                            if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
-                                                $exist = true;
-
-                                                break;
-                                            }
-                                        } else {
+                                        if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
                                             $exist = true;
 
-                                            if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
-                                                $exist = false;
-
-                                                break;
-                                            }
+                                            break;
                                         }
                                     }
                                 }
@@ -84,6 +74,7 @@ class KeywordsController extends Controller
 
                             $re[$i] = $rr;
                             $re[$i]['index'] = $i;
+                            $re[$i]['month'] = round($rr['month_search'] / 5000, 2) . 'K - ' . round($rr['month_search'] / 500, 2) . 'K';
                             $re[$i]['trends'] = [];
 
                             if (isset($rr['trends']) && sizeof($rr['trends']) > 0) {

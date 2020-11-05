@@ -55,14 +55,8 @@
             <v-row justify="center" align="center">
                 <v-col cols="12" md="11" sm="12" lg="11" xl="11">
                     <v-radio-group v-model="checked_type" row>
-                        <v-radio
-                            label="Questions(Exact)"
-                            value="exact"
-                        ></v-radio>
-                        <v-radio
-                            label="Non-Questions(Related)"
-                            value="non"
-                        ></v-radio>
+                        <v-radio label="Exact Match" value="exact"></v-radio>
+                        <v-radio label="Related Match" value="non"></v-radio>
                         <v-radio label="Broad Match" value="broad"></v-radio>
                     </v-radio-group>
                 </v-col>
@@ -103,6 +97,11 @@
                                     <keyword-trends
                                         :chart-data="getChartData(item.trends)"
                                     ></keyword-trends>
+                                </div>
+                            </template>
+                            <template #[`item.month_search`]="{ item }">
+                                <div>
+                                    {{ item.month }}
                                 </div>
                             </template>
                             <template #[`item.bid_low`]="{ item }">
@@ -209,7 +208,7 @@ export default {
                 text: 'Volume',
                 value: 'month_search',
                 align: 'right',
-                width: '10%',
+                width: '15%',
             },
             {
                 text: 'Trend',
@@ -221,25 +220,25 @@ export default {
                 text: 'State',
                 value: 'competition',
                 align: 'left',
-                width: '10%',
+                width: '9%',
             },
             {
                 text: 'BID(low)',
                 value: 'bid_low',
                 align: 'right',
-                width: '10%',
+                width: '9%',
             },
             {
                 text: 'BID(high)',
                 value: 'bid_high',
                 align: 'right',
-                width: '10%',
+                width: '9%',
             },
             {
                 text: 'Com.',
                 value: 'competition_index',
                 align: 'left',
-                width: '10%',
+                width: '8%',
             },
         ],
         desserts: [],
