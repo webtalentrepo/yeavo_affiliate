@@ -144,14 +144,30 @@ class KeywordsController extends Controller
                             if ($start_val > 1000) {
                                 $start_str = round($start_val / 1000, 2) . 'M';
                             } else {
-                                $start_str = $start_val . 'K';
+                                if ($start_val < 1) {
+                                    if ($start_val < 0.1) {
+                                        $start_str = 10;
+                                    } else {
+                                        $start_str = 100;
+                                    }
+                                } else {
+                                    $start_str = $start_val . 'K';
+                                }
                             }
 
                             $end_val = round($rr['month_search'] / 500, 2);
                             if ($end_val > 1000) {
                                 $end_str = round($end_val / 1000, 2) . 'M';
                             } else {
-                                $end_str = $end_val . 'K';
+                                if ($end_val < 1) {
+                                    if ($end_val < 0.1) {
+                                        $end_str = 10;
+                                    } else {
+                                        $end_str = 100;
+                                    }
+                                } else {
+                                    $end_str = $end_val . 'K';
+                                }
                             }
 
                             $re[$i]['month'] = $start_str . ' - ' . $end_str;
