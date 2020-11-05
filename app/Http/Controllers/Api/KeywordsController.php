@@ -177,7 +177,7 @@ class KeywordsController extends Controller
                                 $k = 0;
                                 foreach ($rr['trends'] as $r_t) {
                                     $month = $k === 35 ? date('n/y') : date('n/y', strtotime('-' . (35 - $k) . ' months'));
-                                    $re[$i]['trends']['name'][$k] = $month . '(' . round($r_t * 1 / 1000) . 'K)';
+                                    $re[$i]['trends']['name'][$k] = $month . '(' . round($r_t * 1 / 1000, 2) . 'K)';
                                     $re[$i]['trends']['value'][$k] = $r_t * 1;
 
                                     $k++;
