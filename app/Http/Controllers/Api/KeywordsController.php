@@ -51,7 +51,7 @@ class KeywordsController extends Controller
                         Cache::add('RE_KEYS_' . $keyword, json_encode($re_keys), 864000);
                     }
 
-                    if ($re && sizeof($re) > 0) {
+                    if ($re) {
                         $re_reset = $re;
                         $re = [];
                         $is_question = false;
@@ -107,7 +107,7 @@ class KeywordsController extends Controller
                                     $exist = true;
                                 }
                             } else {
-                                if ($is_question) {
+//                                if ($is_question) {
                                     $e_str1 = ltrim(strtolower($keyword));
                                     $e_str1 = rtrim($e_str1);
                                     if (strpos(strtolower($rr['name']), $e_str1) === false) {
@@ -115,23 +115,23 @@ class KeywordsController extends Controller
                                     } else {
                                         $exist = true;
                                     }
-                                } else {
-                                    if ($questions && sizeof($questions) > 0) {
-                                        foreach ($questions as $q_row) {
-                                            $s_str = strtolower($q_row);
-                                            $t_ary = explode($s_str, strtolower($rr['name']));
-                                            if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
-                                                if (strpos(strtolower($t_ary[1]), $e_str) === false) {
-                                                    $exist = false;
-                                                } else {
-                                                    $exist = true;
-
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+//                                } else {
+//                                    if ($questions && sizeof($questions) > 0) {
+//                                        foreach ($questions as $q_row) {
+//                                            $s_str = strtolower($q_row);
+//                                            $t_ary = explode($s_str, strtolower($rr['name']));
+//                                            if (isset($t_ary[0]) && $t_ary[0] == '' && isset($t_ary[1])) {
+//                                                if (strpos(strtolower($t_ary[1]), $e_str) === false) {
+//                                                    $exist = false;
+//                                                } else {
+//                                                    $exist = true;
+//
+//                                                    break;
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+//                                }
                             }
 
                             if (!$exist) {
