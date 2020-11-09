@@ -188,9 +188,9 @@ class KeywordsController extends Controller
                         }
                     }
 
-//                    if ($re && sizeof($re) > 0) {
-//                        Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
-//                    }
+                    if ($re && sizeof($re) > 0) {
+                        Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
+                    }
                 }
 
                 if (Cache::has('RANK_COL_KEYWORD_' . $keyword)) {
