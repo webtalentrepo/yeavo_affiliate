@@ -43,6 +43,6 @@ Route::group([
     Route::post('/scout-data', 'Api\ScoutsController@index');
     Route::post('/child-data', 'Api\ScoutsController@getChildData');
     Route::get('/scout-data', 'Api\ScoutsController@index');
-    Route::post('/keyword-top-data', 'Api\KeywordsController@getKeywordData');
-    Route::post('/keyword-data', 'Api\KeywordsController@getTopUrls');
+    Route::post('/keyword-data', 'Api\KeywordsController@getKeywordData');
+    Route::post('/keyword-top-data', 'Api\KeywordsController@getTopUrls');
 });
