@@ -279,7 +279,6 @@ export default {
             };
 
             this.desserts = [];
-            this.desserts1 = [];
             this.pageCount = 0;
             this.page = 1;
             this.page1 = 1;
@@ -288,7 +287,6 @@ export default {
                 .post('/keyword-data', params)
                 .then((r) => {
                     this.desserts = r.data.result;
-                    this.desserts1 = r.data.rank.TopUrls;
                     this.pageCount = Math.ceil(
                         r.data.pageCount / this.itemsPerPage,
                     );
