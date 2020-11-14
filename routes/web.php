@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'IndexController@index')->name('index');
-Route::get('/test-call', 'Api\KeywordsController@testCall');
 
 Route::get('{all}', 'IndexController@index')->name('index')->where(['all' => '.*']);
 

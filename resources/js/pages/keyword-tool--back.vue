@@ -27,6 +27,31 @@
                     </v-combobox>
                 </v-col>
             </v-row>
+
+            <!--            <v-row v-if="refine_keys && refine_keys.length" justify="center">-->
+            <!--                <v-col-->
+            <!--                    v-for="(rItem, rKey) in refine_keys"-->
+            <!--                    :key="`rKey${rKey}`"-->
+            <!--                    cols="12"-->
+            <!--                    xl="2"-->
+            <!--                    lg="2"-->
+            <!--                    md="5"-->
+            <!--                    sm="5"-->
+            <!--                >-->
+            <!--                    <label class="font-weight-black refine-key-label">{{-->
+            <!--                        rItem.name-->
+            <!--                    }}</label>-->
+            <!--                    <div v-if="rItem.value && rItem.value.length">-->
+            <!--                        <div-->
+            <!--                            v-for="(cRItem, cRI) in rItem.value"-->
+            <!--                            :key="`cRItem${cRI}`"-->
+            <!--                        >-->
+            <!--                            <span>{{ cRItem.name }}: </span>-->
+            <!--                            <span>{{ cRItem.value }}</span>-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                </v-col>-->
+            <!--            </v-row>-->
             <v-row justify="center" align="center">
                 <v-col cols="12" md="11" sm="12" lg="11" xl="11">
                     <v-radio-group v-model="checked_type" row>
@@ -240,9 +265,9 @@ export default {
             { text: 'Topics', value: 'topics', align: 'right', width: '45%' },
         ],
         desserts1: [],
+        refine_keys: [],
         checked_type: 'exact',
         questionItems: [],
-        rCal: 0,
     }),
     created() {
         this.questionItems = this.$store.state.questions;
@@ -250,26 +275,9 @@ export default {
     methods: {
         clickData() {
             this.desserts = [];
-
-            this.getTopUrls();
-            this.searchData();
-        },
-        getTopUrls() {
             this.desserts1 = [];
 
-            const params = {
-                search_str: this.search_str,
-            };
-
-            this.$http
-                .post('/keyword-top-data', params)
-                .then((r) => {
-                    this.desserts1 = r.data.rank.TopUrls;
-                })
-                // eslint-disable-next-line no-unused-vars
-                .catch((e) => {
-                    console.log(e);
-                });
+            this.searchData();
         },
         searchData() {
             this.searchStart = true;
@@ -278,6 +286,7 @@ export default {
                 checked_type: this.checked_type,
             };
 
+            this.refine_keys = [];
             this.desserts = [];
             this.desserts1 = [];
             this.pageCount = 0;
@@ -293,6 +302,36 @@ export default {
                         r.data.pageCount / this.itemsPerPage,
                     );
                     this.searchStart = false;
+                    const re_keys = r.data.re_keys;
+                    if (re_keys) {
+                        re_keys.map((el, key) => {
+                            this.refine_keys[key] = { name: '', value: [] };
+                            Object.keys(el).map((cKey) => {
+                                if (parseInt(cKey) === 1) {
+                                    this.refine_keys[key].name = el[cKey];
+                                } else {
+                                    if (parseInt(cKey) !== 4) {
+                                        el[cKey].map((eEl) => {
+                                            Object.keys(eEl).map((sKey) => {
+                                                if (parseInt(sKey) === 1) {
+                                                    this.refine_keys[
+                                                        key
+                                                    ].value.push({
+                                                        name: eEl[sKey],
+                                                        value: eEl[2],
+                                                    });
+                                                }
+                                            });
+                                        });
+                                    }
+                                }
+
+                                return cKey;
+                            });
+
+                            return el;
+                        });
+                    }
                 })
                 // eslint-disable-next-line no-unused-vars
                 .catch((e) => {
