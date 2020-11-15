@@ -342,6 +342,8 @@ export default {
                             }${this.search_str}`;
 
                             this.searchData();
+                        } else {
+                            this.searchStart = false;
                         }
                     }
                 })
