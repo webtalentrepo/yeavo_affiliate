@@ -19,7 +19,7 @@ class CreateKeywordsTable extends Migration
             $table->text('result');
             $table->enum('type', ['exact', 'non', 'broad'])->index();
             $table->string('volume');
-            $table->json('trend');
+            $table->text('trend');
             $table->string('state', 20);
             $table->string('bid_low', 20);
             $table->string('bid_high', 20);
