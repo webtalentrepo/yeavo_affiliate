@@ -82,6 +82,11 @@
                             :search="search"
                             loading-text="Loading... Please wait"
                         >
+                            <template #[`item.name`]="{ item }">
+                                <div class="w-100" @click="clickRow(item)">
+                                    {{ item.name }}
+                                </div>
+                            </template>
                             <template #[`item.trend`]="{ item }">
                                 <div>
                                     <keyword-trends
@@ -94,18 +99,6 @@
                                     {{ item.month }}
                                 </div>
                             </template>
-                            <!--                            <template #[`item.bid_low`]="{ item }">-->
-                            <!--                                <div v-if="item.bid_low === 'NA'">-->
-                            <!--                                    {{ item.bid_low }}-->
-                            <!--                                </div>-->
-                            <!--                                <div v-else>${{ item.bid_low }}</div>-->
-                            <!--                            </template>-->
-                            <!--                            <template #[`item.bid_high`]="{ item }">-->
-                            <!--                                <div v-if="item.bid_high === 'NA'">-->
-                            <!--                                    {{ item.bid_high }}-->
-                            <!--                                </div>-->
-                            <!--                                <div v-else>${{ item.bid_high }}</div>-->
-                            <!--                            </template>-->
                         </v-data-table>
                     </v-card>
                 </v-col>
@@ -254,6 +247,11 @@ export default {
         this.questionItems = this.$store.state.questions;
     },
     methods: {
+        clickRow(item) {
+            this.search_str = item.name;
+
+            this.clickData();
+        },
         clickData() {
             this.desserts = [];
 
