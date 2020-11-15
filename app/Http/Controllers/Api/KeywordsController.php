@@ -69,6 +69,7 @@ class KeywordsController extends Controller
         $re = [];
         $checked_type = $request->input('checked_type');
         $is_question = $request->input('is_question');
+        $keyword_str = $request->input('keyword_str');
         if ($request->has('search_str')) {
             $keyword = $request->input('search_str');
 
@@ -102,24 +103,14 @@ class KeywordsController extends Controller
                             }
                         }
 
-                        if ($re) {
+                        if ($re && sizeof($re) > 0) {
                             $re_reset = $re;
                             $re = [];
-                            $e_str = rtrim(strtolower($keyword));
+                            $e_str = rtrim(strtolower($keyword_str));
                             $e_str = ltrim($e_str);
                             $questions = config('services.questions');
-                            if ($questions && sizeof($questions) > 0) {
-                                foreach ($questions as $q_row) {
-                                    $s_str = strtolower($q_row);
-                                    $t_ary1 = explode($s_str, strtolower($keyword));
-                                    if (isset($t_ary1[1])) {
-                                        $e_str = $t_ary1[1];
-                                        break;
-                                    }
-                                }
-                            }
-
                             $i = 0;
+
                             foreach ($re_reset as $key => $row) {
                                 $rr = (array)$row;
                                 $exist = false;
@@ -158,10 +149,17 @@ class KeywordsController extends Controller
                                 } else {
                                     $e_str1 = ltrim(strtolower($keyword));
                                     $e_str1 = rtrim($e_str1);
-                                    if (strpos(strtolower($rr['name']), $e_str1) === false) {
-                                        $exist = false;
+                                    $e_ary1 = explode($e_str, $e_str1);
+
+                                    if (isset($e_ary1[1]) && $e_ary1[1] === '') {
+                                        $e_str1 = $e_ary1[0];
+                                        if (strpos(strtolower($rr['name']), $e_str) === false && strpos(strtolower($rr['name']), $e_str1) === false) {
+                                            $exist = false;
+                                        } else {
+                                            $exist = true;
+                                        }
                                     } else {
-                                        $exist = true;
+                                        $exist = false;
                                     }
                                 }
 
@@ -215,6 +213,22 @@ class KeywordsController extends Controller
                                     }
                                 }
 
+                                Keyword::insertGetId([
+                                    'keywords'     => $keyword,
+                                    'result'       => $re[$i]['name'],
+                                    'type'         => $checked_type,
+                                    'volume'       => $re[$i]['month'],
+                                    'trend'        => json_encode($re[$i]['trends']),
+                                    'state'        => $re[$i]['competition'],
+                                    'bid_low'      => $re[$i]['bid_low'],
+                                    'bid_high'     => $re[$i]['bid_high'],
+                                    'competition'  => $re[$i]['competition_index'],
+                                    'write_date'   => date('Y-m-d'),
+                                    'updated_flag' => 0,
+                                    'created_at'   => now(),
+                                    'updated_at'   => now(),
+                                ]);
+
                                 $i++;
                             }
                         }
@@ -231,6 +245,30 @@ class KeywordsController extends Controller
             'result'    => $re,
             'pageCount' => sizeof($re)
         ]);
+    }
+
+    private function getSearchData($keyword, $check_type)
+    {
+        $qry = Keyword::where('keywords', $keyword)->where('type', $check_type)->get();
+
+        $re = [];
+        if ($qry) {
+            foreach ($qry as $key => $row) {
+                $re[$key] = [
+                    'name'              => $row->result,
+                    'month'             => $row->volume,
+                    'month_search'      => $row->volume,
+                    'trend'             => json_decode($row->trend),
+                    'trends'            => json_decode($row->trend),
+                    'competition'       => json_decode($row->state, true),
+                    'bid_low'           => $row->bid_low,
+                    'bid_high'          => $row->bid_high,
+                    'competition_index' => $row->competition,
+                ];
+            }
+        }
+
+        return $re;
     }
 
     private function getGoogleKeywords($keyword)
@@ -254,28 +292,5 @@ class KeywordsController extends Controller
         curl_close($chnd);
 
         return json_decode($data, true);
-    }
-
-    private function getSearchData($keyword, $check_type)
-    {
-        $qry = Keyword::where('keywords', $keyword)->where('type', $check_type)->get();
-
-        $re = [];
-        if ($qry) {
-            foreach ($qry as $key => $row) {
-                $re[$key] = [
-                    'month'             => $row->volume,
-                    'month_search'      => $row->volume,
-                    'trend'             => json_decode($row->trend),
-                    'trends'            => json_decode($row->trend),
-                    'competition'       => json_decode($row->state, true),
-                    'bid_low'           => $row->bid_low,
-                    'bid_high'          => $row->bid_high,
-                    'competition_index' => $row->competition,
-                ];
-            }
-        }
-
-        return $re;
     }
 }

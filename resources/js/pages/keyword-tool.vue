@@ -276,11 +276,12 @@ export default {
         startSearch() {
             this.isQuestion = false;
             this.rCal = 0;
+            this.keyword_str1 = '';
             for (let i = 0; i < this.questionItems.length; i++) {
                 const sAry = this.search_str
                     .toLowerCase()
                     .split(this.questionItems[i].toLowerCase());
-                if (sAry[0] === '' && sAry[1]) {
+                if (sAry[0] === '' && sAry[1] && sAry[1] !== '') {
                     this.isQuestion = true;
                     this.keyword_str1 = sAry[1];
 
@@ -292,6 +293,7 @@ export default {
                 this.keyword_str2 = this.search_str;
             } else {
                 this.keyword_str2 = `${this.questionItems[0]}${this.search_str}`;
+                this.keyword_str1 = this.search_str;
             }
 
             this.desserts = [];
@@ -302,7 +304,11 @@ export default {
             this.searchData();
         },
         searchData() {
-            if (!this.keyword_str2 || this.keyword_str2 === '') {
+            if (
+                !this.keyword_str2 ||
+                this.keyword_str2 === '' ||
+                this.keyword_str1 === ''
+            ) {
                 this.searchStart = false;
 
                 return;
@@ -311,6 +317,7 @@ export default {
             this.searchStart = true;
             const params = {
                 search_str: this.keyword_str2,
+                keyword_str: this.keyword_str1,
                 checked_type: this.checked_type,
                 is_question: this.isQuestion,
             };
