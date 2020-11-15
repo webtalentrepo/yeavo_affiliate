@@ -248,6 +248,7 @@ export default {
         isQuestion: false,
         keyword_str1: '',
         keyword_str2: '',
+        rowCount: 0,
     }),
     created() {
         this.questionItems = this.$store.state.questions;
@@ -301,6 +302,7 @@ export default {
 
             this.desserts = [];
             this.pageCount = 0;
+            this.rowCount = 0;
             this.page = 1;
             this.page1 = 1;
 
@@ -330,8 +332,9 @@ export default {
                 .then((r) => {
                     if (r.data.result && r.data.result.length) {
                         this.desserts = this.desserts.concat(r.data.result);
-                        this.pageCount += Math.ceil(
-                            r.data.pageCount / this.itemsPerPage,
+                        this.rowCount += r.data.pageCount;
+                        this.pageCount = Math.ceil(
+                            this.rowCount / this.itemsPerPage,
                         );
                     }
 
