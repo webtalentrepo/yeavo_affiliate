@@ -226,7 +226,7 @@ class KeywordsController extends Controller
                                     'write_date'   => date('Y-m-d'),
                                     'updated_flag' => 0,
                                     'created_at'   => now(),
-                                    'updated_at'   => now(),∂
+                                    'updated_at'   => now(),
                                 ]);
 
                                 $i++;
