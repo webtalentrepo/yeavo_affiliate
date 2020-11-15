@@ -325,13 +325,13 @@ export default {
             this.$http
                 .post('/keyword-data', params)
                 .then((r) => {
-                    const desserts_data = JSON.parse(
-                        JSON.stringify(this.desserts),
-                    );
-                    this.desserts = [...desserts_data, r.data.result];
-                    this.pageCount += Math.ceil(
-                        r.data.pageCount / this.itemsPerPage,
-                    );
+                    if (r.data.result && r.data.result.length) {
+                        this.desserts = this.desserts.concat(r.data.result);
+                        this.pageCount += Math.ceil(
+                            r.data.pageCount / this.itemsPerPage,
+                        );
+                    }
+
                     if (this.isQuestion) {
                         this.searchStart = false;
                     } else {
