@@ -74,32 +74,32 @@ class KeywordsController extends Controller
             $keyword = $request->input('search_str');
 
             if ($keyword != '') {
-                if (Cache::has($checked_type . '_' . $keyword)) {
-                    $re = json_decode(Cache::get($checked_type . '_' . $keyword));
+                if (Cache::has($checked_type . '_' . strtolower($keyword))) {
+                    $re = json_decode(Cache::get($checked_type . '_' . strtolower($keyword)));
 
                     return response()->json([
                         'result'    => $re,
                         'pageCount' => sizeof($re)
                     ]);
                 } else {
-                    $re = $this->getSearchData($keyword, $checked_type);
+                    $re = $this->getSearchData(strtolower($keyword), $checked_type);
                     if (sizeof($re) > 0) {
-                        Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
+                        Cache::add($checked_type . '_' . strtolower($keyword), json_encode($re), 864000);
 
                         return response()->json([
                             'result'    => $re,
                             'pageCount' => sizeof($re)
                         ]);
                     } else {
-                        if (Cache::has($keyword)) {
-                            $re = json_decode(Cache::get($keyword));
+                        if (Cache::has(strtolower($keyword))) {
+                            $re = json_decode(Cache::get(strtolower($keyword)));
                         } else {
                             $data = $this->getGoogleKeywords($keyword);
 
                             $re = $data['keywords'];
 
                             if ($re && sizeof($re) > 0) {
-                                Cache::add($keyword, json_encode($re), 864000);
+                                Cache::add(strtolower($keyword), json_encode($re), 864000);
                             }
                         }
 
@@ -214,7 +214,7 @@ class KeywordsController extends Controller
                                 }
 
                                 Keyword::insertGetId([
-                                    'keywords'     => $keyword,
+                                    'keywords'     => strtolower($keyword),
                                     'result'       => $re[$i]['name'],
                                     'type'         => $checked_type,
                                     'volume'       => $re[$i]['month'],
@@ -234,7 +234,7 @@ class KeywordsController extends Controller
                         }
 
                         if ($re && sizeof($re) > 0) {
-                            Cache::add($checked_type . '_' . $keyword, json_encode($re), 864000);
+                            Cache::add($checked_type . '_' . strtolower($keyword), json_encode($re), 864000);
                         }
                     }
                 }
