@@ -33,16 +33,19 @@
                         <v-radio
                             label="Exact Match"
                             value="exact"
+                            :disabled="searchStart"
                             @click="clickData"
                         ></v-radio>
                         <v-radio
                             label="Non-Questions"
                             value="non"
+                            :disabled="searchStart"
                             @click="clickData"
                         ></v-radio>
                         <v-radio
                             label="Broad Match"
                             value="broad"
+                            :disabled="searchStart"
                             @click="clickData"
                         ></v-radio>
                     </v-radio-group>
