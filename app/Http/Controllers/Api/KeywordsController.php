@@ -96,14 +96,14 @@ class KeywordsController extends Controller
                         } else {
                             $data = $this->getGoogleKeywords($keyword);
 
-                            $re = $data['keywords'];
+                            $re = isset($data['keywords']) ? $data['keywords'] : [];
 
 //                            if ($re && sizeof($re) > 0) {
 ////                                Cache::add(strtolower($keyword), json_encode($re), 864000);
 //                            }
                         }
 
-                        if ($re && sizeof($re) > 0) {
+                        if ($re && isset($re) && !is_null($re)) {
                             $re_reset = $re;
                             $re = [];
                             $e_str = rtrim(strtolower($keyword_str));
