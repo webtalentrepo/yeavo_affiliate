@@ -17,7 +17,7 @@ class CreateKeywordsTable extends Migration
             $table->id();
             $table->string('keywords')->index();
             $table->text('result');
-            $table->enum('type', ['exact', 'non', 'broad']);
+            $table->enum('type', ['exact', 'non', 'broad'])->index();
             $table->string('volume');
             $table->json('trend');
             $table->string('state', 20);

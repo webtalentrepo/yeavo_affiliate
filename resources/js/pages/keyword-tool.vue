@@ -91,18 +91,18 @@
                                     {{ item.month }}
                                 </div>
                             </template>
-                            <template #[`item.bid_low`]="{ item }">
-                                <div v-if="item.bid_low === 'NA'">
-                                    {{ item.bid_low }}
-                                </div>
-                                <div v-else>${{ item.bid_low }}</div>
-                            </template>
-                            <template #[`item.bid_high`]="{ item }">
-                                <div v-if="item.bid_high === 'NA'">
-                                    {{ item.bid_high }}
-                                </div>
-                                <div v-else>${{ item.bid_high }}</div>
-                            </template>
+                            <!--                            <template #[`item.bid_low`]="{ item }">-->
+                            <!--                                <div v-if="item.bid_low === 'NA'">-->
+                            <!--                                    {{ item.bid_low }}-->
+                            <!--                                </div>-->
+                            <!--                                <div v-else>${{ item.bid_low }}</div>-->
+                            <!--                            </template>-->
+                            <!--                            <template #[`item.bid_high`]="{ item }">-->
+                            <!--                                <div v-if="item.bid_high === 'NA'">-->
+                            <!--                                    {{ item.bid_high }}-->
+                            <!--                                </div>-->
+                            <!--                                <div v-else>${{ item.bid_high }}</div>-->
+                            <!--                            </template>-->
                         </v-data-table>
                     </v-card>
                 </v-col>
