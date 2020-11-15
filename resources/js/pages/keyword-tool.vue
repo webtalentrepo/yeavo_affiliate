@@ -233,8 +233,7 @@ export default {
         keyword_str: '',
         chart_data: {},
         top_page: 1,
-        pageCount1: 0,
-        itemsPerPage1: 10,
+        itemsPerPage1: 15,
         top_headers: [
             { text: 'Title & URL', value: 'url', width: '55%' },
             { text: 'Topics', value: 'topics', align: 'right', width: '45%' },
@@ -243,6 +242,9 @@ export default {
         checked_type: 'exact',
         questionItems: [],
         rCal: 0,
+        isQuestion: false,
+        keyword_str1: '',
+        keyword_str2: '',
     }),
     created() {
         this.questionItems = this.$store.state.questions;
@@ -251,8 +253,8 @@ export default {
         clickData() {
             this.desserts = [];
 
+            this.startSearch();
             this.getTopUrls();
-            this.searchData();
         },
         getTopUrls() {
             this.desserts1 = [];
@@ -271,26 +273,70 @@ export default {
                     console.log(e);
                 });
         },
-        searchData() {
-            this.searchStart = true;
-            const params = {
-                search_str: this.search_str,
-                checked_type: this.checked_type,
-            };
+        startSearch() {
+            this.isQuestion = false;
+            this.rCal = 0;
+            for (let i = 0; i < this.questionItems.length; i++) {
+                const sAry = this.search_str
+                    .toLowerCase()
+                    .split(this.questionItems[i].toLowerCase());
+                if (sAry[0] === '' && sAry[1]) {
+                    this.isQuestion = true;
+                    this.keyword_str1 = sAry[1];
+
+                    break;
+                }
+            }
+
+            if (this.isQuestion) {
+                this.keyword_str2 = this.search_str;
+            } else {
+                this.keyword_str2 = `${this.questionItems[0]}${this.search_str}`;
+            }
 
             this.desserts = [];
             this.pageCount = 0;
             this.page = 1;
             this.page1 = 1;
 
+            this.searchData();
+        },
+        searchData() {
+            if (!this.keyword_str2 || this.keyword_str2 === '') {
+                this.searchStart = false;
+
+                return;
+            }
+
+            this.searchStart = true;
+            const params = {
+                search_str: this.keyword_str2,
+                checked_type: this.checked_type,
+                is_question: this.isQuestion,
+            };
+
             this.$http
                 .post('/keyword-data', params)
                 .then((r) => {
-                    this.desserts = r.data.result;
-                    this.pageCount = Math.ceil(
+                    const desserts_data = JSON.parse(
+                        JSON.stringify(this.desserts),
+                    );
+                    this.desserts = [...desserts_data, r.data.result];
+                    this.pageCount += Math.ceil(
                         r.data.pageCount / this.itemsPerPage,
                     );
-                    this.searchStart = false;
+                    if (this.isQuestion) {
+                        this.searchStart = false;
+                    } else {
+                        if (this.rCal < this.questionItems.length - 1) {
+                            this.rCal++;
+                            this.keyword_str2 = `${
+                                this.questionItems[this.rCal]
+                            }${this.search_str}`;
+
+                            this.searchData();
+                        }
+                    }
                 })
                 // eslint-disable-next-line no-unused-vars
                 .catch((e) => {
