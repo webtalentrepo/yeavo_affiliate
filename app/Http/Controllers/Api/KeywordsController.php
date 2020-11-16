@@ -83,8 +83,8 @@ class KeywordsController extends Controller
                     ]);
                 } else {
                     $re = $this->getSearchData(strtolower($keyword), $checked_type);
-                    if (sizeof($re) > 0) {
-//                        Cache::add($checked_type . '_' . strtolower($keyword), json_encode($re), 864000);
+                    if ($re && isset($re) && !is_null($re)) {
+                        Cache::add($checked_type . '_' . strtolower($keyword), json_encode($re), 864000);
 
                         return response()->json([
                             'result'    => $re,
@@ -98,9 +98,9 @@ class KeywordsController extends Controller
 
                             $re = isset($data['keywords']) ? $data['keywords'] : [];
 
-//                            if ($re && sizeof($re) > 0) {
-////                                Cache::add(strtolower($keyword), json_encode($re), 864000);
-//                            }
+                            if ($re && isset($re) && !is_null($re)) {
+                                Cache::add(strtolower($keyword), json_encode($re), 864000);
+                            }
                         }
 
                         if ($re && isset($re) && !is_null($re)) {
@@ -233,9 +233,9 @@ class KeywordsController extends Controller
                             }
                         }
 
-//                        if ($re && sizeof($re) > 0) {
-////                            Cache::add($checked_type . '_' . strtolower($keyword), json_encode($re), 864000);
-//                        }
+                        if ($re && isset($re) && !is_null($re)) {
+                            Cache::add($checked_type . '_' . strtolower($keyword), json_encode($re), 864000);
+                        }
                     }
                 }
             }

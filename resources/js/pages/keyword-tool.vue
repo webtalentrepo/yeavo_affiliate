@@ -186,7 +186,7 @@ export default {
         pageCount: 0,
         itemsPerPage: 10,
         headers: [
-            { text: 'Keyword', value: 'name', width: '41%' },
+            { text: 'Keyword', value: 'name', width: '36%' },
             {
                 text: 'Average Month',
                 value: 'month_search',
@@ -197,7 +197,7 @@ export default {
                 text: 'Trend',
                 value: 'trend',
                 align: 'left',
-                width: '24%',
+                width: '29%',
             },
             {
                 text: 'Competition',
