@@ -1,6 +1,18 @@
 import axios from 'axios';
 
 const actions = {
+    CANCEL_PENDING_REQUESTS(context) {
+        // Cancel all request where a token exists
+        // eslint-disable-next-line no-unused-vars
+        context.state.cancelTokens.forEach((request, i) => {
+            if (request.cancel) {
+                request.cancel();
+            }
+        });
+
+        // Reset the cancelTokens store
+        context.commit('CLEAR_CANCEL_TOKENS');
+    },
     // eslint-disable-next-line no-unused-vars
     post({ commit }, post_data) {
         return new Promise((resolve, reject) => {

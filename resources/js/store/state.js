@@ -4,6 +4,7 @@ import BCookie from '../utils/BCookie';
 const state = {
     siteName: 'Tewl Kit',
     siteSubName: 'Market Data Demystified',
+    cancelTokens: [],
     accessToken: BCookie.check('DBAccessToken')
         ? BCookie.get('DBAccessToken')
         : null,

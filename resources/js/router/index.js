@@ -15,6 +15,8 @@ const router = new VueRouter({
  * Authentication check and return to login page before route change.
  */
 router.beforeEach((to, from, next) => {
+    store.dispatch('CANCEL_PENDING_REQUESTS');
+
     if (!store.getters.isAuthenticated) {
         if (to.meta.auth) {
             next({

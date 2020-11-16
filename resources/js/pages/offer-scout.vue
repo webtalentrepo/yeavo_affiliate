@@ -433,6 +433,11 @@ export default {
             scout_network: 'getNetworkList',
         }),
     },
+    beforeDestroy() {
+        this.cSearchStart = false;
+        this.searchStart = false;
+        this.search_str = '';
+    },
     mounted() {
         this.getSalesData();
     },
@@ -445,6 +450,11 @@ export default {
             }
         },
         getChildData(id) {
+            if (this.search_str === '') {
+                this.cSearchStart = false;
+
+                return;
+            }
             this.page = 1;
             this.cSearchStart = true;
 
@@ -477,6 +487,12 @@ export default {
             this.getSalesData();
         },
         getSalesData() {
+            if (this.search_str === '') {
+                this.searchStart = false;
+
+                return;
+            }
+
             this.searchStart = true;
             const params = {
                 search_str: this.search_str,

@@ -186,42 +186,24 @@ export default {
         pageCount: 0,
         itemsPerPage: 10,
         headers: [
-            { text: 'Keyword(by relevance)', value: 'name', width: '35%' },
+            { text: 'Keyword', value: 'name', width: '41%' },
             {
-                text: 'Volume(AVG. monthly)',
+                text: 'Average Month',
                 value: 'month_search',
                 align: 'right',
-                width: '15%',
+                width: '21%',
             },
             {
                 text: 'Trend',
                 value: 'trend',
                 align: 'left',
-                width: '15%',
+                width: '24%',
             },
             {
-                text: 'State',
-                value: 'competition',
-                align: 'left',
-                width: '9%',
-            },
-            {
-                text: 'BID(low)',
-                value: 'bid_low',
-                align: 'right',
-                width: '9%',
-            },
-            {
-                text: 'BID(high)',
-                value: 'bid_high',
-                align: 'right',
-                width: '9%',
-            },
-            {
-                text: 'Com.',
+                text: 'Competition',
                 value: 'competition_index',
                 align: 'left',
-                width: '8%',
+                width: '14%',
             },
         ],
         desserts: [],
@@ -245,6 +227,20 @@ export default {
     }),
     created() {
         this.questionItems = this.$store.state.questions;
+    },
+    beforeDestroy() {
+        this.desserts = [];
+        this.isQuestion = true;
+        this.keyword_str = '';
+        this.keyword_str1 = '';
+        this.keyword_str2 = '';
+        this.rowCount = 0;
+        this.rCal = 0;
+        this.pageCount = 0;
+        this.search_str = '';
+        this.page = 1;
+        this.page1 = 1;
+        this.searchStart = false;
     },
     methods: {
         clickRow(item) {
@@ -324,6 +320,16 @@ export default {
                 checked_type: this.checked_type,
                 is_question: this.isQuestion,
             };
+
+            if (
+                !this.keyword_str2 ||
+                this.keyword_str2 === '' ||
+                this.keyword_str1 === ''
+            ) {
+                this.searchStart = false;
+
+                return;
+            }
 
             this.$http
                 .post('/keyword-data', params)

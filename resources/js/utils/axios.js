@@ -8,6 +8,15 @@ import store from '../store/store';
 
 axios.interceptors.request.use(
     (requestConfig) => {
+        //  Generate cancel token source
+        let source = axios.CancelToken.source();
+
+        // Set cancel token on this request
+        requestConfig.cancelToken = source.token;
+
+        // Add to vuex to make cancellation available from anywhere
+        store.commit('ADD_CANCEL_TOKEN', source);
+
         if (store.getters.isAuthenticated) {
             requestConfig.headers.Authorization = `Bearer ${store.state.accessToken}`;
         }
@@ -20,12 +29,15 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (
-            error.response.status === 401 &&
-            error.config.url.indexOf('/api/login') < 0
-        ) {
-            store.commit('destroyAccessToken');
-            window.location.replace(`${window.location.origin}/login`);
+        if (error.response && error.response.status) {
+            if (
+                error.response.status === 401 &&
+                error.config.url.indexOf('/api/login') < 0
+            ) {
+                store.commit('destroyAccessToken');
+
+                window.location.replace(`${window.location.origin}/login`);
+            }
         }
 
         return Promise.reject(error);

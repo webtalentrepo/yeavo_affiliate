@@ -2,6 +2,12 @@ import Ls from '../utils/Ls';
 import BCookie from '../utils/BCookie';
 
 let mutations = {
+    ADD_CANCEL_TOKEN(state, token) {
+        state.cancelTokens.push(token);
+    },
+    CLEAR_CANCEL_TOKENS(state) {
+        state.cancelTokens = [];
+    },
     /**
      * Set Authenticated Access Token.
      *

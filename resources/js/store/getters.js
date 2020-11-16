@@ -1,6 +1,9 @@
 import BCookie from '../utils/BCookie';
 
 const getters = {
+    cancelTokens(state) {
+        return state.cancelTokens;
+    },
     getNetworkList(state) {
         return state.scout_network;
     },
