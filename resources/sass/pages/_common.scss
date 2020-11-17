@@ -159,3 +159,19 @@
     width: 100%;
     line-height: 50px;
 }
+
+.custom-pagination {
+    ul {
+        li {
+            button {
+                &.v-pagination__item {
+                    &:not(.v-pagination__item--active) {
+                        position: relative;
+                        color: black;
+                        background-color: lightgrey;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -125,6 +125,7 @@
                         v-model="page"
                         :length="pageCount"
                         :total-visible="10"
+                        class="custom-pagination"
                         circle
                         dark
                         color="white"
