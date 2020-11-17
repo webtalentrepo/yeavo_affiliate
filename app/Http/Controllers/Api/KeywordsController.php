@@ -243,7 +243,7 @@ class KeywordsController extends Controller
 
         return response()->json([
             'result'    => $re,
-            'pageCount' => sizeof($re)
+            'pageCount' => ($re && isset($re) && !is_null($re)) ? sizeof($re) : 0
         ]);
     }
 

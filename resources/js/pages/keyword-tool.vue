@@ -99,6 +99,21 @@
                                     {{ item.month }}
                                 </div>
                             </template>
+                            <template #[`item.competition_index`]="{ item }">
+                                <div
+                                    :class="{
+                                        'light-green--text':
+                                            item.competition_index <= 40,
+                                        'amber--text':
+                                            item.competition_index > 40 &&
+                                            item.competition_index <= 68,
+                                        'red--text':
+                                            item.competition_index > 68,
+                                    }"
+                                >
+                                    {{ item.competition_index }}
+                                </div>
+                            </template>
                         </v-data-table>
                     </v-card>
                 </v-col>
