@@ -336,16 +336,6 @@ export default {
                 is_question: this.isQuestion,
             };
 
-            if (
-                !this.keyword_str2 ||
-                this.keyword_str2 === '' ||
-                this.keyword_str1 === ''
-            ) {
-                this.searchStart = false;
-
-                return;
-            }
-
             this.$http
                 .post('/keyword-data', params)
                 .then((r) => {
@@ -360,7 +350,10 @@ export default {
                     if (this.isQuestion) {
                         this.searchStart = false;
                     } else {
-                        if (this.rCal < this.questionItems.length - 1) {
+                        if (
+                            this.searchStart &&
+                            this.rCal < this.questionItems.length - 1
+                        ) {
                             this.rCal++;
                             this.keyword_str2 = `${
                                 this.questionItems[this.rCal]
