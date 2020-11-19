@@ -161,15 +161,15 @@
 }
 
 .custom-pagination {
-    ul {
+    ul.v-pagination {
         li {
-            button {
-                &.v-pagination__item {
-                    &:not(.v-pagination__item--active) {
-                        //position: relative;
-                        //color: black;
-                        //background-color: lightgrey;
-                    }
+            button.v-pagination__item {
+
+                &:not(.v-pagination__item--active) {
+                    //position: relative;
+                    //color: black;
+                    //background-color: lightgrey;
+                    //overflow: hidden;
                 }
             }
         }
