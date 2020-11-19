@@ -288,6 +288,7 @@ export default {
                 });
         },
         startSearch() {
+            this.$store.dispatch('CANCEL_PENDING_REQUESTS');
             this.isQuestion = false;
             this.rCal = 0;
             this.keyword_str1 = '';
