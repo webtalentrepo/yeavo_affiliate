@@ -18,7 +18,7 @@
             <v-list-item-avatar>
                 <v-img v-if="!user" src="/assets/menu-icons/user.png" alt="" />
 
-                <v-img v-else :src="user.profile.image_ext" />
+                <!--                <v-img v-else :src="user.profile.image_ext" />-->
             </v-list-item-avatar>
         </v-app-bar>
     </div>

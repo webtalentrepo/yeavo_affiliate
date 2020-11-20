@@ -6,10 +6,10 @@
             permanent
             width="245px"
         >
-            <v-list-item class="px-2">
+            <v-list-item class="px-4 py-2">
                 <v-spacer v-if="!user"></v-spacer>
 
-                <v-list-item-avatar v-if="user" size="62">
+                <v-list-item-avatar v-if="user" size="50">
                     <v-img :src="user.profile.image_ext" />
                 </v-list-item-avatar>
 
@@ -84,6 +84,7 @@ export default {
         .v-list-item__subtitle {
             font-style: italic;
             font-size: 0.75rem;
+            color: #363636;
         }
     }
 }
