@@ -14,11 +14,16 @@ html {
 .app-container {
     height: calc(100vh - 96px);
     margin-top: 48px;
+    min-height: calc(100vh - 96px);
 }
 
 .app-container {
     overflow: auto;
     width: calc(100vw - 250px);
+
+    .v-application--wrap {
+        min-height: calc(100vh - 96px);
+    }
 }
 
 @font-face {
@@ -50,11 +55,15 @@ html {
     text-align: center;
 }
 
-.v-text-field.v-text-field--solo:not(.v-text-field--solo-flat)
-> .v-input__control
-> .v-input__slot,
-.v-btn--contained {
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2), 0 0 5px -4px rgba(0, 0, 0, 0.14),
-    0 0 6px 4px rgba(0, 0, 0, 0.12);
-    border-radius: 6px;
+.v-text-field.v-text-field--solo:not(.v-text-field--solo-flat) > .v-input__control > .v-input__slot,
+.v-btn--contained, .v-btn--outlined {
+    border: 2px solid #f3f3f3 !important;
+    box-shadow: none;
+    border-radius: 4px !important;
+}
+
+.v-btn:not(.v-btn--round).v-size--default {
+    height: 40px;
+    min-width: 64px;
+    padding: 4px 20px;
 }

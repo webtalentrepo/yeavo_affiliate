@@ -5,7 +5,7 @@
                 <v-col cols="12" md="5" sm="10" xs="12" lg="4" xl="3">
                     <form>
                         <v-row
-                            class="mt-md-10 mt-sm-8 pb-4 blue-grey--text ml-0 mr-0"
+                            class="black--text mt-md-10 mt-sm-8 pb-4 ml-0 mr-0"
                             justify="center"
                         >
                             Please Log In, or Sign Up to Get Started
@@ -50,21 +50,21 @@
                             class="ml-0 mr-0"
                         >
                             <v-btn
-                                class="mr-4"
+                                class="mr-4 text-capitalize"
                                 light
-                                color="white"
+                                outlined
                                 @click="submit"
                                 >Log In
                             </v-btn>
                         </v-row>
 
                         <v-row
-                            class="mt-md-10 mt-sm-8 blue-grey--text ml-0 mr-0"
+                            class="black--text mt-md-10 mt-sm-8 ml-0 mr-0"
                             justify="center"
                         >
                             <span>Don't have an account,</span>
                             <router-link
-                                class="ml-1 blue-grey--text text-decoration-underline"
+                                class="ml-1 black--text text-decoration-underline"
                                 to="/register"
                                 >Sign Up Here
                             </router-link>
@@ -73,10 +73,10 @@
                         <v-row
                             justify="center"
                             align="center"
-                            class="mt-md-10 mt-sm-8 ml-0 mr-0"
+                            class="mt-md-6 mt-sm-4 ml-0 mr-0"
                         >
                             <router-link
-                                class="ml-1 blue-grey--text text-decoration-underline"
+                                class="ml-1 black--text text-decoration-underline"
                                 to="/forgot-password"
                                 >Forgot Password?
                             </router-link>
@@ -175,9 +175,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.login-container {
-    *:not(i) {
-        font-weight: 100;
-    }
-}
+/*.login-container {*/
+/*    *:not(i) {*/
+/*        font-weight: 100;*/
+/*    }*/
+/*}*/
 </style>

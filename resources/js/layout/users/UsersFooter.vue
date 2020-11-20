@@ -3,7 +3,7 @@
         horizontal
         fixed
         height="48px"
-        background-color="grey darken-3"
+        background-color="#363636"
         color="#f5f5f5"
         dark
         class="app-footer"

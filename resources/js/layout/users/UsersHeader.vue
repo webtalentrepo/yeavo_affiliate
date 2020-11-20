@@ -1,10 +1,10 @@
 <template>
     <div class="users-header">
-        <v-app-bar color="grey darken-3" dense dark flat absolute>
-            <v-toolbar-title class="app-logo"
-                >{{ $store.state.siteName }}
-                <span class="sub-title">{{ $store.state.siteSubName }}</span>
-            </v-toolbar-title>
+        <v-app-bar color="#363636" dense dark flat absolute>
+            <!--            <v-toolbar-title class="app-logo"-->
+            <!--                >{{ $store.state.siteName }}-->
+            <!--                <span class="sub-title">{{ $store.state.siteSubName }}</span>-->
+            <!--            </v-toolbar-title>-->
 
             <v-spacer></v-spacer>
 
