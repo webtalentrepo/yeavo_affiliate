@@ -18,7 +18,7 @@
                     >
                         <template #append>
                             <img
-                                src="/assets/icons/search.png"
+                                src="/assets/menu-icons/search.png"
                                 alt=""
                                 class="append-icon cursor-pointer"
                                 @click="clickData"
