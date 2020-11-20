@@ -28,7 +28,7 @@
                 >
                     <v-list-item-icon>
                         <!--                        <v-icon>{{ item.icon }}</v-icon>-->
-                        <img :src="`/assets/icons/${item.icon}`" alt="" />
+                        <img :src="`/assets/menu-icons/${item.icon}`" alt="" />
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -38,7 +38,7 @@
 
                 <v-list-item v-if="user" link to="/logout">
                     <v-list-item-icon>
-                        <v-icon>mdi-logout</v-icon>
+                        <v-icon size="18" color="#363636">mdi-logout</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -123,19 +123,14 @@ export default {
             align-items: center;
             margin-right: 8px;
             height: 32px;
-
-            img {
-                width: 24px;
-                height: 24px;
-            }
         }
 
-        &__content {
-            .v-list-item__title {
-                font-size: 1rem;
-                font-weight: 100;
-            }
-        }
+        /*&__content {*/
+        /*    .v-list-item__title {*/
+        /*        font-size: 1rem;*/
+        /*        font-weight: 100;*/
+        /*    }*/
+        /*}*/
     }
 }
 </style>

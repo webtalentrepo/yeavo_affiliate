@@ -1,5 +1,5 @@
 const menuItems = [
-    { title: 'Home', icon: 'home-icon.png', link: '/' },
+    { title: 'Home', icon: 'home.png', link: '/' },
     {
         title: 'Domain Ideas',
         icon: 'domain-ideas.png',

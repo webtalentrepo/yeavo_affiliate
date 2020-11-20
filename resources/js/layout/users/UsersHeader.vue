@@ -16,11 +16,9 @@
             <div class="px-10">Video Tutorials</div>
 
             <v-list-item-avatar>
-                <v-icon v-if="!user" large color="#f0f0f0"
-                    >mdi-account-circle-outline
-                </v-icon>
+                <v-img v-if="!user" src="/assets/menu-icons/user.png" alt="" />
 
-                <v-img v-if="user" :src="user.profile.image_ext" />
+                <v-img v-else :src="user.profile.image_ext" />
             </v-list-item-avatar>
         </v-app-bar>
     </div>
