@@ -289,35 +289,42 @@ export default {
         },
         startSearch() {
             this.$store.dispatch('CANCEL_PENDING_REQUESTS');
-            this.isQuestion = false;
-            this.rCal = 0;
-            this.keyword_str1 = '';
-            for (let i = 0; i < this.questionItems.length; i++) {
-                const sAry = this.search_str
-                    .toLowerCase()
-                    .split(this.questionItems[i].toLowerCase());
-                if (sAry[0] === '' && sAry[1] && sAry[1] !== '') {
-                    this.isQuestion = true;
-                    this.keyword_str1 = sAry[1];
 
-                    break;
-                }
-            }
+            setTimeout(() => {
+                this.$nextTick(() => {
+                    this.isQuestion = false;
+                    this.rCal = 0;
+                    this.keyword_str1 = '';
+                    this.searchStart = false;
 
-            if (this.isQuestion) {
-                this.keyword_str2 = this.search_str;
-            } else {
-                this.keyword_str2 = `${this.questionItems[0]}${this.search_str}`;
-                this.keyword_str1 = this.search_str;
-            }
+                    for (let i = 0; i < this.questionItems.length; i++) {
+                        const sAry = this.search_str
+                            .toLowerCase()
+                            .split(this.questionItems[i].toLowerCase());
+                        if (sAry[0] === '' && sAry[1] && sAry[1] !== '') {
+                            this.isQuestion = true;
+                            this.keyword_str1 = sAry[1];
 
-            this.desserts = [];
-            this.pageCount = 0;
-            this.rowCount = 0;
-            this.page = 1;
-            this.page1 = 1;
+                            break;
+                        }
+                    }
 
-            this.searchData();
+                    if (this.isQuestion) {
+                        this.keyword_str2 = this.search_str;
+                    } else {
+                        this.keyword_str2 = `${this.questionItems[0]}${this.search_str}`;
+                        this.keyword_str1 = this.search_str;
+                    }
+
+                    this.desserts = [];
+                    this.pageCount = 0;
+                    this.rowCount = 0;
+                    this.page = 1;
+                    this.page1 = 1;
+
+                    this.searchData();
+                });
+            }, 500);
         },
         searchData() {
             if (
