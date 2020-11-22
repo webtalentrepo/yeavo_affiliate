@@ -149,7 +149,7 @@ class ShareSale
                         $scout->child_category = isset($row['reversalrate30day']) ? (is_array($row['reversalrate30day']) ? json_encode($row['reversalrate30day']) : $row['reversalrate30day']) : '';
                         $scout->full_category = isset($row['category']) ? (is_array($row['category']) ? json_encode($row['category']) : $row['category']) : '';
                         $scout->site_id = (is_array($row['merchantid']) ? json_encode($row['merchantid']) : $row['merchantid']);
-                        $scout->program_url = isset($row['www']) ? (is_array($row['www']) ? json_encode($row['www']) : $row['www']) : '';
+                        $scout->program_url = isset($row['www']) ? (is_array($row['www']) ? json_encode($row['www']) : 'https://'. $row['www']) : '';
                         $scout->popular_rank = isset($row['avecomm30day']) ? (is_array($row['avecomm30day']) ? json_encode($row['avecomm30day']) : $row['avecomm30day']) : 0;
                         $scout->p_title = $name;
                         $scout->p_description = $comm_text;
