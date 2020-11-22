@@ -233,23 +233,35 @@
                         </template>
                     </v-data-table>
                     <v-row class="mt-10">
-                        <v-col cols="10" md="8">
-                            <v-pagination
+                        <v-col cols="12" md="6">
+                            <div
+                                id="custom-pagination-header"
+                                class="font-weight-bold custom-pagination-header mb-2"
+                            >
+                                Page Number
+                            </div>
+                            <paginate
                                 v-model="page"
-                                :length="pageCount"
-                                :total-visible="10"
-                                circle
-                                dark
-                                color="white"
-                            ></v-pagination>
+                                :page-range="5"
+                                :margin-pages="2"
+                                :page-count="pageCount"
+                                :prev-text="'Previous'"
+                                :next-text="'Next'"
+                                :container-class="'custom-pagination'"
+                                :page-class="'custom-page-item'"
+                                :click-handler="clickPaginate"
+                            >
+                            </paginate>
                         </v-col>
 
-                        <v-col cols="10" md="2">
+                        <v-col cols="12" md="4"></v-col>
+
+                        <v-col cols="12" md="2" class="custom-page-filter">
                             <v-text-field
                                 v-model="page1"
                                 type="number"
                                 label="Go to Page"
-                                width="60px"
+                                width="40px"
                                 min="1"
                                 outlined
                                 dense
@@ -332,7 +344,6 @@
                                         circle
                                         color="grey darken-3"
                                     ></v-pagination>
-                                    <!--                            @input="getSalesData"-->
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -345,6 +356,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import Paginate from 'vuejs-paginate';
 import SaleCJComponent from '../components/SaleCJComponent';
 import SaleCBComponent from '../components/SaleCBComponent';
 import SaleSSComponent from '../components/SaleSSComponent';
@@ -353,6 +365,7 @@ import PageHeader from '../layout/users/PageHeader';
 export default {
     name: 'OfferScout',
     components: {
+        Paginate,
         PageHeader,
         SaleSSComponent,
         SaleCBComponent,
@@ -442,6 +455,10 @@ export default {
         this.getSalesData();
     },
     methods: {
+        clickPaginate() {
+            this.page1 = this.page;
+            this.updatePaginate();
+        },
         showDialog(network, id) {
             if (network === 'cj.com') {
                 this.cj_dialog = true;
@@ -512,6 +529,8 @@ export default {
                         // console.log(r)
                         this.desserts = r.data.rows;
                         this.pageCount = r.data.pageCount;
+
+                        this.updatePaginate();
                     }
                     this.searchStart = false;
                 })
@@ -519,6 +538,31 @@ export default {
                 .catch((e) => {
                     this.searchStart = false;
                 });
+        },
+        updatePaginate() {
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    const childLength = document.querySelector(
+                        '.custom-pagination',
+                    ).childNodes.length
+                        ? Math.ceil(
+                              document.querySelector('.custom-pagination')
+                                  .childNodes.length /
+                                  2 +
+                                  2,
+                          )
+                        : 0;
+                    const countVal =
+                        this.pageCount > 6
+                            ? 140.16 + 18.91 * childLength
+                            : 253.62;
+                    document.querySelector(
+                        '#custom-pagination-header',
+                    ).style.width = `${
+                        countVal > 469.13 ? 469.13 : countVal
+                    }px`;
+                });
+            });
         },
     },
 };
