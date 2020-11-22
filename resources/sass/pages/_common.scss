@@ -235,3 +235,32 @@
         }
     }
 }
+
+.custom-radio-group {
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    .v-input--radio-group__input {
+        justify-content: center;
+
+        .v-radio {
+            .v-input--selection-controls__input {
+                display: none;
+            }
+
+            .v-label {
+                padding: 3px 11px;
+                border: 1px solid #f3f3f3;
+                border-radius: 4px;
+                color: #363636;
+            }
+
+            &.v-item--active {
+                .v-label {
+                    background-color: #363636;
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+}

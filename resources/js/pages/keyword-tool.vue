@@ -28,7 +28,14 @@
                 </v-col>
             </v-row>
             <v-row justify="center" align="center">
-                <v-col cols="12" md="11" sm="12" lg="11" xl="11">
+                <v-col
+                    cols="12"
+                    md="11"
+                    sm="12"
+                    lg="11"
+                    xl="11"
+                    class="custom-radio-group"
+                >
                     <v-radio-group v-model="checked_type" row>
                         <v-radio
                             label="Exact Match"
@@ -61,61 +68,49 @@
                     xl="10"
                     class="content-table"
                 >
-                    <v-card>
-                        <v-card-title>
-                            <v-text-field
-                                v-model="search"
-                                append-icon="mdi-magnify"
-                                label="Filter Keyword"
-                                single-line
-                                hide-details
-                            ></v-text-field>
-                        </v-card-title>
-                        <v-data-table
-                            :headers="headers"
-                            :items="desserts"
-                            :page.sync="page"
-                            :items-per-page="itemsPerPage"
-                            hide-default-footer
-                            class="elevation-1"
-                            :loading="searchStart"
-                            :search="search"
-                            loading-text="Loading... Please wait"
-                        >
-                            <template #[`item.name`]="{ item }">
-                                <div class="w-100" @click="clickRow(item)">
-                                    {{ item.name }}
-                                </div>
-                            </template>
-                            <template #[`item.trend`]="{ item }">
-                                <div>
-                                    <keyword-trends
-                                        :chart-data="getChartData(item.trends)"
-                                    ></keyword-trends>
-                                </div>
-                            </template>
-                            <template #[`item.month_search`]="{ item }">
-                                <div>
-                                    {{ item.month }}
-                                </div>
-                            </template>
-                            <template #[`item.competition_index`]="{ item }">
-                                <div
-                                    :class="{
-                                        'light-green--text':
-                                            item.competition_index <= 40,
-                                        'amber--text':
-                                            item.competition_index > 40 &&
-                                            item.competition_index <= 68,
-                                        'red--text':
-                                            item.competition_index > 68,
-                                    }"
-                                >
-                                    {{ item.competition_index }}
-                                </div>
-                            </template>
-                        </v-data-table>
-                    </v-card>
+                    <v-data-table
+                        :headers="headers"
+                        :items="desserts"
+                        :page.sync="page"
+                        :items-per-page="itemsPerPage"
+                        hide-default-footer
+                        class="elevation-1"
+                        :loading="searchStart"
+                        :search="search"
+                        loading-text="Loading... Please wait"
+                    >
+                        <template #[`item.name`]="{ item }">
+                            <div class="w-100" @click="clickRow(item)">
+                                {{ item.name }}
+                            </div>
+                        </template>
+                        <template #[`item.trend`]="{ item }">
+                            <div>
+                                <keyword-trends
+                                    :chart-data="getChartData(item.trends)"
+                                ></keyword-trends>
+                            </div>
+                        </template>
+                        <template #[`item.month_search`]="{ item }">
+                            <div>
+                                {{ item.month }}
+                            </div>
+                        </template>
+                        <template #[`item.competition_index`]="{ item }">
+                            <div
+                                :class="{
+                                    'light-green--text':
+                                        item.competition_index <= 40,
+                                    'amber--text':
+                                        item.competition_index > 40 &&
+                                        item.competition_index <= 68,
+                                    'red--text': item.competition_index > 68,
+                                }"
+                            >
+                                {{ item.competition_index }}
+                            </div>
+                        </template>
+                    </v-data-table>
                 </v-col>
             </v-row>
 
@@ -168,8 +163,14 @@
                 </v-col>
             </v-row>
             <v-row justify="center">
-                <v-col cols="12" md="12" sm="12" lg="11" xl="10"
-                    >Top 10 url ranking on this keyword
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="text-align-center font-weight-bold"
+                    >Top 10 URL's Ranking on this Keyword
                 </v-col>
             </v-row>
             <v-row justify="center">
@@ -228,7 +229,7 @@ export default {
             {
                 text: 'Average Month',
                 value: 'month_search',
-                align: 'right',
+                align: 'center',
                 width: '21%',
             },
             {
@@ -240,7 +241,7 @@ export default {
             {
                 text: 'Competition',
                 value: 'competition_index',
-                align: 'left',
+                align: 'center',
                 width: '14%',
             },
         ],
