@@ -153,7 +153,7 @@ class KeywordsController extends Controller
 
                                     if (isset($e_ary1[1]) && $e_ary1[1] === '') {
                                         $e_str1 = $e_ary1[0];
-                                        if (strpos(strtolower($rr['name']), $e_str) === false || strpos(strtolower($rr['name']), $e_str1) === false) {
+                                        if (strpos(strtolower($rr['name']), $e_str) === false && strpos(strtolower($rr['name']), $e_str1) === false) {
                                             $exist = false;
                                         } else {
                                             $exist = true;
