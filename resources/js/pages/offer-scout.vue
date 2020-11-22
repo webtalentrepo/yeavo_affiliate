@@ -337,13 +337,17 @@
                             </v-data-table>
                             <v-row class="mt-10">
                                 <v-col cols="12">
-                                    <v-pagination
+                                    <paginate
                                         v-model="c_page"
-                                        :length="c_pageCount"
-                                        :total-visible="10"
-                                        circle
-                                        color="grey darken-3"
-                                    ></v-pagination>
+                                        :page-range="5"
+                                        :margin-pages="2"
+                                        :page-count="c_pageCount"
+                                        :prev-text="'Previous'"
+                                        :next-text="'Next'"
+                                        :container-class="'custom-pagination'"
+                                        :page-class="'custom-page-item'"
+                                    >
+                                    </paginate>
                                 </v-col>
                             </v-row>
                         </v-col>
