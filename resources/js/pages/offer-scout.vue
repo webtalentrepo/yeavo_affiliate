@@ -284,7 +284,7 @@
                 transition="dialog-bottom-transition"
             >
                 <v-card class="overflow-hidden">
-                    <v-toolbar dark color="primary">
+                    <v-toolbar dark>
                         <v-btn icon dark @click="cj_dialog = false">
                             <v-icon>mdi-close</v-icon>
                         </v-btn>
@@ -333,8 +333,17 @@
                                         </div>
                                     </div>
                                 </template>
+                                <template #[`item.link`]="{ item }">
+                                    <a :href="item.link" target="_blank">{{
+                                        item.link
+                                    }}</a>
+                                </template>
                                 <template #[`item.sign_up`]="{ item }">
-                                    <a :href="item.sign_up" target="_blank"
+                                    <a
+                                        :href="item.sign_up"
+                                        target="_blank"
+                                        style="color: #363636 !important"
+                                        class="text-decoration-none v-btn v-btn--outlined v-btn--contained text-capitalize py-1 px-2"
                                         >Sign Up</a
                                     >
                                 </template>
@@ -429,18 +438,24 @@ export default {
             cj_dialog: false,
             c_headers: [
                 { text: 'Product', value: 'name', width: '35%' },
-                { text: '$ Sale', value: 'sale', width: '25%' },
+                { text: '$ Sale', value: 'sale', width: '20%' },
                 {
                     text: 'Network',
                     value: 'network',
                     sortable: false,
-                    width: '20%',
+                    width: '10%',
+                },
+                {
+                    text: 'Link',
+                    value: 'link',
+                    sortable: false,
+                    width: '25%',
                 },
                 {
                     text: 'Sign Up',
                     value: 'sign_up',
                     sortable: false,
-                    width: '20%',
+                    width: '10%',
                 },
             ],
             c_page: 1,
