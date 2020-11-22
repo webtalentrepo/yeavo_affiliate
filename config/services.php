@@ -74,6 +74,7 @@ return [
         'Can\'t you ',
         'Can\'t they ',
         'Can\'t we ',
+        'How ',
         'How do you ',
         'How can ',
         'How fast can ',
