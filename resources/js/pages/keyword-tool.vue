@@ -85,7 +85,8 @@
                             </div>
                         </template>
                         <template #[`item.trend`]="{ item }">
-                            <div>
+                            <div class="keyword-trend-area">
+                                <v-btn depressed dark small>View</v-btn>
                                 <keyword-trends
                                     :chart-data="getChartData(item.trends)"
                                 ></keyword-trends>
@@ -147,7 +148,11 @@
 
                         <v-col cols="12" md="4"></v-col>
 
-                        <v-col cols="12" md="2" class="custom-page-filter">
+                        <v-col
+                            cols="12"
+                            md="2"
+                            class="custom-page-filter align-center justify-end d-flex"
+                        >
                             <v-text-field
                                 v-model="page1"
                                 type="number"
@@ -225,24 +230,24 @@ export default {
         pageCount: 0,
         itemsPerPage: 10,
         headers: [
-            { text: 'Keyword', value: 'name', width: '36%' },
+            { text: 'Keyword', value: 'name', width: '38%' },
             {
                 text: 'Average Month',
                 value: 'month_search',
                 align: 'center',
-                width: '21%',
+                width: '27%',
             },
             {
                 text: 'Trend',
                 value: 'trend',
-                align: 'left',
-                width: '29%',
+                align: 'center',
+                width: '16%',
             },
             {
                 text: 'Competition',
                 value: 'competition_index',
                 align: 'center',
-                width: '14%',
+                width: '19%',
             },
         ],
         desserts: [],
@@ -263,6 +268,8 @@ export default {
         keyword_str1: '',
         keyword_str2: '',
         rowCount: 0,
+        selectedItem: {},
+        showTrend: false,
     }),
     created() {
         this.questionItems = this.$store.state.questions;
@@ -414,13 +421,13 @@ export default {
                 datasets: [
                     {
                         label: '',
-                        backgroundColor: 'rgba(220, 236, 255, 0.8)',
+                        backgroundColor: 'transparent',
                         data: item.value,
-                        lineTension: 0.2,
-                        pointRadius: 2,
-                        pointHoverRadius: 2,
-                        borderColor: '#3392FF',
-                        borderWidth: 1,
+                        lineTension: 0,
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        borderColor: '#363636',
+                        borderWidth: 2,
                     },
                 ],
             };

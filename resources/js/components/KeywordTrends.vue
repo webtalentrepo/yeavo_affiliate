@@ -37,8 +37,10 @@ export default {
             scales: {
                 yAxes: [
                     {
+                        display: false,
                         gridLines: {
                             color: 'transparent',
+                            drawBorder: false,
                         },
                         ticks: {
                             display: false,
@@ -47,8 +49,10 @@ export default {
                 ],
                 xAxes: [
                     {
+                        display: false,
                         gridLines: {
                             color: 'transparent',
+                            display: false,
                         },
                         ticks: {
                             display: false,

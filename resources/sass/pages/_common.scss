@@ -161,24 +161,28 @@
 }
 
 .custom-page-filter {
-    .v-text-field__slot {
-        .v-label.v-label--active.theme--light {
-            left: 39px !important;
-            font-weight: 600;
+    .theme--light.v-input {
+        max-width: 157px;
+
+        .v-text-field__slot {
+            .v-label.v-label--active.theme--light {
+                left: 39px !important;
+                font-weight: 600;
+            }
+
+            input {
+                text-align: center;
+                font-weight: 600;
+            }
         }
 
-        input {
-            text-align: center;
-            font-weight: 600;
-        }
-    }
+        .v-input__slot {
+            fieldset {
+                border: 2px solid #363636;
 
-    .v-input__slot {
-        fieldset {
-            border: 2px solid #363636;
-
-            legend {
-                text-align: center !important;
+                legend {
+                    text-align: center !important;
+                }
             }
         }
     }
@@ -262,5 +266,20 @@
                 }
             }
         }
+    }
+}
+
+.keyword-trend-area {
+    position: relative;
+
+    .theme--dark.v-btn:not(.v-btn--flat):not(.v-btn--text):not(.v-btn--outlined) {
+        position: absolute !important;
+        padding: 0 !important;
+        height: 16px !important;
+        font-size: 9px !important;
+        width: 40px !important;
+        min-width: 40px !important;
+        right: 20px;
+        top: 5px;
     }
 }

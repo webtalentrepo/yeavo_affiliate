@@ -256,7 +256,11 @@
 
                         <v-col cols="12" md="4"></v-col>
 
-                        <v-col cols="12" md="2" class="custom-page-filter">
+                        <v-col
+                            cols="12"
+                            md="2"
+                            class="custom-page-filter align-center justify-end d-flex"
+                        >
                             <v-text-field
                                 v-model="page1"
                                 type="number"
