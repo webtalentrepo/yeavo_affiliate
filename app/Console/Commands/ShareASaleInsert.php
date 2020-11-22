@@ -52,6 +52,6 @@ class ShareASaleInsert extends Command
 //            }
 //        }
 //
-//        return 0;
+        return 0;
     }
 }
