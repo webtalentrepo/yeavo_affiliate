@@ -119,33 +119,54 @@
                 </v-col>
             </v-row>
 
-            <v-row class="mt-10">
-                <v-col cols="10" md="8">
-                    <v-pagination
-                        v-model="page"
-                        :length="pageCount"
-                        :total-visible="10"
-                        class="custom-pagination"
-                        circle
-                        dark
-                        color="white"
-                    ></v-pagination>
-                </v-col>
+            <v-row justify="center">
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="content-table"
+                >
+                    <v-row class="mt-10">
+                        <v-col cols="12" md="6">
+                            <div
+                                id="custom-pagination-header"
+                                class="font-weight-bold custom-pagination-header mb-2"
+                            >
+                                Page Number
+                            </div>
+                            <paginate
+                                v-model="page"
+                                :page-range="5"
+                                :margin-pages="2"
+                                :page-count="pageCount"
+                                :prev-text="'Previous'"
+                                :next-text="'Next'"
+                                :container-class="'custom-pagination'"
+                                :page-class="'custom-page-item'"
+                                :click-handler="clickPaginate"
+                            >
+                            </paginate>
+                        </v-col>
 
-                <v-col cols="12" md="2">
-                    <v-text-field
-                        v-model="page1"
-                        type="number"
-                        label="Go to Page"
-                        width="60px"
-                        min="1"
-                        outlined
-                        dense
-                        @input="page = parseInt(page1)"
-                    ></v-text-field>
+                        <v-col cols="12" md="4"></v-col>
+
+                        <v-col cols="12" md="2" class="custom-page-filter">
+                            <v-text-field
+                                v-model="page1"
+                                type="number"
+                                label="Go to Page"
+                                width="60px"
+                                min="1"
+                                outlined
+                                dense
+                                @input="page = parseInt(page1)"
+                            ></v-text-field>
+                        </v-col>
+                    </v-row>
                 </v-col>
             </v-row>
-
             <v-row justify="center">
                 <v-col cols="12" md="12" sm="12" lg="11" xl="10"
                     >Top 10 url ranking on this keyword
@@ -187,12 +208,13 @@
 </template>
 
 <script>
+import Paginate from 'vuejs-paginate';
 import PageHeader from '../layout/users/PageHeader';
 import KeywordTrends from '../components/KeywordTrends';
 
 export default {
     name: 'KeywordTool',
-    components: { KeywordTrends, PageHeader },
+    components: { Paginate, KeywordTrends, PageHeader },
     data: () => ({
         search: '',
         search_str: '',
@@ -259,6 +281,10 @@ export default {
         this.searchStart = false;
     },
     methods: {
+        clickPaginate() {
+            this.page1 = this.page;
+            this.updatePaginate();
+        },
         clickRow(item) {
             this.search_str = item.name;
 
@@ -356,6 +382,8 @@ export default {
                         );
                     }
 
+                    this.updatePaginate();
+
                     if (this.isQuestion) {
                         this.searchStart = false;
                     } else {
@@ -395,6 +423,31 @@ export default {
                     },
                 ],
             };
+        },
+        updatePaginate() {
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    const childLength = document.querySelector(
+                        '.custom-pagination',
+                    ).childNodes.length
+                        ? Math.ceil(
+                              document.querySelector('.custom-pagination')
+                                  .childNodes.length /
+                                  2 +
+                                  2,
+                          )
+                        : 0;
+                    const countVal =
+                        this.pageCount > 6
+                            ? 140.16 + 18.91 * childLength
+                            : 253.62;
+                    document.querySelector(
+                        '#custom-pagination-header',
+                    ).style.width = `${
+                        countVal > 469.13 ? 469.13 : countVal
+                    }px`;
+                });
+            });
         },
     },
 };
