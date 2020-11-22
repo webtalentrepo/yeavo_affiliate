@@ -29,7 +29,15 @@ export default {
                 xPadding: 2,
                 titleMarginBottom: 1,
                 caretSize: 0,
-                borderWidth: 0,
+                borderWidth: 1,
+                callbacks: {
+                    labelColor: function () {
+                        return {
+                            backgroundColor: '#c3c3c3',
+                        };
+                    },
+                },
+                backgroundColor: '#ffffff',
             },
             legend: {
                 display: false,
