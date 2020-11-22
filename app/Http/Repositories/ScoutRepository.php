@@ -66,6 +66,7 @@ class ScoutRepository
         $scout->child_category = $child_category;
         $scout->full_category = $category != '[]' ? ($category . '/' . $child_category) : $child_category;
         $scout->site_id = is_array($row['Id']) ? json_encode($row['Id']) : $row['Id'];
+        $scout->program_url = '';
         $scout->popular_rank = isset($row['PopularityRank']) ? (is_array($row['PopularityRank']) ? json_encode($row['PopularityRank']) : $row['PopularityRank']) : 0;
         $scout->p_title = isset($row['Title']) ? (is_array($row['Title']) ? json_encode($row['Title']) : $row['Title']) : '';
         $scout->p_description = isset($row['Description']) ? (is_array($row['Description']) ? json_encode($row['Description']) : $row['Description']) : '';

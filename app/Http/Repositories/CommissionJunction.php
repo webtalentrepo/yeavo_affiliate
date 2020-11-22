@@ -200,6 +200,17 @@ class CommissionJunction
                 $name = $c_name;
             }
 
+            $program_url = '';
+            if (isset($row['program-url'])) {
+                if (is_array($row['program-url'])) {
+                    if (sizeof($row['program-url']) > 0) {
+                        $program_url = $row['program-url'][0];
+                    }
+                } else {
+                    $program_url = $row['program-url'];
+                }
+            }
+
             $commission = (float)$sale;
             $c_unit_ary = explode($commission, $sale);
             $c_unit = '%';
@@ -256,6 +267,7 @@ class CommissionJunction
             $scout->child_category = $child;
             $scout->full_category = $parent != '[]' ? ($parent . '/' . $child) : $child;
             $scout->site_id = is_array($aid) ? json_encode($aid) : $aid;
+            $scout->program_url = $program_url;
             $scout->popular_rank = isset($row['network-rank']) ? (is_array($row['network-rank']) ? json_encode($row['network-rank']) : $row['network-rank']) : 0;
             $scout->p_title = is_array($name) ? json_encode($name) : $name;
             $scout->p_description = is_array($c_name) ? json_encode($c_name) : $c_name;
