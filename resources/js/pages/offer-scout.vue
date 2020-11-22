@@ -139,7 +139,76 @@
                 </v-col>
             </v-row>
 
-            <v-row justify="center">
+            <v-row
+                v-if="(!desserts || !desserts.length) && search_str === ''"
+                justify="center"
+            >
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="content-table"
+                >
+                    <div class="introduce-text">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
+                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
+                        Proin tempus eros vitae sem pellentesque malesuada.
+                        Maecenas sit amet metus nec purus sodales lobortis id id
+                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
+                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
+                        consequat, non sagittis sem pellentesque. Donec non odio
+                        tristique, condimentum nibh in, commodo ipsum. In
+                        venenatis, nisi in elementum dapibus, lectus turpis
+                        luctus eros, non ultrices diam tellus eget nisi. Aenean
+                        efficitur ex vel sodales lobortis. Aenean turpis orci,
+                        pellentesque vitae congue vel, varius sed odio. Nunc
+                        dapibus quis diam nec condimentum. Maecenas tristique
+                        eros sed lacinia blandit.
+                        <br /><br />
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
+                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
+                        Proin tempus eros vitae sem pellentesque malesuada.
+                        Maecenas sit amet metus nec purus sodales lobortis id id
+                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
+                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
+                        consequat, non sagittis sem pellentesque. Donec non odio
+                        tristique, condimentum nibh in, commodo ipsum.
+                        <br /><br />
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
+                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
+                        Proin tempus eros vitae sem pellentesque malesuada.
+                        Maecenas sit amet metus nec purus sodales lobortis id id
+                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
+                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
+                        consequat, non sagittis sem pellentesque. Donec non odio
+                        tristique, condimentum nibh in, commodo ipsum.
+                    </div>
+                </v-col>
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="content-table"
+                >
+                    <div class="introduce-video">
+                        <div class="introduce-video-back">
+                            <v-icon x-large>mdi-youtube</v-icon>
+                        </div>
+                    </div>
+                </v-col>
+            </v-row>
+
+            <v-row
+                v-if="desserts && desserts.length && search_str !== ''"
+                justify="center"
+            >
                 <v-col
                     cols="12"
                     md="12"
