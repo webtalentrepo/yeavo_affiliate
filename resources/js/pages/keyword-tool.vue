@@ -126,7 +126,7 @@
             </v-row>
 
             <v-row
-                v-if="desserts && desserts.length && search_str !== ''"
+                v-show="desserts && desserts.length && search_str !== ''"
                 justify="center"
             >
                 <v-col
