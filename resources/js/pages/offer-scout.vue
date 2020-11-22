@@ -291,6 +291,11 @@
                                 {{ item.network }}
                             </div>
                         </template>
+                        <template #[`item.program_url`]="{ item }">
+                            <a :href="item.program_url" target="_blank">{{
+                                item.program_url
+                            }}</a>
+                        </template>
                         <template #[`item.sign_up`]="{ item }">
                             <a
                                 v-if="!disableMin[sel_network][2]"
