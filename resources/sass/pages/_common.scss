@@ -148,6 +148,13 @@
     .v-data-table.elevation-1 {
         box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 1px 0 rgba(0, 0, 0, 0.14), 0 0 6px 0 rgba(0, 0, 0, 0.12) !important;
     }
+
+    .v-data-table__progress {
+        .primary {
+            background-color: #363636 !important;
+            border-color: #363636 !important;
+        }
+    }
 }
 
 .refine-key-label {
@@ -281,5 +288,6 @@
         min-width: 40px !important;
         right: 20px;
         top: 5px;
+        text-transform: capitalize !important;
     }
 }

@@ -232,7 +232,7 @@
                             >
                         </template>
                     </v-data-table>
-                    <v-row class="mt-10">
+                    <v-row class="mt-6">
                         <v-col cols="12" md="6">
                             <div
                                 id="custom-pagination-header"

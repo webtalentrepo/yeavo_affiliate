@@ -77,6 +77,7 @@
                         class="elevation-1"
                         :loading="searchStart"
                         :search="search"
+                        :loader-height="3"
                         loading-text="Loading... Please wait"
                     >
                         <template #[`item.name`]="{ item }">
@@ -113,6 +114,20 @@
                         </template>
                     </v-data-table>
                 </v-col>
+                <v-col
+                    cols="12"
+                    md="12"
+                    sm="12"
+                    lg="11"
+                    xl="10"
+                    class="content-table py-0 px-0"
+                >
+                    <v-dialog v-model="showTrend" persistent max-width="600">
+                        <v-card>
+                            <v-card-text></v-card-text>
+                        </v-card>
+                    </v-dialog>
+                </v-col>
             </v-row>
 
             <v-row justify="center">
@@ -124,7 +139,7 @@
                     xl="10"
                     class="content-table"
                 >
-                    <v-row class="mt-10">
+                    <v-row>
                         <v-col cols="12" md="6">
                             <div
                                 id="custom-pagination-header"
