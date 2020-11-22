@@ -87,7 +87,13 @@
                         </template>
                         <template #[`item.trend`]="{ item }">
                             <div class="keyword-trend-area">
-                                <v-btn depressed dark small>View</v-btn>
+                                <v-btn
+                                    depressed
+                                    dark
+                                    small
+                                    @click="showTrendDialog(item)"
+                                    >View
+                                </v-btn>
                                 <keyword-trends
                                     :chart-data="getChartData(item.trends)"
                                 ></keyword-trends>
@@ -122,9 +128,71 @@
                     xl="10"
                     class="content-table py-0 px-0"
                 >
-                    <v-dialog v-model="showTrend" persistent max-width="600">
-                        <v-card>
-                            <v-card-text></v-card-text>
+                    <v-dialog
+                        v-model="showTrend"
+                        persistent
+                        max-width="600"
+                        class="custom-trend-dialog"
+                    >
+                        <v-card
+                            v-if="selectedItem"
+                            class="custom-trend-dialog-card"
+                        >
+                            <div class="close-btn-area">
+                                <div
+                                    class="close-dialog"
+                                    @click="closeTrendDialog"
+                                >
+                                    (&times;)Close
+                                </div>
+                            </div>
+                            <div class="chart-axis-label">
+                                <div class="y-axis-label">
+                                    <div>Monthly</div>
+                                    <div>Volume</div>
+                                </div>
+                                <div class="x-axis-label">Date</div>
+                            </div>
+                            <div
+                                style="
+                                    height: 470px;
+                                    margin-top: 30px;
+                                    padding-left: 19px;
+                                    z-index: 3;
+                                    position: relative;
+                                "
+                            >
+                                <dialog-trends
+                                    :chart-data="
+                                        getDialogChatData(selectedItem.trends)
+                                    "
+                                ></dialog-trends>
+                            </div>
+                            <v-card-text v-if="selectedItem">
+                                <div class="border-card-text">
+                                    {{ selectedItem.name }} |
+                                    <span class="font-italic">{{
+                                        selectedItem.month
+                                    }}</span>
+                                    <span
+                                        :class="{
+                                            'light-green--text':
+                                                selectedItem.competition_index <=
+                                                40,
+                                            'amber--text':
+                                                selectedItem.competition_index >
+                                                    40 &&
+                                                selectedItem.competition_index <=
+                                                    68,
+                                            'red--text':
+                                                selectedItem.competition_index >
+                                                68,
+                                        }"
+                                    >
+                                        | {{ selectedItem.competition_index }}
+                                    </span>
+                                </div>
+                            </v-card-text>
                         </v-card>
                     </v-dialog>
                 </v-col>
@@ -232,10 +300,11 @@
 import Paginate from 'vuejs-paginate';
 import PageHeader from '../layout/users/PageHeader';
 import KeywordTrends from '../components/KeywordTrends';
+import DialogTrends from '../components/DialogTrends';
 
 export default {
     name: 'KeywordTool',
-    components: { Paginate, KeywordTrends, PageHeader },
+    components: { Paginate, KeywordTrends, DialogTrends, PageHeader },
     data: () => ({
         search: '',
         search_str: '',
@@ -283,7 +352,7 @@ export default {
         keyword_str1: '',
         keyword_str2: '',
         rowCount: 0,
-        selectedItem: {},
+        selectedItem: null,
         showTrend: false,
     }),
     created() {
@@ -304,6 +373,14 @@ export default {
         this.searchStart = false;
     },
     methods: {
+        showTrendDialog(item) {
+            this.selectedItem = item;
+            this.showTrend = true;
+        },
+        closeTrendDialog() {
+            this.showTrend = false;
+            this.selectedItem = null;
+        },
         clickPaginate() {
             this.page1 = this.page;
             this.updatePaginate();
@@ -443,6 +520,23 @@ export default {
                         pointHoverRadius: 0,
                         borderColor: '#363636',
                         borderWidth: 2,
+                    },
+                ],
+            };
+        },
+        getDialogChatData(item) {
+            return {
+                labels: item.name,
+                datasets: [
+                    {
+                        label: '',
+                        backgroundColor: 'transparent',
+                        data: item.value,
+                        lineTension: 0,
+                        pointRadius: 4,
+                        pointHoverRadius: 4,
+                        borderColor: '#c3c3c3',
+                        borderWidth: 4,
                     },
                 ],
             };
