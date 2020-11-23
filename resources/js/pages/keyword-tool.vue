@@ -267,7 +267,10 @@
                 </v-col>
             </v-row>
 
-            <v-row justify="center">
+            <v-row
+                v-show="desserts && desserts.length && search_str !== ''"
+                justify="center"
+            >
                 <v-col
                     cols="12"
                     md="12"
@@ -319,7 +322,10 @@
                     </v-row>
                 </v-col>
             </v-row>
-            <v-row justify="center">
+            <v-row
+                v-show="desserts && desserts.length && search_str !== ''"
+                justify="center"
+            >
                 <v-col
                     cols="12"
                     md="12"
@@ -330,7 +336,10 @@
                     >Top 10 URL's Ranking on this Keyword
                 </v-col>
             </v-row>
-            <v-row justify="center">
+            <v-row
+                v-show="desserts && desserts.length && search_str !== ''"
+                justify="center"
+            >
                 <v-col
                     cols="12"
                     md="12"
