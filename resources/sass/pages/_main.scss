@@ -58,7 +58,7 @@ html {
 .v-text-field.v-text-field--solo:not(.v-text-field--solo-flat) > .v-input__control > .v-input__slot,
 .v-btn--contained, .v-btn--outlined {
     border: 2px solid #f3f3f3 !important;
-    box-shadow: none;
+    box-shadow: none !important;
     border-radius: 4px !important;
 }
 
