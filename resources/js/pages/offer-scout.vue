@@ -152,41 +152,25 @@
                     class="content-table"
                 >
                     <div class="introduce-text">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
-                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
-                        Proin tempus eros vitae sem pellentesque malesuada.
-                        Maecenas sit amet metus nec purus sodales lobortis id id
-                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
-                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
-                        consequat, non sagittis sem pellentesque. Donec non odio
-                        tristique, condimentum nibh in, commodo ipsum. In
-                        venenatis, nisi in elementum dapibus, lectus turpis
-                        luctus eros, non ultrices diam tellus eget nisi. Aenean
-                        efficitur ex vel sodales lobortis. Aenean turpis orci,
-                        pellentesque vitae congue vel, varius sed odio. Nunc
-                        dapibus quis diam nec condimentum. Maecenas tristique
-                        eros sed lacinia blandit.
+                        With Offer Scout you can quickly and easily sift through
+                        100,000+ affiliate offers and find the highest
+                        converting offers to promote on your affiliate sites. It
+                        sounds trivial, but a high converting affiliate offer is
+                        the key between making table scraps and hefty living
+                        online.
                         <br /><br />
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
-                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
-                        Proin tempus eros vitae sem pellentesque malesuada.
-                        Maecenas sit amet metus nec purus sodales lobortis id id
-                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
-                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
-                        consequat, non sagittis sem pellentesque. Donec non odio
-                        tristique, condimentum nibh in, commodo ipsum.
+                        How does it work? Offer Scout uses custom algorithms to
+                        queue up major affiliate networks and sift through their
+                        data including popularity, EPC, commission rates,
+                        average sale costs, and more to determine the best
+                        offers to promote for any given keyword. This is
+                        internet marketing nerd speak for "our tool with make
+                        you much more money while you haven't to do much less
+                        work". A lazy person's dream!
                         <br /><br />
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
-                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
-                        Proin tempus eros vitae sem pellentesque malesuada.
-                        Maecenas sit amet metus nec purus sodales lobortis id id
-                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
-                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
-                        consequat, non sagittis sem pellentesque. Donec non odio
-                        tristique, condimentum nibh in, commodo ipsum.
+                        So let's get started. Enter your niche keyword in the
+                        search box above, and let our tool start working it's
+                        magic!
                     </div>
                 </v-col>
                 <v-col
