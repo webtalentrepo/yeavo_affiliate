@@ -5,14 +5,10 @@
 
             <v-row justify="center" class="search-box-row">
                 <v-col cols="8">
-                    <v-combobox
+                    <v-text-field
                         v-model="search_str"
-                        :items="questionItems"
-                        value="search_str"
-                        label="Search"
                         solo
-                        hide-no-data
-                        hide-selected
+                        label="Search"
                         @keyup.enter="clickData"
                         @click:append="clickData"
                     >
@@ -24,7 +20,27 @@
                                 @click="clickData"
                             />
                         </template>
-                    </v-combobox>
+                    </v-text-field>
+                    <!--                    <v-combobox-->
+                    <!--                        v-model="search_str"-->
+                    <!--                        :items="questionItems"-->
+                    <!--                        value="search_str"-->
+                    <!--                        label="Search"-->
+                    <!--                        solo-->
+                    <!--                        hide-no-data-->
+                    <!--                        hide-selected-->
+                    <!--                        @keyup.enter="clickData"-->
+                    <!--                        @click:append="clickData"-->
+                    <!--                    >-->
+                    <!--                        <template #append>-->
+                    <!--                            <img-->
+                    <!--                                src="/assets/menu-icons/search.png"-->
+                    <!--                                alt=""-->
+                    <!--                                class="append-icon cursor-pointer"-->
+                    <!--                                @click="clickData"-->
+                    <!--                            />-->
+                    <!--                        </template>-->
+                    <!--                    </v-combobox>-->
                 </v-col>
             </v-row>
             <v-row justify="center" align="center">
