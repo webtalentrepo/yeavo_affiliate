@@ -88,41 +88,25 @@
                     class="content-table"
                 >
                     <div class="introduce-text">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
-                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
-                        Proin tempus eros vitae sem pellentesque malesuada.
-                        Maecenas sit amet metus nec purus sodales lobortis id id
-                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
-                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
-                        consequat, non sagittis sem pellentesque. Donec non odio
-                        tristique, condimentum nibh in, commodo ipsum. In
-                        venenatis, nisi in elementum dapibus, lectus turpis
-                        luctus eros, non ultrices diam tellus eget nisi. Aenean
-                        efficitur ex vel sodales lobortis. Aenean turpis orci,
-                        pellentesque vitae congue vel, varius sed odio. Nunc
-                        dapibus quis diam nec condimentum. Maecenas tristique
-                        eros sed lacinia blandit.
+                        With QuestionTail you can quickly peer right into the
+                        heart of Google and cherry pick the most easy to rank
+                        for keywords that also convert into more cash in hand
+                        for you.
                         <br /><br />
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
-                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
-                        Proin tempus eros vitae sem pellentesque malesuada.
-                        Maecenas sit amet metus nec purus sodales lobortis id id
-                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
-                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
-                        consequat, non sagittis sem pellentesque. Donec non odio
-                        tristique, condimentum nibh in, commodo ipsum.
+                        Our tool is specifically designed around "long tail"
+                        question-based keywords. Keyword phrases like How to __,
+                        or How do I ___, or What are ways to ____, are some of
+                        those most profitable phrases for affiliate marketers.
+                        Why? Because you know exactly what the person wants and
+                        because often they are 8 or 9 keywords long they are
+                        "hidden in plain sight". QuestionTail helps you uncover
+                        those keyword phrases and ranks them accordingly by
+                        competition levels. This way you can hone in on easy to
+                        medium difficulty keywords and start profiting from and
+                        the shortest time possible!
                         <br /><br />
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        Vivamus sed magna quam. Vivamus consectetur lacinia mi,
-                        et tincidunt tortor. Aenean aliquet sollicitudin tempus.
-                        Proin tempus eros vitae sem pellentesque malesuada.
-                        Maecenas sit amet metus nec purus sodales lobortis id id
-                        dui. Etiam eu luctus ligula. Curabitur blandit lectus
-                        quis odio rutrum gravida. Etiam posuere lorem vel nisi
-                        consequat, non sagittis sem pellentesque. Donec non odio
-                        tristique, condimentum nibh in, commodo ipsum.
+                        Start your data search now but entering your root
+                        keyword phrase in the search box above, then hit enter!
                     </div>
                 </v-col>
                 <v-col
