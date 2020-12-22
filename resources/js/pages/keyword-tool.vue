@@ -75,10 +75,7 @@
                 </v-col>
             </v-row>
 
-            <v-row
-                v-if="(!desserts || !desserts.length) && search_str === ''"
-                justify="center"
-            >
+            <v-row v-if="first_loaded" justify="center">
                 <v-col
                     cols="12"
                     md="12"
@@ -125,10 +122,7 @@
                 </v-col>
             </v-row>
 
-            <v-row
-                v-show="desserts && desserts.length && search_str !== ''"
-                justify="center"
-            >
+            <v-row v-show="!first_loaded" justify="center">
                 <v-col
                     cols="12"
                     md="12"
@@ -267,10 +261,7 @@
                 </v-col>
             </v-row>
 
-            <v-row
-                v-show="desserts && desserts.length && search_str !== ''"
-                justify="center"
-            >
+            <v-row v-show="!first_loaded" justify="center">
                 <v-col
                     cols="12"
                     md="12"
@@ -322,10 +313,7 @@
                     </v-row>
                 </v-col>
             </v-row>
-            <v-row
-                v-show="desserts && desserts.length && search_str !== ''"
-                justify="center"
-            >
+            <v-row v-show="!first_loaded" justify="center">
                 <v-col
                     cols="12"
                     md="12"
@@ -384,6 +372,7 @@ export default {
     name: 'KeywordTool',
     components: { Paginate, KeywordTrends, DialogTrends, PageHeader },
     data: () => ({
+        first_loaded: true,
         search: '',
         search_str: '',
         searchStart: false,
@@ -560,6 +549,7 @@ export default {
             this.$http
                 .post('/keyword-data', params)
                 .then((r) => {
+                    this.first_loaded = false;
                     if (r.data.result && r.data.result.length) {
                         this.desserts = this.desserts.concat(r.data.result);
                         this.rowCount += r.data.pageCount;

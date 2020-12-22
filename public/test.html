@@ -1,0 +1,97 @@
+<script>
+    var mainProd = '2677304';
+    var promoProd = '2798253';
+    var mainProd2 = '2805499';
+    var promoProd2 = '3223590';
+
+    var promoCodes = ['BLACK']; //this should always be uppercase
+    //var head = '<div class="de elHeadlineWrapper de-editable" id="headline-72651" data-de-type="headline" data-de-editing="false" data-title="headline" data-ce="true" data-trigger="none" data-animate="fade" data-delay="500" style="margin-top: 20px; cursor: pointer; outline: none; display: block;"><div class="ne elHeadline lh3 elMargin0 elBGStyle0 hsTextShadow0 elFont_raleway hsSize27" style="text-align: left;" data-bold="inherit" contenteditable="false"><b>Have a Promo Code?</b></div></div>';
+    var head = '';
+    var field = '<input type="text" id="promo_code" name="promo_code" placeholder="Enter promo code..." class="elInput elInput100 elAlign_left elInputSmall elInputStyl0 elInputBG1 elInputBR5 elInputI0 elInputIBlack elInputIRight elInputStyle1 elInputSmall garlic-auto-save" style="text-transform:uppercase"/>';
+    $(document).ready(function () {
+        $('.elOrderProductOptions').last().after(head + field);
+        var mainProdRadio = $('.elOrderProductOptinProductName [value=' + mainProd + ']');
+        var promoProdRadio = $('.elOrderProductOptinProductName [value=' + promoProd + ']');
+        var mainProdRadio1 = $('.elOrderProductOptinProductName [value=' + mainProd2 + ']');
+        var promoProdRadio1 = $('.elOrderProductOptinProductName [value=' + promoProd2 + ']');
+        var elProductName = $('.elOrderProductOptinProductName');
+
+        var promoCodeInput = $('#promo_code');
+
+        promoProdRadio.closest('.elOrderProductOptinProducts').hide();
+        promoProdRadio1.closest('.elOrderProductOptinProducts').hide();
+        promoCodeInput.val('');
+
+        function hideShowItem(main, promo, main1, promo1, show) {
+            elProductName.removeClass('activeRadioProduct');
+            if (show) {
+                promo.click();
+                promo.parent().addClass('activeRadioProduct');
+                promo.closest('.elOrderProductOptinProducts').show();
+                main.closest('.elOrderProductOptinProducts').hide();
+            } else {
+                main.click();
+                main.parent().addClass('activeRadioProduct');
+                main.closest('.elOrderProductOptinProducts').show();
+                promo.closest('.elOrderProductOptinProducts').hide();
+            }
+
+            main1.closest('.elOrderProductOptinProducts').show();
+            promo1.closest('.elOrderProductOptinProducts').hide();
+        }
+
+        function eventSwitchItem() {
+            var show = $.inArray(promoCodeInput.val().toUpperCase(), promoCodes) > -1;
+
+            if (mainProdRadio.prop('checked') || promoProdRadio.prop('checked')) {
+                hideShowItem(mainProdRadio, promoProdRadio, mainProdRadio1, promoProdRadio1, show);
+            } else if (mainProdRadio1.prop('checked') || promoProdRadio1.prop('checked')) {
+                hideShowItem(mainProdRadio1, promoProdRadio1, mainProdRadio, promoProdRadio, show);
+            }
+        }
+
+        promoCodeInput.on('keyup', function (ev) {
+            if (ev.keyCode !== 13) {
+                var promoCodeVal = promoCodeInput.val().toUpperCase();
+                promoCodeVal = promoCodeVal.trim();
+                promoCodeVal = promoCodeVal.replace(/ /g, '');
+                promoCodeInput.val(promoCodeVal);
+            }
+
+            eventSwitchItem();
+        });
+
+        elProductName.on('mousedown', function (e) {
+            var radio = $(this).find('input[type="radio"]');
+            if (radio.val() === mainProd || radio.val() === promoProd) {
+                mainProdRadio1.closest('.elOrderProductOptinProducts').show();
+                promoProdRadio1.closest('.elOrderProductOptinProducts').hide();
+            } else if ($(this).val() === mainProd2 || $(this).val() === promoProd2) {
+                mainProdRadio.closest('.elOrderProductOptinProducts').show();
+                promoProdRadio.closest('.elOrderProductOptinProducts').hide();
+            }
+
+            if ($(this).val() === mainProd || $(this).val() === mainProd2) {
+                promoCodeInput.val('');
+            }
+        });
+
+        $('.elOrderProductOptinProductName input[type="radio"]').on('mousedown', function (e) {
+            if ($(this).val() === mainProd || $(this).val() === promoProd) {
+                mainProdRadio1.closest('.elOrderProductOptinProducts').show();
+                promoProdRadio1.closest('.elOrderProductOptinProducts').hide();
+            } else if ($(this).val() === mainProd2 || $(this).val() === promoProd2) {
+                mainProdRadio.closest('.elOrderProductOptinProducts').show();
+                promoProdRadio.closest('.elOrderProductOptinProducts').hide();
+            }
+
+            if ($(this).val() === mainProd || $(this).val() === mainProd2) {
+                promoCodeInput.val('');
+            }
+        });
+    });
+
+    window.onload = function () {
+        $('#promo_code').val('');///////
+    }
+</script>

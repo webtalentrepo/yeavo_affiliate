@@ -139,10 +139,7 @@
                 </v-col>
             </v-row>
 
-            <v-row
-                v-if="(!desserts || !desserts.length) && search_str === ''"
-                justify="center"
-            >
+            <v-row v-if="first_loaded" justify="center">
                 <v-col
                     cols="12"
                     md="12"
@@ -189,10 +186,7 @@
                 </v-col>
             </v-row>
 
-            <v-row
-                v-show="desserts && desserts.length && search_str !== ''"
-                justify="center"
-            >
+            <v-row v-show="!first_loaded" justify="center">
                 <v-col
                     cols="12"
                     md="12"
@@ -448,6 +442,7 @@ export default {
     },
     data() {
         return {
+            first_loaded: true,
             search_str: '',
             sale_min: '',
             sale_max: '',
@@ -619,6 +614,7 @@ export default {
                         // console.log(r)
                         this.desserts = r.data.rows;
                         this.pageCount = r.data.pageCount;
+                        this.first_loaded = false;
 
                         this.updatePaginate();
                     }

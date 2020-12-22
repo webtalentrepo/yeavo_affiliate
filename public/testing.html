@@ -1,0 +1,238 @@
+<script>
+    // DO NOT EDIT //
+    window.cfpt = window.cfpt || {};
+    window.cfpt.promoCodePro = window.cfpt.promoCodePro || {};
+    // END DO NOT EDIT //
+    // CONFIGURATION SECTION //
+    //set to true to only show input field when URL param ?pcon=1 exists
+    window.cfpt.promoCodePro.onlyOnFlag = false;
+    //configure with your product IDs and codes
+    window.cfpt.promoCodePro.promos = [{
+        'codes': [‘BLACK’, ‘BLACK3'],
+    'regular': ['2677304', '2805499'],
+        'promo': ['2798253', '3223590'],
+        'description': 'You saved $500!'
+    },
+    {
+        'codes': ['ANOTHERCODE'],
+        'regular': ['123456'],
+        'promo': ['123458'],
+        'selectAfter': '123458',
+        'description': 'Happy President\'s Day',
+        'expires': '2018-02-21 10-0500'
+    }
+    ];
+    // END CONFIGURATION SECTION //
+</script>
+<script>
+    /**************************
+     * Copyright 2018 CF Pro Tools, All Rights Reserved
+     * Do not share, or distribute this code without author's consent.
+     * This copyright notice must remain in place whenever using
+     * this code - DO NOT REMOVE
+     * Author: Jaime Smith
+     * Website: https://cfprotools.com
+     **************************/
+    window.cfpt = window.cfpt || {};
+    window.cfpt.promoCodePro = window.cfpt.promoCodePro || {};
+    var onlyOnFlag = window.cfpt.promoCodePro.onlyOnFlag || false;
+    var promos = window.cfpt.promoCodePro.promos || [];
+    var promoFlag = getURLParameter('pcon');
+    var promoEnabled = false;
+    if (onlyOnFlag === false) {
+        promoEnabled = true;
+    } else if (promoFlag && promoFlag !== 'null' && promoFlag !== '0') {
+        promoEnabled = true;
+    }
+    var passedPromo = getURLParameter('promo');
+    var promoCodes = [];
+    var allPromoProds = [];
+    var allMainProds = [];
+    $.each(promos, function(index, value) {
+        var currCodes = value.codes;
+        var currPromoProds = value.promo;
+        var currMainProds = value.regular;
+        if (currCodes) {
+            promoCodes = promoCodes.concat(currCodes);
+        }
+        if (currPromoProds) {
+            allPromoProds = allPromoProds.concat(currPromoProds);
+        }
+        if (currMainProds) {
+            allMainProds = allMainProds.concat(currMainProds);
+        }
+    });
+    //convert codes to upper
+    promoCodes = promoCodes.map(function(x) {
+        return x.toUpperCase();
+    });
+    allMainProds = _.uniq(allMainProds);
+    allPromoProds = _.uniq(allPromoProds);
+    $(function() {
+        $('[data-de-type="orpo"]').hide();
+//hide promo products by default
+        $.each(allPromoProds, function(index, value) {
+            $('.elOrderProductOptinProductName [value=' + value + ']').closest('.elOrderProductOptinProducts').hide();
+        });
+        $('[data-de-type="orpo"]').show();
+    });
+    $(function() {
+        var applyButton = $('<span/>', {
+            'class': 'input-group-addon cf-promo-apply',
+            text: 'Apply'
+        });
+        $('[data-title*="cf-promo-input"] input').wrap('<div class="input-group"></div>');
+        $('[data-title*="cf-promo-input"] .input-group').append(applyButton);
+        $('[data-title*="cf-promo-input"]').append($('<div/>', {
+            'class': 'cf-promo-status form-control-feedback elAlign_right',
+            text: ''
+        }));
+        if (promoEnabled) {
+            if ($('.o2step_wrapper').length) {
+                $('.elOrderProductOptions').first().attr('data-de-type', 'orpo').before($('[data-title="cf-promo-headline"], [data-title*="cf-promo-input"]').show());
+            } else {
+                $('[data-title="cf-promo-headline"], [data-title*="cf-promo-input"]').show();
+            }
+            if (passedPromo && passedPromo !== 'null') {
+                $('[data-title*="cf-promo-input"] input').val(passedPromo);
+                $('[data-title*="cf-promo-input"] input').garlic('onRetrieve', function() {
+                    return false;
+                });
+                cfCheckPromoCode();
+            }
+        }
+        $('[data-title*="cf-promo-input"] input').on('keypress', function(e) {
+            if (e.which == 13) {
+                if ($(this).val()) {
+                    cfCheckPromoCode();
+                }
+            }
+        });
+        $('[data-title*="cf-promo-input"] input').on('blur', function(e) {
+            if ($(this).val()) {
+                cfCheckPromoCode();
+            }
+        });
+        $('.cf-promo-apply').on('click', function(ev) {
+            $('[data-title*="cf-promo-input"] input').blur();
+        });
+    });
+    function cfCheckPromoCode() {
+        var applied = false;
+        var mainProds = [];
+        var promoProds = [];
+        var description = '';
+        var promoEntered = $('[data-title="cf-promo-input"] input').val().toUpperCase();
+        var promoInputName = $('[data-title="cf-promo-input"] input').attr('data-custom-type');
+        var cfARpromoField = $('#cfAR input[name="' + promoInputName + '"]').first();
+        if (cfARpromoField.length > 0) {
+            cfARpromoField.val(promoEntered);
+        } else {
+            $('#cfAR').append($('<input>', {
+                type: 'text',
+                name: promoInputName,
+                value: promoEntered
+            }));
+        }
+        if ($.inArray(promoEntered, promoCodes) > -1) {
+//find the obj that contains the code
+            var promo = {};
+            var expires = null;
+            var affiliate_id = null;
+            var selectAfter = null;
+            $.each(promos, function(index, value) {
+                var currCodes = value.codes;
+                currCodes = currCodes.map(function(x) {
+                    return x.toUpperCase();
+                });
+                if (currCodes.indexOf(promoEntered) > -1) {
+                    mainProds = value.regular;
+                    promoProds = value.promo;
+                    description = value.description;
+                    selectAfter = value.selectAfter;
+                    if (value.expires) {
+                        expires = moment(value.expires);
+                    }
+                    if (value.affiliate_id) {
+                        affiliate_id = value.affiliate_id;
+                    }
+                    return false;
+                }
+            });
+            var expired = (expires && expires.isBefore(moment())) ? true : false;
+            if (!expired) {
+//hide all main price product options
+                $.each(mainProds, function(index, value) {
+                    $('.elOrderProductOptinProductName #pid-' + value).closest('.elOrderProductOptinProducts').hide(400);
+                });
+//hide all promo prods in case another code was entered previously
+                $.each(allPromoProds, function(index, value) {
+                    $('.elOrderProductOptinProductName #pid-' + value).closest('.elOrderProductOptinProducts').hide();
+                });
+//show all promo products
+                $.each(promoProds, function(index, value) {
+                    $('.elOrderProductOptinProductName [value="' + value + '"]').closest('.elOrderProductOptinProducts').show(400);
+//trigger click on first promo prod option
+                    if (index == 0) {
+                        $('.elOrderProductOptinProductName #pid-' + value).trigger("click");
+                    }
+                    if (value.selectAfter != null) {
+                        $('.elOrderProductOptinProductName #pid-' + value.selectAfter).trigger("click");
+                    }
+                });
+                if (affiliate_id) {
+                    $('#cfAR input[name="contact[affiliate_id]"]').val(affiliate_id);
+                    $('#cfAR input[name="contact[aff_sub]"]').val('promo');
+                    $('#cfAR input[name="contact[aff_sub2]"]').val(promoEntered);
+                }
+                applied = true;
+            }
+        } else {
+//hide all promo price product options
+            $.each(allPromoProds, function(index, value) {
+                $('.elOrderProductOptinProductName #pid-' + value).closest('.elOrderProductOptinProducts').hide(400);
+            });
+//show all main products
+            $.each(allMainProds, function(index, value) {
+                $('.elOrderProductOptinProductName #pid-' + value).closest('.elOrderProductOptinProducts').show(400);
+//trigger click on first main prod option
+                if (index == 0) {
+                    $('.elOrderProductOptinProductName #pid-' + value).trigger("click");
+                }
+            });
+            applied = false;
+        }
+        if (applied) {
+            var appliedText = 'Code Applied';
+            if (description) {
+                appliedText = description;
+            }
+            $('[data-title*="cf-promo-input"]').removeClass('has-warning').addClass('has-success').find('.cf-promo-status').html(appliedText);
+            $('[data-title="cf-promo-input"] input').attr('placeholder', 'Code Applied: ' + promoEntered).val('');
+        } else {
+            var warnString = (expired) ? 'Code Expired!' : 'No Such Code!';
+            $('[data-title*="cf-promo-input"]').removeClass('has-success').addClass('has-warning').find('.cf-promo-status').html(warnString);
+            $('[data-title="cf-promo-input"] input').attr('placeholder', warnString).val('');
+        }
+        return applied;
+    }
+</script>
+<style>
+    .cf-promo-apply:hover {
+        cursor: pointer;
+    }
+    [data-title*="cf-promo-input"] input.elInput {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    }
+    .o2step_wrapper [data-title*="cf-promo-input"] .elInput {
+        margin-top: 0;
+    }
+    .o2step_wrapper [data-de-type="orpo"] {
+        margin-top: 20px;
+    }
+    span.cf-promo-apply {
+        display: table-cell !important;
+    }
+</style>
