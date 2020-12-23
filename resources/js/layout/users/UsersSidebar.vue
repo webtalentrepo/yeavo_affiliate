@@ -133,13 +133,6 @@ export default {
             margin-right: 8px;
             height: 32px;
         }
-
-        /*&__content {*/
-        /*    .v-list-item__title {*/
-        /*        font-size: 1rem;*/
-        /*        font-weight: 100;*/
-        /*    }*/
-        /*}*/
     }
 }
 </style>

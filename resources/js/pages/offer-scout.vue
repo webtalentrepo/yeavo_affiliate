@@ -596,6 +596,7 @@ export default {
             }
 
             this.searchStart = true;
+            this.first_loaded = false;
             const params = {
                 search_str: this.search_str,
                 sel_network: this.sel_network,

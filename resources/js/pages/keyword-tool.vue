@@ -538,6 +538,8 @@ export default {
                 return;
             }
 
+            this.first_loaded = false;
+
             this.searchStart = true;
             const params = {
                 search_str: this.keyword_str2,
