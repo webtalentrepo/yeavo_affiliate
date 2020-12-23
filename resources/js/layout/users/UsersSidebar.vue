@@ -25,6 +25,7 @@
                     :key="item.title"
                     link
                     :to="item.link"
+                    :class="{ 'locked-item': item.locked }"
                 >
                     <v-list-item-icon>
                         <img :src="`/assets/menu-icons/${item.icon}`" alt="" />
@@ -84,6 +85,8 @@ export default {
 <style lang="scss">
 .app-sidebar {
     .v-list-item__content {
+        padding: 5px 0 15px;
+
         .v-list-item__subtitle {
             font-style: italic;
             font-size: 0.75rem;
@@ -100,20 +103,22 @@ export default {
             display: none;
         }
 
-        &:after {
-            content: ' ';
-            width: 10px;
-            height: 10px !important;
-            color: #363636;
-            background: black;
-            border: 0;
-            border-radius: 10px;
-            line-height: 10px;
-            position: absolute;
-            top: 20px;
-            right: 35px;
-            max-height: 10px;
-            min-height: 10px;
+        &:not(.locked-item) {
+            &:after {
+                content: ' ';
+                width: 10px;
+                height: 10px !important;
+                color: #363636;
+                background: black;
+                border: 0;
+                border-radius: 10px;
+                line-height: 10px;
+                position: absolute;
+                top: 20px;
+                right: 35px;
+                max-height: 10px;
+                min-height: 10px;
+            }
         }
     }
 
