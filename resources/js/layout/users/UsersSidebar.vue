@@ -27,13 +27,16 @@
                     :to="item.link"
                 >
                     <v-list-item-icon>
-                        <!--                        <v-icon>{{ item.icon }}</v-icon>-->
                         <img :src="`/assets/menu-icons/${item.icon}`" alt="" />
                     </v-list-item-icon>
 
                     <v-list-item-content>
                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                     </v-list-item-content>
+
+                    <v-list-item-icon v-if="item.locked">
+                        <v-icon size="18" color="#363636">mdi-lock</v-icon>
+                    </v-list-item-icon>
                 </v-list-item>
 
                 <v-list-item v-if="user" link to="/logout">
@@ -108,7 +111,7 @@ export default {
             line-height: 10px;
             position: absolute;
             top: 20px;
-            right: 25px;
+            right: 35px;
             max-height: 10px;
             min-height: 10px;
         }
