@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Repositories\UsersRepository;
 use App\User;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class KajabiController extends Controller
@@ -17,14 +18,18 @@ class KajabiController extends Controller
         $this->hasher = $hasher;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             $inputData = json_decode(file_get_contents('php://input'), true);
-
             Log::info(json_encode($inputData));
 
-            if (isset($inputData['event']) && isset($inputData['payload']) && $inputData['event'] == 'purchase.created') {
+            if (!$inputData || !isset($inputData)) {
+                $inputData = $request->all();
+            }
+
+            if (isset($inputData['event']) && isset($inputData['payload'])) {
+                // && $inputData['event'] == 'purchase.created'
                 $payload = $inputData['payload'];
 
                 $email = $payload['member_email'];
