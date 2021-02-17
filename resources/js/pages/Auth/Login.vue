@@ -65,7 +65,7 @@
                             <span>Don't have an account,</span>
                             <router-link
                                 class="ml-1 black--text text-decoration-underline"
-                                to="/register"
+                                to="/deadbeatregister"
                                 >Sign Up Here
                             </router-link>
                         </v-row>

@@ -54,7 +54,7 @@ const auth_routes = [
         },
     },
     {
-        path: '/register',
+        path: '/deadbeatregister',
         name: 'Register',
         component: Register,
         meta: {
