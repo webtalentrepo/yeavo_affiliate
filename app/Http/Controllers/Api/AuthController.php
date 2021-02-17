@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Lcobucci\JWT\Parser;
+use Stripe\StripeClient;
 
 class AuthController extends Controller
 {
@@ -252,33 +253,52 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-//        $user = new User();
-        $user = User::where('email', $request->input('email'))->first();
-        if (!$user) {
-            $user = new User();
+        // check user in the stripe
+        $stripe = new StripeClient(
+            env('STRIPE_SECRET')
+        );
+        $customer = $stripe->customers->all(['limit' => 1, 'email' => strtolower($request->input('email'))]);
+        if ($customer) {
+            $customer = json_decode($customer, true);
+
+            if ($customer && isset($customer['data']) && isset($customer['data']['email']) && !is_null($customer['data']['email'])) {
+                $user = User::where('email', $request->input('email'))->first();
+                $exist = true;
+                if (!$user) {
+                    $user = new User();
+                    $exist = false;
+                }
+                $user->name = $request->input('name');
+                $user->email = $request->input('email');
+                $user->password = $this->hasher->make($request->input('password'));
+                $user->save();
+
+                if (!$exist) {
+                    $userRepo = new UsersRepository();
+                    $userRepo->createFreeUserDetails($user, $request->input('password'));
+                }
+
+                $tokenObject = $this->createTokenForUser($user);
+
+                $user = new UserResource($user);
+
+                return response()->json([
+                    'accessToken' => $tokenObject->accessToken,
+                    'expiresIn'   => $tokenObject->token->expires_at->diffInSeconds(now()),
+                    'email'       => $user->email,
+                    'name'        => $user->name,
+                    'id'          => $user->id,
+                    'userInfo'    => $user,
+                    'isAdmin'     => checkSupperAdmin($user->email),
+                    'result'      => 'success'
+                ], 200);
+            }
         }
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->password = $this->hasher->make($request->input('password'));
-        $user->save();
-
-//        $userRepo = new UsersRepository();
-//        $userRepo->createFreeUserDetails($user, $request->input('password'));
-
-        $tokenObject = $this->createTokenForUser($user);
-
-        $user = new UserResource($user);
 
         return response()->json([
-            'accessToken' => $tokenObject->accessToken,
-            'expiresIn'   => $tokenObject->token->expires_at->diffInSeconds(now()),
-            'email'       => $user->email,
-            'name'        => $user->name,
-            'id'          => $user->id,
-            'userInfo'    => $user,
-            'isAdmin'     => checkSupperAdmin($user->email),
-            'result'      => 'success'
-        ], 200);
+            'result' => 'error',
+            'message' => 'Not exist customer!'
+        ]);
     }
 
     public function getUserByActivateToken(Request $request)
