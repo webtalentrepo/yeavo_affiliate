@@ -25,7 +25,7 @@
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.1",
         "predis/predis": "^1.1",
-        "stripe/stripe-php": "^7.73",
+        "stripe/stripe-php": "^7.74",
         "symfony/http-foundation": "^5.1",
         "webjeyros/bing-webmaster-api": "dev-master",
         "yajra/laravel-datatables": "^1.5"
