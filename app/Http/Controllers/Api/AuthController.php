@@ -254,9 +254,7 @@ class AuthController extends Controller
         ]);
 
         // check user in the stripe
-        $stripe = new StripeClient(
-            env('STRIPE_SECRET')
-        );
+        $stripe = new StripeClient(config('services.stripe.secret'));
         $customer = $stripe->customers->all(['limit' => 1, 'email' => strtolower($request->input('email'))]);
         if ($customer) {
             $customer = json_decode($customer, true);

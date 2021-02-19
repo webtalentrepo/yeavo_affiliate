@@ -30,6 +30,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
+
     'passport' => [
         'login_end_point'        => env('PASSPORT_LOGIN_ENDPOINT'),
         'login_client_end_point' => env('PASSPORT_CLIENT_ENDPOINT'),
