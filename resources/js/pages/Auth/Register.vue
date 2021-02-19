@@ -109,9 +109,9 @@
                             class="ml-0 mr-0"
                         >
                             <v-btn
-                                class="mr-4"
+                                class="mr-4 text-capitalize"
                                 light
-                                color="white"
+                                outlined
                                 @click="submit"
                                 >Sign Up
                             </v-btn>
