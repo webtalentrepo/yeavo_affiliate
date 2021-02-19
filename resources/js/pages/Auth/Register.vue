@@ -103,7 +103,15 @@
                             </v-checkbox>
                         </ValidationProvider>
 
+                        <div
+                            v-if="noExist"
+                            class="font-weight-bold text-capitalize text--accent-4 text-align-center text-h4"
+                        >
+                            Not subscribed email!
+                        </div>
+
                         <v-row
+                            v-show="!noExist"
                             justify="center"
                             align="center"
                             class="ml-0 mr-0"
