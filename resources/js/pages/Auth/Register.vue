@@ -141,6 +141,7 @@ export default {
             password_confirmation: '',
             agree_tos: null,
         },
+        noExist: false,
     }),
     methods: {
         ...mapMutations({
@@ -155,6 +156,7 @@ export default {
 
         submit() {
             this.$refs.observer.validate().then((r) => {
+                this.noExist = false;
                 if (r) {
                     this.registerUser({ ...this.credentials })
                         .then((response) => {
@@ -187,8 +189,10 @@ export default {
                                     this.$forceUpdate();
                                 });
                             } else {
-                                console.log('email exist');
                                 // this.destroyAccessToken();
+                                if (response.data.result === 'no_registered') {
+                                    this.noExist = true;
+                                }
                             }
                         })
                         .catch((error) => {

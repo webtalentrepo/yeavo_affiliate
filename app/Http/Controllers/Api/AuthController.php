@@ -294,7 +294,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'result' => 'error',
+            'result' => 'no_registered',
             'message' => 'Not exist customer!'
         ]);
     }
