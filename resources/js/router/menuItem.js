@@ -48,6 +48,13 @@ const menuItems = [
         link: '/competitor-spy',
         locked: true,
     },
+    {
+        title: 'Done-For-You Connect',
+        icon: 'done-for-you-connect-menu.png',
+        headerIcon: 'done-for-you-connect.png',
+        link: '/done-for-you',
+        locked: false,
+    },
 ];
 
 export default menuItems;

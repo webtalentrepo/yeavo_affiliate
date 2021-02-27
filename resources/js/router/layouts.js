@@ -39,6 +39,16 @@ const layouts = [
             auth: false,
         },
     },
+    {
+        path: '/done-for-you',
+        name: 'Done-For-You Connect',
+        // eslint-disable-next-line no-undef
+        component: (resolve) => require(['../pages/done-for-you'], resolve),
+        meta: {
+            title: 'Done-For-You Connect',
+            auth: true,
+        },
+    },
 ];
 
 export default layouts;
