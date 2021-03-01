@@ -49,6 +49,54 @@ const layouts = [
             auth: true,
         },
     },
+    {
+        path: '/done-for-you/add-a-worker',
+        name: 'Add A Worker',
+        // eslint-disable-next-line no-undef
+        component: (resolve) =>
+            // eslint-disable-next-line no-undef
+            require(['../pages/done-for-you/add-a-worker'], resolve),
+        meta: {
+            title: 'Add A Worker',
+            auth: true,
+        },
+    },
+    {
+        path: '/done-for-you/details',
+        name: 'Details',
+        // eslint-disable-next-line no-undef
+        component: (resolve) =>
+            // eslint-disable-next-line no-undef
+            require(['../pages/done-for-you/done-for-you-detail'], resolve),
+        meta: {
+            title: 'Details',
+            auth: true,
+        },
+    },
+    {
+        path: '/done-for-you/my-listings',
+        name: 'My Listings',
+        // eslint-disable-next-line no-undef
+        component: (resolve) =>
+            // eslint-disable-next-line no-undef
+            require(['../pages/done-for-you/my-listings'], resolve),
+        meta: {
+            title: 'My Listings',
+            auth: true,
+        },
+    },
+    {
+        path: '/done-for-you/favorites',
+        name: 'Favorites',
+        // eslint-disable-next-line no-undef
+        component: (resolve) =>
+            // eslint-disable-next-line no-undef
+            require(['../pages/done-for-you/favorites'], resolve),
+        meta: {
+            title: 'Favorites',
+            auth: true,
+        },
+    },
 ];
 
 export default layouts;

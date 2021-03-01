@@ -4,7 +4,12 @@
         align="center"
         class="mr-0 ml-0 font-weight-thin page-header-title"
     >
-        <img :src="`/assets/menu-icons/${icon}`" alt="" class="header-img" />
+        <img
+            v-if="icons"
+            :src="`/assets/menu-icons/${icon}`"
+            alt=""
+            class="header-img"
+        />
         <div class="pt-5 pb-5 ml-3 font-weight-bold">
             {{ $route.name }}
         </div>
@@ -16,6 +21,12 @@ import menuItems from '../../router/menuItem';
 
 export default {
     name: 'PageHeader',
+    props: {
+        icons: {
+            type: Boolean,
+            default: true,
+        },
+    },
     data: () => ({
         icon: '',
     }),
@@ -27,11 +38,13 @@ export default {
         },
     },
     mounted() {
-        this.items.map((el) => {
-            if (el.title === this.$route.name) {
-                this.icon = el.headerIcon;
-            }
-        });
+        if (this.icons) {
+            this.items.map((el) => {
+                if (el.title === this.$route.name) {
+                    this.icon = el.headerIcon;
+                }
+            });
+        }
     },
 };
 </script>

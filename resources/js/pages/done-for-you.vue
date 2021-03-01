@@ -1,7 +1,11 @@
 <template>
     <v-app>
         <v-container>
-            <v-app-bar></v-app-bar>
+            <v-row justify="center" class="search-box-row">
+                <v-col cols="8">
+                    <done-for-you-header></done-for-you-header>
+                </v-col>
+            </v-row>
             <PageHeader></PageHeader>
 
             <v-row justify="center" class="search-box-row">
@@ -103,10 +107,11 @@
 
 <script>
 import PageHeader from '../layout/users/PageHeader';
+import DoneForYouHeader from '../components/DoneForYouHeader';
 
 export default {
     name: 'DoneForYou',
-    components: { PageHeader },
+    components: { DoneForYouHeader, PageHeader },
     data: () => ({
         search_str: '',
         searchData: '',
