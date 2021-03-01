@@ -13,21 +13,21 @@ class CreateKeywordsTable extends Migration
      */
     public function up()
     {
-//        Schema::create('keywords', function (Blueprint $table) {
-//            $table->id();
-//            $table->string('keywords')->index();
-//            $table->text('result');
-//            $table->enum('type', ['exact', 'non', 'broad'])->index();
-//            $table->string('volume');
-//            $table->text('trend');
-//            $table->string('state', 20);
-//            $table->string('bid_low', 20);
-//            $table->string('bid_high', 20);
-//            $table->double('competition');
-//            $table->date('write_date');
-//            $table->boolean('updated_flag');
-//            $table->timestamps();
-//        });
+        Schema::create('keywords', function (Blueprint $table) {
+            $table->id();
+            $table->string('keywords')->index();
+            $table->text('result');
+            $table->enum('type', ['exact', 'non', 'broad'])->index();
+            $table->string('volume');
+            $table->text('trend');
+            $table->string('state', 20);
+            $table->string('bid_low', 20);
+            $table->string('bid_high', 20);
+            $table->double('competition');
+            $table->date('write_date');
+            $table->boolean('updated_flag');
+            $table->timestamps();
+        });
     }
 
     /**
