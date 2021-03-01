@@ -227,7 +227,7 @@ export default {
 }
 
 .worker-submit {
-    color: #ffffff;
+    color: #ffffff !important;
     box-shadow: none;
     background: #121212 !important;
     border: 0;
