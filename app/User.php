@@ -48,6 +48,16 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Role', 'role_user', 'user_id', 'role_id');
     }
 
+    public function worker_likes()
+    {
+        return $this->belongsToMany('App\Models\Worker', 'worker_likes', 'user_id', 'worker_id');
+    }
+
+    public function worker_dislikes()
+    {
+        return $this->belongsToMany('App\Models\Worker', 'worker_dislikes', 'user_id', 'worker_id');
+    }
+
     public function plans()
     {
         return $this->belongsToMany('App\Plan', 'user_plans', 'user_id', 'plan_id');

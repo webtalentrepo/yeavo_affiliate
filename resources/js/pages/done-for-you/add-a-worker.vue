@@ -38,19 +38,35 @@
                                 ></v-text-field>
                             </ValidationProvider>
 
-                            <ValidationProvider
-                                v-slot="{ errors }"
-                                name="SearchTags"
-                                rules="required"
-                            >
+                            <ValidationProvider name="SearchTags">
                                 <label class="form-label">Search Tags</label>
-                                <v-text-field
+                                <v-combobox
                                     v-model="search_tags"
-                                    :error-messages="errors"
-                                    solo
+                                    :items="items"
+                                    chips
                                     clearable
-                                    required
-                                ></v-text-field>
+                                    multiple
+                                    solo
+                                >
+                                    <template
+                                        #selection="{
+                                            attrs,
+                                            item,
+                                            select,
+                                            selected,
+                                        }"
+                                    >
+                                        <v-chip
+                                            v-bind="attrs"
+                                            :input-value="selected"
+                                            close
+                                            @click="select"
+                                            @click:close="remove(item)"
+                                        >
+                                            <strong>{{ item }}</strong>
+                                        </v-chip>
+                                    </template>
+                                </v-combobox>
                             </ValidationProvider>
 
                             <ValidationProvider
@@ -110,7 +126,24 @@ export default {
     data: () => ({
         title: '',
         url: '',
-        search_tags: '',
+        search_tags: [],
+        items: [
+            'Design',
+            'Work',
+            'Develop',
+            'Online',
+            'Freelancer',
+            'Upwork',
+            'Service',
+            'Developer',
+            'Program',
+            'Home',
+            'Remote',
+            'Website',
+            'Manager',
+            'Expert',
+            'Write',
+        ],
         description: '',
     }),
     methods: {
@@ -118,6 +151,10 @@ export default {
             this.$refs.observer.validate().then((r) => {
                 console.log(r);
             });
+        },
+        remove(item) {
+            this.search_tags.splice(this.search_tags.indexOf(item), 1);
+            this.search_tags = [...this.search_tags];
         },
     },
 };
