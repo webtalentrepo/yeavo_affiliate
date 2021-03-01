@@ -34,11 +34,11 @@ export default {
     height: 50px !important;
 
     .v-toolbar__content {
-        height: 50px !important;
+        height: 45px !important;
         display: flex;
         justify-content: space-between;
         text-align: center;
-        padding: 0 20px;
+        padding: 0 40px;
 
         .header-link {
             color: #000 !important;

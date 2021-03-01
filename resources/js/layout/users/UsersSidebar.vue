@@ -130,7 +130,7 @@ export default {
             width: 24px;
             display: flex;
             align-items: center;
-            margin-right: 8px;
+            margin-right: 8px !important;
             height: 32px;
         }
     }
