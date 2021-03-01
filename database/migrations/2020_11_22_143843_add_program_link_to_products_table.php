@@ -13,9 +13,9 @@ class AddProgramLinkToProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->text('program_url')->after('site_id');
-        });
+//        Schema::table('products', function (Blueprint $table) {
+//            $table->text('program_url')->after('site_id');
+//        });
     }
 
     /**
