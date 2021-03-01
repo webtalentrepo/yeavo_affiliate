@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Worker extends Model
 {
     protected $table = 'workers';
-    protected $fillable = ['worker_title', 'worker_url', 'image_extension', 'search_tags', 'worker_description'];
+    protected $fillable = ['worker_title', 'worker_url', 'image_name', 'search_tags', 'worker_description'];
 
     public function like_users()
     {

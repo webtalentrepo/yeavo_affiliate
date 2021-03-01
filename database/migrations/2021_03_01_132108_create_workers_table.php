@@ -15,9 +15,12 @@ class CreateWorkersTable extends Migration
     {
         Schema::create('workers', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
             $table->string('worker_title')->index();
             $table->string('worker_url')->index();
-            $table->string('image_extension');
+            $table->string('image_name');
             $table->text('search_tags');
             $table->text('worker_description');
             $table->timestamps();

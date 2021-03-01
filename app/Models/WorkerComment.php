@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class WorkerComment extends Model
 {
     protected $table = 'worker_comments';
+    protected $fillable = ['body', 'commentable_id', 'commentable_type'];
 
     public function user()
     {

@@ -11,7 +11,7 @@
 
                 <v-row justify="center">
                     <v-col cols="6" md="6" sm="8" xs="10">
-                        <form>
+                        <form enctype="multipart/form-data">
                             <ValidationProvider
                                 v-slot="{ errors }"
                                 name="Title"
@@ -36,6 +36,21 @@
                                     solo
                                     clearable
                                 ></v-text-field>
+                            </ValidationProvider>
+
+                            <ValidationProvider
+                                v-slot="{ errors }"
+                                name="Image"
+                            >
+                                <label class="form-label">Image</label>
+                                <v-file-input
+                                    v-model="images"
+                                    :rules="rules"
+                                    accept="image/png, image/jpeg, image/bmp"
+                                    :error-messages="errors"
+                                    solo
+                                    placeholder="Optional"
+                                ></v-file-input>
                             </ValidationProvider>
 
                             <ValidationProvider name="SearchTags">
@@ -145,6 +160,13 @@ export default {
             'Write',
         ],
         description: '',
+        rules: [
+            (value) =>
+                !value ||
+                value.size < 2000000 ||
+                'Image size should be less than 2 MB!',
+        ],
+        images: null,
     }),
     methods: {
         submit() {

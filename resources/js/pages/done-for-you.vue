@@ -29,7 +29,11 @@
                 </v-col>
             </v-row>
 
-            <v-row justify="center" align="center" class="p-0">
+            <v-row
+                justify="center"
+                align="center"
+                class="p-0 done-for-you-search"
+            >
                 <v-col cols="8" md="8" sm="10" xs="12">
                     <v-row justify="center" align="center" class="search-row">
                         <v-col cols="5" md="5" sm="12">
