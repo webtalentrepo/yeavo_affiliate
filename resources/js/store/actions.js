@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
+
 const actions = {
     CANCEL_PENDING_REQUESTS(context) {
         // Cancel all request where a token exists

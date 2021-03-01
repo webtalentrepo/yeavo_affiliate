@@ -19,7 +19,7 @@
                             >
                                 <label class="form-label">Title</label>
                                 <v-text-field
-                                    v-model="title"
+                                    v-model="worker_title"
                                     :error-messages="errors"
                                     solo
                                     clearable
@@ -31,7 +31,7 @@
                             <ValidationProvider v-slot="{ errors }" name="URL">
                                 <label class="form-label">URL</label>
                                 <v-text-field
-                                    v-model="url"
+                                    v-model="worker_url"
                                     :error-messages="errors"
                                     solo
                                     clearable
@@ -50,6 +50,7 @@
                                     :error-messages="errors"
                                     solo
                                     placeholder="Optional"
+                                    prepend-icon="mdi-camera"
                                 ></v-file-input>
                             </ValidationProvider>
 
@@ -126,9 +127,10 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import DoneForYouHeader from '../../components/DoneForYouHeader';
 import PageHeader from '../../layout/users/PageHeader';
-import { ValidationObserver, ValidationProvider } from 'vee-validate';
 
 export default {
     name: 'AddAWorker',
@@ -139,8 +141,8 @@ export default {
         ValidationObserver,
     },
     data: () => ({
-        title: '',
-        url: '',
+        worker_title: '',
+        worker_url: '',
         search_tags: [],
         items: [
             'Design',
@@ -169,9 +171,48 @@ export default {
         images: null,
     }),
     methods: {
+        ...mapActions({
+            postData: 'post',
+        }),
         submit() {
             this.$refs.observer.validate().then((r) => {
-                console.log(r);
+                if (r) {
+                    //
+                    let formData = new FormData();
+                    if (this.images) {
+                        formData.append(
+                            'worker_image',
+                            this.images,
+                            this.images.name,
+                        );
+                    }
+
+                    formData.append('worker_title', this.worker_title);
+                    formData.append('worker_url', this.worker_url);
+                    formData.append('worker_description', this.description);
+                    if (this.search_tags && this.search_tags.length) {
+                        this.search_tags.map((el) => {
+                            formData.append('search_tags[]', el);
+                        });
+                    }
+
+                    const post_data = {
+                        url: '/workers',
+                        data: formData,
+                    };
+
+                    this.postData({ ...post_data })
+                        .then((re) => {
+                            if (re.data.result === 'success') {
+                                this.$router.push('/done-for-you');
+                            } else {
+                                this.$router.push('/logout');
+                            }
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                        });
+                }
             });
         },
         remove(item) {
