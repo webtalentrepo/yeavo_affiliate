@@ -188,7 +188,6 @@ export default {
     methods: {
         ...mapActions({
             postData: 'post',
-            putData: 'putData',
             getData: 'getData',
         }),
         getWorkerData() {

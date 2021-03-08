@@ -83,7 +83,11 @@
                                     </v-btn>
                                 </div>
                                 <div>
-                                    <v-btn color="error">Delete</v-btn>
+                                    <v-btn
+                                        color="error"
+                                        @click="deleteListingsData(row.id)"
+                                        >Delete</v-btn
+                                    >
                                 </div>
                             </v-col>
                         </v-row>
@@ -107,6 +111,7 @@ export default {
     components: { PageHeader, DoneForYouHeader },
     data: () => ({
         listings: null,
+        del_list: null,
     }),
     mounted() {
         this.getListingsData();
@@ -114,6 +119,7 @@ export default {
     methods: {
         ...mapActions({
             getData: 'getData',
+            postData: 'post',
         }),
 
         getListingsData() {
@@ -128,6 +134,31 @@ export default {
                 .catch((e) => {
                     console.log(e);
                 });
+        },
+
+        deleteListingsData(id) {
+            this.del_list = id;
+
+            if (this.del_list) {
+                this.postData({
+                    url: `/workers/${this.del_list}`,
+                    data: {
+                        _method: 'DELETE',
+                    },
+                })
+                    .then((r) => {
+                        if (r.data.result === 'success') {
+                            this.listings = this.listings.filter((e) => {
+                                return e.id !== this.del_list;
+                            });
+
+                            this.del_list = null;
+                        }
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                    });
+            }
         },
     },
 };

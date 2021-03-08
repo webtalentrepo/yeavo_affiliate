@@ -153,10 +153,19 @@ class WorkersController extends Controller
      * Remove the specified resource from storage.
      *
      * @param \App\Models\Worker $worker
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function destroy(Worker $worker)
     {
-        //
+        if (!is_null($worker->image_name) && Storage::exists('public' . $worker->image_name)) {
+            Storage::delete('public' . $worker->image_name);
+        }
+
+        $worker->delete();
+
+        return response()->json([
+            'result' => 'success'
+        ]);
     }
 }
