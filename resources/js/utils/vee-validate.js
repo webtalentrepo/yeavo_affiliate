@@ -1,4 +1,4 @@
-import { required, email, max, min, confirmed } from 'vee-validate/dist/rules';
+import { confirmed, email, max, min, required } from 'vee-validate/dist/rules';
 import { extend, setInteractionMode } from 'vee-validate';
 
 extend('required', {
@@ -29,6 +29,21 @@ extend('password_confirmed', {
 extend('agree_tos', {
     ...required,
     message: 'You must agree to continue.',
+});
+
+extend('url', {
+    validate: (str) => {
+        let url;
+
+        try {
+            url = new URL(str);
+        } catch (_) {
+            return false;
+        }
+
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    },
+    message: 'The {_field_} field is not a valid URL.',
 });
 
 setInteractionMode('eager');

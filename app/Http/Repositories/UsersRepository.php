@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\DB;
 
 class UsersRepository extends Repository
 {
+    public function model()
+    {
+        return app(User::class);
+    }
+
     /**
      * Create users by Administrator
      *
@@ -69,11 +74,6 @@ class UsersRepository extends Repository
         $user->user_profile()->create($ins_data);
 
         $user->notify(new WelcomeToOurSoftware($user, $request['password']));
-    }
-
-    public function model()
-    {
-        return app(User::class);
     }
 
     public function createFreeUserDetails($user, $password)

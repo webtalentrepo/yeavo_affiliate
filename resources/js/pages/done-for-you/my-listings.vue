@@ -7,6 +7,92 @@
                 </v-col>
             </v-row>
             <PageHeader :icons="false"></PageHeader>
+            <v-row justify="center">
+                <v-col cols="10" md="10" sm="11" xs="12">
+                    <v-container v-if="listings" class="body-content">
+                        <v-row
+                            v-for="(row, key) in listings"
+                            :key="key"
+                            justify="center"
+                            class="cursor-pointer"
+                        >
+                            <v-col cols="3" md="3" sm="11" xs="12">
+                                <v-img
+                                    :src="`/storage/public${row.image_name}`"
+                                    aspect-ratio="1.7"
+                                ></v-img>
+                            </v-col>
+                            <v-col
+                                cols="7"
+                                md="7"
+                                sm="11"
+                                xs="12"
+                                class="list-content"
+                            >
+                                <v-row>
+                                    <v-col cols="12" class="list-title">
+                                        {{ row.worker_title }}
+                                    </v-col>
+                                </v-row>
+                                <v-row>
+                                    <v-col cols="7">
+                                        {{ row.worker_description }}
+                                    </v-col>
+                                    <v-col cols="5" class="justify-center">
+                                        <div class="list-like">
+                                            <div class="like">
+                                                <img
+                                                    src="/assets/menu-icons/like.png"
+                                                    alt=""
+                                                />
+
+                                                <span>
+                                                    {{ row.like_users.length }}
+                                                </span>
+                                            </div>
+                                            <div class="dis-like">
+                                                <span>
+                                                    {{
+                                                        row.dislike_users.length
+                                                    }}
+                                                </span>
+
+                                                <img
+                                                    src="/assets/menu-icons/dislike.png"
+                                                    alt=""
+                                                />
+                                            </div>
+                                        </div>
+                                    </v-col>
+                                </v-row>
+                            </v-col>
+                            <v-col
+                                cols="2"
+                                md="2"
+                                sm="11"
+                                xs="12"
+                                class="list-actions"
+                            >
+                                <div>
+                                    <v-btn color="dark">
+                                        <router-link
+                                            :to="`/done-for-you/edit/${row.id}`"
+                                        >
+                                            Edit
+                                        </router-link>
+                                    </v-btn>
+                                </div>
+                                <div>
+                                    <v-btn color="error">Delete</v-btn>
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                    <v-container v-else class="text-align-center">
+                        Not exist listing's data.
+                    </v-container>
+                </v-col>
+            </v-row>
         </v-container>
     </v-app>
 </template>
@@ -14,11 +100,38 @@
 <script>
 import DoneForYouHeader from '../../components/DoneForYouHeader';
 import PageHeader from '../../layout/users/PageHeader';
+import { mapActions } from 'vuex';
 
 export default {
     name: 'MyListings',
     components: { PageHeader, DoneForYouHeader },
+    data: () => ({
+        listings: null,
+    }),
+    mounted() {
+        this.getListingsData();
+    },
+    methods: {
+        ...mapActions({
+            getData: 'getData',
+        }),
+
+        getListingsData() {
+            this.listings = null;
+            this.getData({ url: '/workers', config: {} })
+                .then((re) => {
+                    if (re.data.result === 'success') {
+                        this.listings = re.data.message;
+                        console.log(this.listings);
+                    }
+                })
+                .catch((e) => {
+                    console.log(e);
+                });
+        },
+    },
 };
 </script>
 
-<style scoped></style>
+<style lang="scss" src="../../../sass/pages/_common.scss"></style>
+<style lang="scss" src="../../../sass/pages/_done.scss"></style>

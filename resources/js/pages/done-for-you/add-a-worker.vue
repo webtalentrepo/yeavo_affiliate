@@ -28,13 +28,18 @@
                                 ></v-text-field>
                             </ValidationProvider>
 
-                            <ValidationProvider v-slot="{ errors }" name="URL">
+                            <ValidationProvider
+                                v-slot="{ errors }"
+                                name="URL"
+                                rules="required|url"
+                            >
                                 <label class="form-label">URL</label>
                                 <v-text-field
                                     v-model="worker_url"
                                     :error-messages="errors"
                                     solo
                                     clearable
+                                    required
                                 ></v-text-field>
                             </ValidationProvider>
 
@@ -166,15 +171,49 @@ export default {
                 'Image size should be less than 2 MB!',
         ],
         images: null,
+        edit: false,
+        worker_id: null,
     }),
+    created() {
+        if (this.$route.params && this.$route.params.id) {
+            this.edit = true;
+            this.worker_id = this.$route.params.id;
+        }
+    },
+    mounted() {
+        if (this.edit && this.worker_id) {
+            this.getWorkerData();
+        }
+    },
     methods: {
         ...mapActions({
             postData: 'post',
+            putData: 'putData',
+            getData: 'getData',
         }),
+        getWorkerData() {
+            this.getData({
+                url: `/workers/${this.worker_id}/edit`,
+                config: {},
+            })
+                .then((r) => {
+                    if (r.data.result === 'success') {
+                        this.worker_title = r.data.message.worker_title;
+                        this.worker_url = r.data.message.worker_url;
+                        this.description = r.data.message.description;
+                        this.search_tags =
+                            r.data.message.search_tags ??
+                            r.data.message.search_tags;
+                    }
+                })
+                .catch((e) => {
+                    console.log('get worker edit data error:', e);
+                    this.$router.push('/logout');
+                });
+        },
         submit() {
             this.$refs.observer.validate().then((r) => {
                 if (r) {
-                    //
                     let formData = new FormData();
                     if (this.images) {
                         formData.append(
@@ -193,17 +232,24 @@ export default {
                         });
                     }
 
+                    if (this.edit && this.worker_id) {
+                        formData.append('_method', 'PUT');
+                    }
+
                     const post_data = {
-                        url: '/workers',
+                        url:
+                            this.edit && this.worker_id
+                                ? `/workers/${this.worker_id}`
+                                : '/workers',
                         data: formData,
                     };
 
                     this.postData({ ...post_data })
                         .then((re) => {
                             if (re.data.result === 'success') {
-                                this.$router.push('/done-for-you');
+                                this.$router.push('/done-for-you/my-listings');
                             } else {
-                                this.$router.push('/logout');
+                                // this.$router.push('/logout');
                             }
                         })
                         .catch((e) => {

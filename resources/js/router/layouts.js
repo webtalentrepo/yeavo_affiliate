@@ -62,6 +62,18 @@ const layouts = [
         },
     },
     {
+        path: '/done-for-you/edit/:id',
+        name: 'Add A Worker',
+        // eslint-disable-next-line no-undef
+        component: (resolve) =>
+            // eslint-disable-next-line no-undef
+            require(['../pages/done-for-you/add-a-worker'], resolve),
+        meta: {
+            title: 'Add A Worker',
+            auth: true,
+        },
+    },
+    {
         path: '/done-for-you/details',
         name: 'Details',
         // eslint-disable-next-line no-undef
