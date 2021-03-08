@@ -18,7 +18,7 @@
                         >
                             <v-col cols="3" md="3" sm="11" xs="12">
                                 <v-img
-                                    :src="`/storage/public${row.image_name}`"
+                                    :src="`/storage${row.image_name}`"
                                     aspect-ratio="1.7"
                                 ></v-img>
                             </v-col>
