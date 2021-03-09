@@ -85,9 +85,10 @@
                                 <div>
                                     <v-btn
                                         color="error"
-                                        @click="deleteListingsData(row.id)"
-                                        >Delete</v-btn
+                                        @click="openDelConfirm(row.id)"
                                     >
+                                        Delete
+                                    </v-btn>
                                 </div>
                             </v-col>
                         </v-row>
@@ -98,6 +99,24 @@
                 </v-col>
             </v-row>
         </v-container>
+        <v-dialog v-model="dialog" persistent max-width="290">
+            <v-card>
+                <v-card-title class="headline"> Are you sure?</v-card-title>
+                <v-card-text>
+                    You will lost all settings of this data. Do you still delete
+                    this?
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="red darken-1" @click="deleteListingsData()">
+                        Delete
+                    </v-btn>
+                    <v-btn color="grey darken-1" @click="dialog = false">
+                        Cancel
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-app>
 </template>
 
@@ -112,6 +131,7 @@ export default {
     data: () => ({
         listings: null,
         del_list: null,
+        dialog: false,
     }),
     mounted() {
         this.getListingsData();
@@ -136,9 +156,12 @@ export default {
                 });
         },
 
-        deleteListingsData(id) {
+        openDelConfirm(id) {
             this.del_list = id;
+            this.dialog = true;
+        },
 
+        deleteListingsData() {
             if (this.del_list) {
                 this.postData({
                     url: `/workers/${this.del_list}`,
@@ -147,6 +170,8 @@ export default {
                     },
                 })
                     .then((r) => {
+                        this.dialog = false;
+
                         if (r.data.result === 'success') {
                             this.listings = this.listings.filter((e) => {
                                 return e.id !== this.del_list;
