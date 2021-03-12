@@ -38,28 +38,77 @@
                                     <v-col cols="7">
                                         {{ row.worker_description }}
                                     </v-col>
-                                    <v-col cols="5" class="justify-center">
+                                    <v-col
+                                        v-if="!watchedLike"
+                                        cols="5"
+                                        class="justify-center"
+                                    >
                                         <div class="list-like">
                                             <div class="like">
                                                 <img
+                                                    v-if="filterLike(row, true)"
+                                                    src="/assets/menu-icons/like-fill.png"
+                                                    alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            row,
+                                                            true,
+                                                        )
+                                                    "
+                                                />
+
+                                                <img
+                                                    v-else
                                                     src="/assets/menu-icons/like.png"
                                                     alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            row,
+                                                            true,
+                                                        )
+                                                    "
                                                 />
 
                                                 <span>
-                                                    {{ row.like_users.length }}
+                                                    {{
+                                                        row.like_users.length +
+                                                        checkLike(row, true)
+                                                    }}
                                                 </span>
                                             </div>
                                             <div class="dis-like">
                                                 <span>
                                                     {{
-                                                        row.dislike_users.length
+                                                        row.dislike_users
+                                                            .length +
+                                                        checkLike(row, false)
                                                     }}
                                                 </span>
 
                                                 <img
+                                                    v-if="
+                                                        filterLike(row, false)
+                                                    "
+                                                    src="/assets/menu-icons/dislike-fill.png"
+                                                    alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            row,
+                                                            false,
+                                                        )
+                                                    "
+                                                />
+
+                                                <img
+                                                    v-else
                                                     src="/assets/menu-icons/dislike.png"
                                                     alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            row,
+                                                            false,
+                                                        )
+                                                    "
                                                 />
                                             </div>
                                         </div>
@@ -132,8 +181,14 @@ export default {
         listings: null,
         del_list: null,
         dialog: false,
+        like_list: [],
+        dislike_list: [],
+        user_id: null,
+        watchedLike: false,
     }),
     mounted() {
+        this.user_id = this.$store.state.userData.id;
+
         this.getListingsData();
     },
     methods: {
@@ -141,6 +196,103 @@ export default {
             getData: 'getData',
             postData: 'post',
         }),
+
+        checkLike(item, flag) {
+            if (flag) {
+                if (this.like_list && this.like_list.indexOf(item.id) > -1) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            } else {
+                if (
+                    this.dislike_list &&
+                    this.dislike_list.indexOf(item.id) > -1
+                ) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        },
+
+        likeDislikeAction(item, flag) {
+            if (flag) {
+                if (this.like_list.length) {
+                    if (this.like_list.indexOf(item.id) > -1) {
+                        this.like_list = this.like_list.filter((el) => {
+                            return el !== item.id;
+                        });
+                    }
+
+                    this.$forceUpdate();
+
+                    return;
+                }
+
+                if (this.dislike_list.length) {
+                    if (this.dislike_list.indexOf(item.id) > -1) {
+                        return;
+                    }
+                }
+
+                this.$set(this.like_list, this.like_list.length, item.id);
+                this.$forceUpdate();
+            } else {
+                if (this.dislike_list.length) {
+                    if (this.dislike_list.indexOf(item.id) > -1) {
+                        this.dislike_list = this.dislike_list.filter((el) => {
+                            return el !== item.id;
+                        });
+                    }
+
+                    this.$forceUpdate();
+
+                    return;
+                }
+
+                if (this.like_list.length) {
+                    if (this.like_list.indexOf(item.id) > -1) {
+                        return;
+                    }
+                }
+
+                this.$set(this.dislike_list, this.dislike_list.length, item.id);
+                this.$forceUpdate();
+            }
+        },
+
+        filterLike(item, flag) {
+            let like_action = [];
+
+            if (flag) {
+                if (this.like_list.indexOf(item.id) > -1) {
+                    return true;
+                }
+
+                if (!item.like_users.length) {
+                    return false;
+                }
+
+                like_action = item.like_users.filter((el) => {
+                    return this.user_id === el.user_id;
+                });
+            } else {
+                if (this.dislike_list.indexOf(item.id) > -1) {
+                    return true;
+                }
+
+                if (!item.dislike_users.length) {
+                    return false;
+                }
+
+                like_action = item.dislike_users.filter((el) => {
+                    return this.user_id === el.user_id;
+                });
+            }
+
+            return like_action && like_action.length;
+        },
 
         getListingsData() {
             this.listings = null;

@@ -63,13 +63,13 @@ const layouts = [
     },
     {
         path: '/done-for-you/edit/:id',
-        name: 'Add A Worker',
+        name: 'Edit A Worker',
         // eslint-disable-next-line no-undef
         component: (resolve) =>
             // eslint-disable-next-line no-undef
             require(['../pages/done-for-you/add-a-worker'], resolve),
         meta: {
-            title: 'Add A Worker',
+            title: 'Edit A Worker',
             auth: true,
         },
     },
