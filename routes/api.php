@@ -46,4 +46,5 @@ Route::group([
     Route::post('/keyword-data', 'Api\KeywordsController@getKeywordData')->middleware('throttle:500,1');
     Route::post('/keyword-top-data', 'Api\KeywordsController@getTopUrls');
     Route::resource('workers', 'Api\WorkersController', ['names' => ['index' => 'workers']]);
+    Route::post('/vote-worker', 'Api\WorkerLikesController@voteLikeDislike');
 });

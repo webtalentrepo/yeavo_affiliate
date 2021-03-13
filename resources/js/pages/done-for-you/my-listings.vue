@@ -70,19 +70,12 @@
                                                 />
 
                                                 <span>
-                                                    {{
-                                                        row.like_users.length +
-                                                        checkLike(row, true)
-                                                    }}
+                                                    {{ checkLike(row, true) }}
                                                 </span>
                                             </div>
                                             <div class="dis-like">
                                                 <span>
-                                                    {{
-                                                        row.dislike_users
-                                                            .length +
-                                                        checkLike(row, false)
-                                                    }}
+                                                    {{ checkLike(row, false) }}
                                                 </span>
 
                                                 <img
@@ -198,6 +191,10 @@ export default {
         }),
 
         checkLike(item, flag) {
+            if (!item) {
+                return 0;
+            }
+
             if (flag) {
                 if (this.like_list && this.like_list.indexOf(item.id) > -1) {
                     return 1;
@@ -216,18 +213,32 @@ export default {
             }
         },
 
+        async setLikes(id, flag, add) {
+            await this.$http.post('/vote-worker', {
+                worker_id: id,
+                flag: flag,
+                add: add,
+            });
+        },
+
         likeDislikeAction(item, flag) {
+            if (!item) {
+                return;
+            }
+
             if (flag) {
                 if (this.like_list.length) {
                     if (this.like_list.indexOf(item.id) > -1) {
                         this.like_list = this.like_list.filter((el) => {
                             return el !== item.id;
                         });
+
+                        this.$forceUpdate();
+
+                        this.setLikes(item.id, 'like', 'no');
+
+                        return;
                     }
-
-                    this.$forceUpdate();
-
-                    return;
                 }
 
                 if (this.dislike_list.length) {
@@ -237,6 +248,9 @@ export default {
                 }
 
                 this.$set(this.like_list, this.like_list.length, item.id);
+
+                this.setLikes(item.id, 'like', 'yes');
+
                 this.$forceUpdate();
             } else {
                 if (this.dislike_list.length) {
@@ -244,11 +258,13 @@ export default {
                         this.dislike_list = this.dislike_list.filter((el) => {
                             return el !== item.id;
                         });
+
+                        this.$forceUpdate();
+
+                        this.setLikes(item.id, 'dislike', 'no');
+
+                        return;
                     }
-
-                    this.$forceUpdate();
-
-                    return;
                 }
 
                 if (this.like_list.length) {
@@ -258,40 +274,29 @@ export default {
                 }
 
                 this.$set(this.dislike_list, this.dislike_list.length, item.id);
+
+                this.setLikes(item.id, 'dislike', 'yes');
+
                 this.$forceUpdate();
             }
         },
 
         filterLike(item, flag) {
-            let like_action = [];
+            if (!item) {
+                return false;
+            }
 
             if (flag) {
                 if (this.like_list.indexOf(item.id) > -1) {
                     return true;
                 }
-
-                if (!item.like_users.length) {
-                    return false;
-                }
-
-                like_action = item.like_users.filter((el) => {
-                    return this.user_id === el.user_id;
-                });
             } else {
                 if (this.dislike_list.indexOf(item.id) > -1) {
                     return true;
                 }
-
-                if (!item.dislike_users.length) {
-                    return false;
-                }
-
-                like_action = item.dislike_users.filter((el) => {
-                    return this.user_id === el.user_id;
-                });
             }
 
-            return like_action && like_action.length;
+            return false;
         },
 
         getListingsData() {
@@ -300,7 +305,38 @@ export default {
                 .then((re) => {
                     if (re.data.result === 'success') {
                         this.listings = re.data.message;
-                        console.log(this.listings);
+
+                        for (const el of this.listings) {
+                            const like_list = el.like_users.filter((el1) => {
+                                return this.user_id === el1.id;
+                            });
+
+                            if (like_list && like_list.length) {
+                                for (const item of like_list) {
+                                    this.$set(
+                                        this.like_list,
+                                        this.like_list.length,
+                                        item.pivot.worker_id,
+                                    );
+                                }
+                            }
+
+                            const dislike_list = el.dislike_users.filter(
+                                (el2) => {
+                                    return this.user_id === el2.id;
+                                },
+                            );
+
+                            if (dislike_list && dislike_list.length) {
+                                for (const item of dislike_list) {
+                                    this.$set(
+                                        this.dislike_list,
+                                        this.dislike_list.length,
+                                        item.pivot.worker_id,
+                                    );
+                                }
+                            }
+                        }
                     }
                 })
                 .catch((e) => {
