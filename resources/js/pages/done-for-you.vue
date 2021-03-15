@@ -140,14 +140,22 @@ export default {
             'Video Editing',
             'Others',
         ],
-        top_workers: [
-            'primary',
-            'secondary',
-            'yellow darken-2',
-            'red',
-            'orange',
-        ],
+        top_workers: null,
     }),
+    mounted() {
+        this.getTopWorkers();
+    },
+    methods: {
+        getTopWorkers() {
+            this.top_workers = null;
+
+            this.$http.post('/get-top-workers', {}).then((r) => {
+                if (r.data.result === 'success') {
+                    this.top_workers = r.data.data;
+                }
+            });
+        },
+    },
 };
 </script>
 <style lang="scss" src="../../sass/pages/_common.scss"></style>

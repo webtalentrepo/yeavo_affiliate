@@ -61,7 +61,7 @@
 
                             <ValidationProvider name="SearchTags">
                                 <label class="form-label">Search Tags</label>
-                                <v-combobox
+                                <v-autocomplete
                                     v-model="search_tags"
                                     :items="items"
                                     chips
@@ -87,7 +87,7 @@
                                             <strong>{{ item }}</strong>
                                         </v-chip>
                                     </template>
-                                </v-combobox>
+                                </v-autocomplete>
                             </ValidationProvider>
 
                             <ValidationProvider

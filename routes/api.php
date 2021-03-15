@@ -47,4 +47,5 @@ Route::group([
     Route::post('/keyword-top-data', 'Api\KeywordsController@getTopUrls');
     Route::resource('workers', 'Api\WorkersController', ['names' => ['index' => 'workers']]);
     Route::post('/vote-worker', 'Api\WorkerLikesController@voteLikeDislike');
+    Route::post('/get-top-workers', 'Api\WorkersMainController@index');
 });
