@@ -40,10 +40,17 @@ class WorkersMainController extends Controller
             $recently_added[$tags[$i]] = $added_count;
         }
 
+        $trending_list = $this->workersRepo->getTrendingLists()->map(function ($el) {
+            $el->search_tags = json_decode($el->search_tags);
+
+            return $el;
+        });
+
         return response()->json([
-            'result'       => 'success',
-            'top_workers'  => $top_workers,
-            'recent_added' => $recently_added,
+            'result'        => 'success',
+            'top_workers'   => $top_workers,
+            'recent_added'  => $recently_added,
+            'trending_list' => $trending_list,
         ]);
     }
 }

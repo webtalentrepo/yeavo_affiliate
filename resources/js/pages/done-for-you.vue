@@ -127,7 +127,11 @@
                                             <div class="like">
                                                 <img
                                                     v-if="
-                                                        filterLike(worker, true)
+                                                        filterLike(
+                                                            worker,
+                                                            true,
+                                                            0,
+                                                        )
                                                     "
                                                     src="/assets/menu-icons/like-fill.png"
                                                     alt=""
@@ -135,6 +139,7 @@
                                                         likeDislikeAction(
                                                             worker,
                                                             true,
+                                                            0,
                                                         )
                                                     "
                                                 />
@@ -147,20 +152,29 @@
                                                         likeDislikeAction(
                                                             worker,
                                                             true,
+                                                            0,
                                                         )
                                                     "
                                                 />
 
                                                 <span>
                                                     {{
-                                                        checkLike(worker, true)
+                                                        worker.like_users.length
+                                                            ? worker.like_users
+                                                                  .length
+                                                            : 0
                                                     }}
                                                 </span>
                                             </div>
                                             <div class="dis-like">
                                                 <span>
                                                     {{
-                                                        checkLike(worker, false)
+                                                        worker.dislike_users
+                                                            .length
+                                                            ? worker
+                                                                  .dislike_users
+                                                                  .length
+                                                            : 0
                                                     }}
                                                 </span>
 
@@ -169,6 +183,7 @@
                                                         filterLike(
                                                             worker,
                                                             false,
+                                                            0,
                                                         )
                                                     "
                                                     src="/assets/menu-icons/dislike-fill.png"
@@ -177,6 +192,7 @@
                                                         likeDislikeAction(
                                                             worker,
                                                             false,
+                                                            0,
                                                         )
                                                     "
                                                 />
@@ -189,6 +205,7 @@
                                                         likeDislikeAction(
                                                             worker,
                                                             false,
+                                                            0,
                                                         )
                                                     "
                                                 />
@@ -273,9 +290,10 @@ export default {
             'Others',
         ],
         top_workers: null,
-        like_list: [],
-        dislike_list: [],
         recent_list: null,
+        trending_list: null,
+        like_list: [[], []],
+        dislike_list: [[], []],
         user_id: null,
         settings: {
             dots: false,
@@ -325,10 +343,12 @@ export default {
     methods: {
         getTopWorkers() {
             this.top_workers = null;
+            this.trending_list = null;
 
             this.$http.post('/get-top-workers', {}).then((r) => {
                 if (r.data.result === 'success') {
                     this.top_workers = r.data.top_workers;
+                    this.trending_list = r.data.trending_list;
                     this.recent_list = r.data.recent_added;
 
                     for (const el of this.top_workers) {
@@ -339,8 +359,8 @@ export default {
                         if (like_list && like_list.length) {
                             for (const item of like_list) {
                                 this.$set(
-                                    this.like_list,
-                                    this.like_list.length,
+                                    this.like_list[0],
+                                    this.like_list[0].length,
                                     item.pivot.worker_id,
                                 );
                             }
@@ -353,8 +373,38 @@ export default {
                         if (dislike_list && dislike_list.length) {
                             for (const item of dislike_list) {
                                 this.$set(
-                                    this.dislike_list,
-                                    this.dislike_list.length,
+                                    this.dislike_list[0],
+                                    this.dislike_list[0].length,
+                                    item.pivot.worker_id,
+                                );
+                            }
+                        }
+                    }
+
+                    for (const tEl of this.trending_list) {
+                        const like_list = tEl.like_users.filter((el1) => {
+                            return this.user_id === el1.id;
+                        });
+
+                        if (like_list && like_list.length) {
+                            for (const item of like_list) {
+                                this.$set(
+                                    this.like_list[1],
+                                    this.like_list[1].length,
+                                    item.pivot.worker_id,
+                                );
+                            }
+                        }
+
+                        const dislike_list = tEl.dislike_users.filter((el2) => {
+                            return this.user_id === el2.id;
+                        });
+
+                        if (dislike_list && dislike_list.length) {
+                            for (const item of dislike_list) {
+                                this.$set(
+                                    this.dislike_list[1],
+                                    this.dislike_list[1].length,
                                     item.pivot.worker_id,
                                 );
                             }
@@ -362,29 +412,6 @@ export default {
                     }
                 }
             });
-        },
-
-        checkLike(item, flag) {
-            if (!item) {
-                return 0;
-            }
-
-            if (flag) {
-                if (this.like_list && this.like_list.indexOf(item.id) > -1) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            } else {
-                if (
-                    this.dislike_list &&
-                    this.dislike_list.indexOf(item.id) > -1
-                ) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
         },
 
         async setLikes(id, flag, add) {
@@ -395,17 +422,19 @@ export default {
             });
         },
 
-        likeDislikeAction(item, flag) {
+        likeDislikeAction(item, flag, ind) {
             if (!item) {
                 return;
             }
 
             if (flag) {
-                if (this.like_list.length) {
-                    if (this.like_list.indexOf(item.id) > -1) {
-                        this.like_list = this.like_list.filter((el) => {
-                            return el !== item.id;
-                        });
+                if (this.like_list[ind].length) {
+                    if (this.like_list[ind].indexOf(item.id) > -1) {
+                        this.like_list[ind] = this.like_list[ind].filter(
+                            (el) => {
+                                return el !== item.id;
+                            },
+                        );
 
                         this.$forceUpdate();
 
@@ -415,23 +444,29 @@ export default {
                     }
                 }
 
-                if (this.dislike_list.length) {
-                    if (this.dislike_list.indexOf(item.id) > -1) {
+                if (this.dislike_list[ind].length) {
+                    if (this.dislike_list[ind].indexOf(item.id) > -1) {
                         return;
                     }
                 }
 
-                this.$set(this.like_list, this.like_list.length, item.id);
+                this.$set(
+                    this.like_list[ind],
+                    this.like_list[ind].length,
+                    item.id,
+                );
 
                 this.setLikes(item.id, 'like', 'yes');
 
                 this.$forceUpdate();
             } else {
-                if (this.dislike_list.length) {
-                    if (this.dislike_list.indexOf(item.id) > -1) {
-                        this.dislike_list = this.dislike_list.filter((el) => {
-                            return el !== item.id;
-                        });
+                if (this.dislike_list[ind].length) {
+                    if (this.dislike_list[ind].indexOf(item.id) > -1) {
+                        this.dislike_list[ind] = this.dislike_list[ind].filter(
+                            (el) => {
+                                return el !== item.id;
+                            },
+                        );
 
                         this.$forceUpdate();
 
@@ -441,13 +476,17 @@ export default {
                     }
                 }
 
-                if (this.like_list.length) {
-                    if (this.like_list.indexOf(item.id) > -1) {
+                if (this.like_list[ind].length) {
+                    if (this.like_list[ind].indexOf(item.id) > -1) {
                         return;
                     }
                 }
 
-                this.$set(this.dislike_list, this.dislike_list.length, item.id);
+                this.$set(
+                    this.dislike_list[ind],
+                    this.dislike_list[ind].length,
+                    item.id,
+                );
 
                 this.setLikes(item.id, 'dislike', 'yes');
 
@@ -455,17 +494,17 @@ export default {
             }
         },
 
-        filterLike(item, flag) {
+        filterLike(item, flag, ind) {
             if (!item) {
                 return false;
             }
 
             if (flag) {
-                if (this.like_list.indexOf(item.id) > -1) {
+                if (this.like_list[ind].indexOf(item.id) > -1) {
                     return true;
                 }
             } else {
-                if (this.dislike_list.indexOf(item.id) > -1) {
+                if (this.dislike_list[ind].indexOf(item.id) > -1) {
                     return true;
                 }
             }

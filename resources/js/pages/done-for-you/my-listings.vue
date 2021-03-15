@@ -66,12 +66,23 @@
                                                 />
 
                                                 <span>
-                                                    {{ checkLike(row, true) }}
+                                                    {{
+                                                        row.like_users.length
+                                                            ? worker.like_users
+                                                                  .length
+                                                            : 0
+                                                    }}
                                                 </span>
                                             </div>
                                             <div class="dis-like">
                                                 <span>
-                                                    {{ checkLike(row, false) }}
+                                                    {{
+                                                        row.dislike_users.length
+                                                            ? worker
+                                                                  .dislike_users
+                                                                  .length
+                                                            : 0
+                                                    }}
                                                 </span>
 
                                                 <img
@@ -188,29 +199,6 @@ export default {
             getData: 'getData',
             postData: 'post',
         }),
-
-        checkLike(item, flag) {
-            if (!item) {
-                return 0;
-            }
-
-            if (flag) {
-                if (this.like_list && this.like_list.indexOf(item.id) > -1) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            } else {
-                if (
-                    this.dislike_list &&
-                    this.dislike_list.indexOf(item.id) > -1
-                ) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-        },
 
         async setLikes(id, flag, add) {
             await this.$http.post('/vote-worker', {

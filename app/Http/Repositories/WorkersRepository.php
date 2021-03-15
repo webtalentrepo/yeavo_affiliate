@@ -19,6 +19,7 @@ class WorkersRepository extends Repository
         return $this->model()
             ->where('user_id', $user_id)
             ->with(['like_users', 'dislike_users'])
+            ->orderBy('id', 'desc')
             ->get();
     }
 
@@ -58,5 +59,21 @@ class WorkersRepository extends Repository
             ->whereMonth('created_at', date('m'))
             ->orderBy('id', 'desc')
             ->count();
+    }
+
+    /**
+     * get trending list
+     *
+     * @return mixed
+     */
+    public function getTrendingLists()
+    {
+        return $this->model()
+            ->with(['like_users', 'dislike_users', 'favorites_users'])
+            ->whereYear('created_at', date('Y'))
+            ->whereMonth('created_at', date('m'))
+            ->orderBy('id', 'desc')
+            ->take(5)
+            ->get();
     }
 }
