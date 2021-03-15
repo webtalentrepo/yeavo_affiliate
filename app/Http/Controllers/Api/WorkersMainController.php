@@ -23,9 +23,27 @@ class WorkersMainController extends Controller
             return $el;
         });
 
+        $tags = [
+            'Writing',
+            'Graphic Design',
+            'Traffic',
+            'SEO',
+            'Programming',
+            'Video Editing',
+            'Others'
+        ];
+
+        $recently_added = [];
+        for ($i = 0; $i < count($tags); $i++) {
+            $added_count = $this->workersRepo->getRecentlyAddedByTag($tags[$i]);
+
+            $recently_added[$tags[$i]] = $added_count;
+        }
+
         return response()->json([
-            'result'      => 'success',
-            'top_workers' => $top_workers
+            'result'       => 'success',
+            'top_workers'  => $top_workers,
+            'recent_added' => $recently_added,
         ]);
     }
 }

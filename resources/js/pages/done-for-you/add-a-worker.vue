@@ -156,6 +156,7 @@ export default {
             '99 Designs',
             'Guru',
             'Fiverr',
+            'Writing',
             'Graphic Design',
             'Traffic',
             'SEO',

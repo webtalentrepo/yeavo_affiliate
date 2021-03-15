@@ -18,6 +18,23 @@ const state = {
         'clickbank.com',
         'shareasale.com',
     ],
+    platform_tags: [
+        'Upwork',
+        'Konker',
+        'Freelancer',
+        '99 Designs',
+        'Guru',
+        'Fiverr',
+    ],
+    service_tags: [
+        'Writing',
+        'Graphic Design',
+        'Traffic',
+        'SEO',
+        'Programming',
+        'Video Editing',
+        'Others',
+    ],
     questions: [
         'How ',
         'How do you ',

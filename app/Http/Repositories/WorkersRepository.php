@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class WorkersRepository extends Repository
 {
+    /**
+     * get my listings
+     * @param $user_id
+     * @return mixed
+     */
     public function getListings($user_id)
     {
         return $this->model()
@@ -22,6 +27,11 @@ class WorkersRepository extends Repository
         return app(Worker::class);
     }
 
+    /**
+     * get top workers
+     *
+     * @return mixed
+     */
     public function getLikesCount()
     {
         return $this->model()
@@ -32,5 +42,21 @@ class WorkersRepository extends Repository
             ->orderBy('user_likes', 'desc')
             ->take(10)
             ->get();
+    }
+
+    /**
+     * get recently added count
+     *
+     * @param $service
+     * @return mixed
+     */
+    public function getRecentlyAddedByTag($service)
+    {
+        return $this->model()
+            ->where('search_tags', 'like', '%' . $service . '%')
+            ->whereYear('created_at', date('Y'))
+            ->whereMonth('created_at', date('m'))
+            ->orderBy('id', 'desc')
+            ->count();
     }
 }

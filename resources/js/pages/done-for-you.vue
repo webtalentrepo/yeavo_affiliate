@@ -126,16 +126,71 @@
                                         <div class="list-like">
                                             <div class="like">
                                                 <img
+                                                    v-if="
+                                                        filterLike(worker, true)
+                                                    "
                                                     src="/assets/menu-icons/like-fill.png"
                                                     alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            worker,
+                                                            true,
+                                                        )
+                                                    "
                                                 />
-                                                <span> 0 </span>
+
+                                                <img
+                                                    v-else
+                                                    src="/assets/menu-icons/like.png"
+                                                    alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            worker,
+                                                            true,
+                                                        )
+                                                    "
+                                                />
+
+                                                <span>
+                                                    {{
+                                                        checkLike(worker, true)
+                                                    }}
+                                                </span>
                                             </div>
                                             <div class="dis-like">
-                                                <span> 0 </span>
+                                                <span>
+                                                    {{
+                                                        checkLike(worker, false)
+                                                    }}
+                                                </span>
+
                                                 <img
+                                                    v-if="
+                                                        filterLike(
+                                                            worker,
+                                                            false,
+                                                        )
+                                                    "
                                                     src="/assets/menu-icons/dislike-fill.png"
                                                     alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            worker,
+                                                            false,
+                                                        )
+                                                    "
+                                                />
+
+                                                <img
+                                                    v-else
+                                                    src="/assets/menu-icons/dislike.png"
+                                                    alt=""
+                                                    @click="
+                                                        likeDislikeAction(
+                                                            worker,
+                                                            false,
+                                                        )
+                                                    "
                                                 />
                                             </div>
                                         </div>
@@ -148,7 +203,7 @@
                 </v-col>
             </v-row>
 
-            <v-row justify="center" align="center" class="p-0">
+            <v-row justify="center" class="trend-recent-list">
                 <v-col cols="7" md="7" sm="8" xs="12">
                     <v-row>
                         <v-col cols="12">
@@ -156,12 +211,28 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                <v-col cols="3" md="3" sm="4" xs="12">
+                <v-col cols="3" md="3" sm="4" xs="12" class="border-left">
                     <v-row>
                         <v-col cols="12">
                             <h2>Recently Added</h2>
                         </v-col>
                     </v-row>
+                    <div v-if="recent_list">
+                        <v-row v-for="(s, k) in service_category_list" :key="k">
+                            <v-col v-if="s !== 'All'" cols="6">{{ s }}</v-col>
+                            <v-col
+                                v-if="s !== 'All'"
+                                cols="6"
+                                class="font-weight-bold"
+                            >
+                                {{
+                                    recent_list[s]
+                                        ? `${recent_list[s]} New Added`
+                                        : 'None'
+                                }}
+                            </v-col>
+                        </v-row>
+                    </div>
                 </v-col>
             </v-row>
         </v-container>
@@ -193,6 +264,7 @@ export default {
         ],
         service_category_list: [
             'All',
+            'Writing',
             'Graphic Design',
             'Traffic',
             'SEO',
@@ -203,6 +275,7 @@ export default {
         top_workers: null,
         like_list: [],
         dislike_list: [],
+        recent_list: null,
         user_id: null,
         settings: {
             dots: false,
@@ -256,6 +329,7 @@ export default {
             this.$http.post('/get-top-workers', {}).then((r) => {
                 if (r.data.result === 'success') {
                     this.top_workers = r.data.top_workers;
+                    this.recent_list = r.data.recent_added;
 
                     for (const el of this.top_workers) {
                         const like_list = el.like_users.filter((el1) => {
