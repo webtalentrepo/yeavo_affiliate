@@ -27,7 +27,7 @@ class WorkersRepository extends Repository
         return $this->model()
             ->select('workers.*', DB::raw('COUNT(worker_likes.user_id) as user_likes'))
             ->leftJoin('worker_likes', 'workers.id', '=', 'worker_likes.worker_id')
-            ->with(['like_users', 'dislike_users'])
+            ->with(['like_users', 'dislike_users', 'favorites_users'])
             ->groupBy('workers.id')
             ->orderBy('user_likes', 'desc')
             ->take(10)

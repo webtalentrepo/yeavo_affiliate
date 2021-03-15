@@ -38,11 +38,7 @@
                                     <v-col cols="7">
                                         {{ row.worker_description }}
                                     </v-col>
-                                    <v-col
-                                        v-if="!watchedLike"
-                                        cols="5"
-                                        class="justify-center"
-                                    >
+                                    <v-col cols="5" class="justify-center">
                                         <div class="list-like">
                                             <div class="like">
                                                 <img
@@ -177,7 +173,6 @@ export default {
         like_list: [],
         dislike_list: [],
         user_id: null,
-        watchedLike: false,
     }),
     mounted() {
         this.user_id = this.$store.state.userData.id;

@@ -86,6 +86,65 @@
                     class="text-align-center"
                 >
                     <!--                    top workers here when back end completed-->
+                    <div v-if="top_workers">
+                        <VueSlickCarousel v-bind="settings">
+                            <div
+                                v-for="(worker, i) in top_workers"
+                                :key="i"
+                                class="top-worker-cards"
+                            >
+                                <div class="worker-item">
+                                    <div class="worker-service">
+                                        <div class="service-title">Upwork</div>
+                                    </div>
+                                    <v-card class="mx-auto" max-width="200">
+                                        <a
+                                            :href="worker.worker_url"
+                                            target="_blank"
+                                        >
+                                            <v-img
+                                                :src="`/storage${worker.image_name}`"
+                                                height="120px"
+                                            ></v-img>
+                                        </a>
+
+                                        <v-card-text>
+                                            {{ worker.worker_description }}
+                                        </v-card-text>
+
+                                        <v-card-title>
+                                            <div class="worker-category">
+                                                <img
+                                                    src="/assets/menu-icons/small-heart.png"
+                                                    alt=""
+                                                />
+                                                <div>Writing</div>
+                                            </div>
+                                        </v-card-title>
+                                    </v-card>
+                                    <div class="like-item">
+                                        <div class="list-like">
+                                            <div class="like">
+                                                <img
+                                                    src="/assets/menu-icons/like-fill.png"
+                                                    alt=""
+                                                />
+                                                <span> 0 </span>
+                                            </div>
+                                            <div class="dis-like">
+                                                <span> 0 </span>
+                                                <img
+                                                    src="/assets/menu-icons/dislike-fill.png"
+                                                    alt=""
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </VueSlickCarousel>
+                    </div>
+                    <div v-else>Not Exists</div>
                 </v-col>
             </v-row>
 
@@ -110,12 +169,13 @@
 </template>
 
 <script>
+import VueSlickCarousel from 'vue-slick-carousel';
 import PageHeader from '../layout/users/PageHeader';
 import DoneForYouHeader from '../components/DoneForYouHeader';
 
 export default {
     name: 'DoneForYou',
-    components: { DoneForYouHeader, PageHeader },
+    components: { DoneForYouHeader, PageHeader, VueSlickCarousel },
     data: () => ({
         search_str: '',
         searchData: '',
@@ -141,8 +201,48 @@ export default {
             'Others',
         ],
         top_workers: null,
+        like_list: [],
+        dislike_list: [],
+        user_id: null,
+        settings: {
+            dots: false,
+            arrows: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3,
+                        infinite: true,
+                        dots: true,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                        initialSlide: 2,
+                    },
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                    },
+                },
+            ],
+        },
     }),
     mounted() {
+        this.user_id = this.$store.state.userData.id;
+
         this.getTopWorkers();
     },
     methods: {
@@ -151,9 +251,148 @@ export default {
 
             this.$http.post('/get-top-workers', {}).then((r) => {
                 if (r.data.result === 'success') {
-                    this.top_workers = r.data.data;
+                    this.top_workers = r.data.top_workers;
+
+                    for (const el of this.top_workers) {
+                        const like_list = el.like_users.filter((el1) => {
+                            return this.user_id === el1.id;
+                        });
+
+                        if (like_list && like_list.length) {
+                            for (const item of like_list) {
+                                this.$set(
+                                    this.like_list,
+                                    this.like_list.length,
+                                    item.pivot.worker_id,
+                                );
+                            }
+                        }
+
+                        const dislike_list = el.dislike_users.filter((el2) => {
+                            return this.user_id === el2.id;
+                        });
+
+                        if (dislike_list && dislike_list.length) {
+                            for (const item of dislike_list) {
+                                this.$set(
+                                    this.dislike_list,
+                                    this.dislike_list.length,
+                                    item.pivot.worker_id,
+                                );
+                            }
+                        }
+                    }
                 }
             });
+        },
+
+        checkLike(item, flag) {
+            if (!item) {
+                return 0;
+            }
+
+            if (flag) {
+                if (this.like_list && this.like_list.indexOf(item.id) > -1) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            } else {
+                if (
+                    this.dislike_list &&
+                    this.dislike_list.indexOf(item.id) > -1
+                ) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        },
+
+        async setLikes(id, flag, add) {
+            await this.$http.post('/vote-worker', {
+                worker_id: id,
+                flag: flag,
+                add: add,
+            });
+        },
+
+        likeDislikeAction(item, flag) {
+            if (!item) {
+                return;
+            }
+
+            if (flag) {
+                if (this.like_list.length) {
+                    if (this.like_list.indexOf(item.id) > -1) {
+                        this.like_list = this.like_list.filter((el) => {
+                            return el !== item.id;
+                        });
+
+                        this.$forceUpdate();
+
+                        this.setLikes(item.id, 'like', 'no');
+
+                        return;
+                    }
+                }
+
+                if (this.dislike_list.length) {
+                    if (this.dislike_list.indexOf(item.id) > -1) {
+                        return;
+                    }
+                }
+
+                this.$set(this.like_list, this.like_list.length, item.id);
+
+                this.setLikes(item.id, 'like', 'yes');
+
+                this.$forceUpdate();
+            } else {
+                if (this.dislike_list.length) {
+                    if (this.dislike_list.indexOf(item.id) > -1) {
+                        this.dislike_list = this.dislike_list.filter((el) => {
+                            return el !== item.id;
+                        });
+
+                        this.$forceUpdate();
+
+                        this.setLikes(item.id, 'dislike', 'no');
+
+                        return;
+                    }
+                }
+
+                if (this.like_list.length) {
+                    if (this.like_list.indexOf(item.id) > -1) {
+                        return;
+                    }
+                }
+
+                this.$set(this.dislike_list, this.dislike_list.length, item.id);
+
+                this.setLikes(item.id, 'dislike', 'yes');
+
+                this.$forceUpdate();
+            }
+        },
+
+        filterLike(item, flag) {
+            if (!item) {
+                return false;
+            }
+
+            if (flag) {
+                if (this.like_list.indexOf(item.id) > -1) {
+                    return true;
+                }
+            } else {
+                if (this.dislike_list.indexOf(item.id) > -1) {
+                    return true;
+                }
+            }
+
+            return false;
         },
     },
 };

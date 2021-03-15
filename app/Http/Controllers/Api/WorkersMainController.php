@@ -17,11 +17,15 @@ class WorkersMainController extends Controller
 
     public function index(Request $request)
     {
-        $counts = $this->workersRepo->getLikesCount();
+        $top_workers = $this->workersRepo->getLikesCount()->map(function ($el) {
+            $el->search_tags = json_decode($el->search_tags);
+
+            return $el;
+        });
 
         return response()->json([
-            'result' => 'success',
-            'count'  => $counts
+            'result'      => 'success',
+            'top_workers' => $top_workers
         ]);
     }
 }

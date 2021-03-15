@@ -58,6 +58,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\Worker', 'worker_dislikes', 'user_id', 'worker_id');
     }
 
+    public function favorite_workers()
+    {
+        return $this->belongsToMany('App\Models\Worker', 'worker_favorites', 'user_id', 'worker_id');
+    }
+
     public function plans()
     {
         return $this->belongsToMany('App\Plan', 'user_plans', 'user_id', 'plan_id');

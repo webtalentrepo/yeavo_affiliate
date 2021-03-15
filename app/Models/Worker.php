@@ -19,6 +19,11 @@ class Worker extends Model
         return $this->belongsToMany('App\User', 'worker_dislikes', 'worker_id', 'user_id');
     }
 
+    public function favorites_users()
+    {
+        return $this->belongsToMany('App\User', 'worker_favorites', 'worker_id', 'user_id');
+    }
+
     public function comments()
     {
         return $this->morphMany(WorkerComment::class, 'commentable')->whereNull('parent_id');
