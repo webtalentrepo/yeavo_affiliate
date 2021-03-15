@@ -241,7 +241,11 @@ export default {
         },
     }),
     mounted() {
-        this.user_id = this.$store.state.userData.id;
+        if (this.$store.state.userData) {
+            this.user_id = this.$store.state.userData.id;
+        } else {
+            this.$router.push('/logout');
+        }
 
         this.getTopWorkers();
     },
