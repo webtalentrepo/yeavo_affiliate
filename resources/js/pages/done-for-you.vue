@@ -258,6 +258,30 @@
                                         {{ trend.worker_description }}
                                     </v-col>
                                 </v-row>
+                                <v-row>
+                                    <v-col
+                                        cols="6"
+                                        md="6"
+                                        sm="12"
+                                        xs="12"
+                                        class="font-italic"
+                                    >
+                                        <div>
+                                            Category:
+                                            {{ filterTag(trend, false) }}
+                                        </div>
+                                        <div>
+                                            Platform:
+                                            {{ filterTag(trend, true) }}
+                                        </div>
+                                        <div>
+                                            Added By:
+                                            {{ trend.owner_user.name }}
+                                        </div>
+                                    </v-col>
+                                    <v-col cols="6" md="6" sm="12" xs="12">
+                                    </v-col>
+                                </v-row>
                             </v-col>
                         </v-row>
                     </div>
