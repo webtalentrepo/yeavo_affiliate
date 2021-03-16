@@ -18,7 +18,7 @@ class WorkersRepository extends Repository
     {
         return $this->model()
             ->where('user_id', $user_id)
-            ->with(['like_users', 'dislike_users'])
+            ->with(['like_users', 'dislike_users', 'owner_user'])
             ->orderBy('id', 'desc')
             ->get();
     }
@@ -38,7 +38,7 @@ class WorkersRepository extends Repository
         return $this->model()
             ->select('workers.*', DB::raw('COUNT(worker_likes.user_id) as user_likes'))
             ->leftJoin('worker_likes', 'workers.id', '=', 'worker_likes.worker_id')
-            ->with(['like_users', 'dislike_users', 'favorites_users'])
+            ->with(['like_users', 'dislike_users', 'favorites_users', 'owner_user'])
             ->groupBy('workers.id')
             ->orderBy('user_likes', 'desc')
             ->take(10)
@@ -69,7 +69,7 @@ class WorkersRepository extends Repository
     public function getTrendingLists()
     {
         return $this->model()
-            ->with(['like_users', 'dislike_users', 'favorites_users'])
+            ->with(['like_users', 'dislike_users', 'favorites_users', 'owner_user'])
             ->whereYear('created_at', date('Y'))
             ->whereMonth('created_at', date('m'))
             ->orderBy('id', 'desc')

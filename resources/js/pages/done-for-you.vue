@@ -95,7 +95,9 @@
                             >
                                 <div class="worker-item">
                                     <div class="worker-service">
-                                        <div class="service-title">Upwork</div>
+                                        <div class="service-title">
+                                            {{ filterTag(worker, true) }}
+                                        </div>
                                     </div>
                                     <v-card class="mx-auto" max-width="200">
                                         <a
@@ -118,7 +120,11 @@
                                                     src="/assets/menu-icons/small-heart.png"
                                                     alt=""
                                                 />
-                                                <div>Writing</div>
+                                                <div>
+                                                    {{
+                                                        filterTag(worker, false)
+                                                    }}
+                                                </div>
                                             </div>
                                         </v-card-title>
                                     </v-card>
@@ -227,6 +233,34 @@
                             <h2>Trending</h2>
                         </v-col>
                     </v-row>
+                    <div v-if="trending_list">
+                        <v-row
+                            v-for="(trend, t) in trending_list"
+                            :key="t"
+                            justify="center"
+                            class="cursor-pointer"
+                        >
+                            <v-col cols="4" md="4" sm="11" xs="12">
+                                <v-img
+                                    :src="`/storage${trend.image_name}`"
+                                    aspect-ratio="1.7"
+                                ></v-img>
+                            </v-col>
+                            <v-col
+                                cols="8"
+                                md="8"
+                                sm="11"
+                                xs="12"
+                                class="list-content"
+                            >
+                                <v-row>
+                                    <v-col cols="12" class="list-title">
+                                        {{ trend.worker_description }}
+                                    </v-col>
+                                </v-row>
+                            </v-col>
+                        </v-row>
+                    </div>
                 </v-col>
                 <v-col cols="3" md="3" sm="4" xs="12" class="border-left">
                     <v-row>
@@ -334,11 +368,15 @@ export default {
     mounted() {
         if (this.$store.state.userData) {
             this.user_id = this.$store.state.userData.id;
-        } else {
-            this.$router.push('/logout');
-        }
 
-        this.getTopWorkers();
+            this.getTopWorkers();
+        } else {
+            this.$nextTick(() => {
+                this.user_id = this.$store.state.userData.id;
+
+                this.getTopWorkers();
+            });
+        }
     },
     methods: {
         getTopWorkers() {
@@ -510,6 +548,28 @@ export default {
             }
 
             return false;
+        },
+
+        filterTag(item, flag) {
+            if (flag) {
+                const platforms = this.$store.state.platform_tags;
+                for (let p = 0; p < platforms.length; p++) {
+                    const p_item = platforms[p];
+                    if (item.search_tags.indexOf(p_item) > -1) {
+                        return p_item;
+                    }
+                }
+            } else {
+                const services = this.$store.state.service_tags;
+                for (let s = 0; s < services.length; s++) {
+                    const s_item = services[s];
+                    if (item.search_tags.indexOf(s_item) > -1) {
+                        return s_item;
+                    }
+                }
+            }
+
+            return '';
         },
     },
 };
