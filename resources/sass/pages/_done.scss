@@ -223,3 +223,12 @@
     padding: 20px 0;
     min-height: 260px;
 }
+
+.trend-like-item {
+    align-items: center;
+    justify-content: space-between;
+
+    .list-like {
+        min-width: 155px;
+    }
+}

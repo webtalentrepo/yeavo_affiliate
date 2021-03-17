@@ -68,7 +68,7 @@
                                                 <span>
                                                     {{
                                                         row.like_users.length
-                                                            ? worker.like_users
+                                                            ? row.like_users
                                                                   .length
                                                             : 0
                                                     }}
@@ -78,8 +78,7 @@
                                                 <span>
                                                     {{
                                                         row.dislike_users.length
-                                                            ? worker
-                                                                  .dislike_users
+                                                            ? row.dislike_users
                                                                   .length
                                                             : 0
                                                     }}
@@ -188,11 +187,19 @@ export default {
     mounted() {
         if (this.$store.state.userData) {
             this.user_id = this.$store.state.userData.id;
-        } else {
-            this.$router.push('/logout');
-        }
 
-        this.getListingsData();
+            this.getListingsData();
+        } else {
+            const intervalCheck = setInterval(() => {
+                if (this.$store.state.userData) {
+                    this.user_id = this.$store.state.userData.id;
+
+                    this.getListingsData();
+
+                    clearInterval(intervalCheck);
+                }
+            }, 200);
+        }
     },
     methods: {
         ...mapActions({
@@ -201,11 +208,17 @@ export default {
         }),
 
         async setLikes(id, flag, add) {
-            await this.$http.post('/vote-worker', {
-                worker_id: id,
-                flag: flag,
-                add: add,
-            });
+            await this.$http
+                .post('/vote-worker', {
+                    worker_id: id,
+                    flag: flag,
+                    add: add,
+                })
+                .then((r) => {
+                    if (r.data.result === 'success') {
+                        this.getListingsData();
+                    }
+                });
         },
 
         likeDislikeAction(item, flag) {
@@ -287,7 +300,9 @@ export default {
         },
 
         getListingsData() {
-            this.listings = null;
+            this.like_list = [];
+            this.dislike_list = [];
+
             this.getData({ url: '/workers', config: {} })
                 .then((re) => {
                     if (re.data.result === 'success') {

@@ -31,18 +31,37 @@ class WorkersRepository extends Repository
     /**
      * get top workers
      *
+     * @param $search_str
+     * @param $platform
+     * @param $service_category
      * @return mixed
      */
-    public function getLikesCount()
+    public function getLikesCount($search_str, $platform, $service_category)
     {
-        return $this->model()
+        $qry = $this->model()
             ->select('workers.*', DB::raw('COUNT(worker_likes.user_id) as user_likes'))
             ->leftJoin('worker_likes', 'workers.id', '=', 'worker_likes.worker_id')
             ->with(['like_users', 'dislike_users', 'favorites_users', 'owner_user'])
             ->groupBy('workers.id')
             ->orderBy('user_likes', 'desc')
-            ->take(10)
-            ->get();
+            ->take(10);
+
+        if ($search_str !== '') {
+            $qry = $qry->where(function ($q) use ($search_str) {
+                return $q->where('workers.worker_title', 'like', '%' . $search_str . '%')
+                    ->orWhere('workers.worker_description', 'like', '%' . $search_str . '%');
+            });
+        }
+
+        if ($platform !== 'All' && $platform !== '') {
+            $qry = $qry->where('workers.search_tags', 'like', '%' . $platform . '%');
+        }
+
+        if ($service_category !== 'All' && $service_category !== '') {
+            $qry = $qry->where('workers.search_tags', 'like', '%' . $service_category . '%');
+        }
+
+        return $qry->get();
     }
 
     /**
@@ -64,16 +83,37 @@ class WorkersRepository extends Repository
     /**
      * get trending list
      *
+     * @param $search_str
+     * @param $platform
+     * @param $service_category
      * @return mixed
      */
-    public function getTrendingLists()
+    public function getTrendingLists($search_str, $platform, $service_category)
     {
-        return $this->model()
+        $qry = $this->model()
             ->with(['like_users', 'dislike_users', 'favorites_users', 'owner_user'])
             ->whereYear('created_at', date('Y'))
             ->whereMonth('created_at', date('m'))
             ->orderBy('id', 'desc')
-            ->take(5)
-            ->get();
+            ->take(5);
+
+        if ($search_str !== '') {
+            $qry = $qry->where(function ($q) use ($search_str) {
+                return $q->where('worker_title', 'like', '%' . $search_str . '%')
+                    ->orWhere('worker_description', 'like', '%' . $search_str . '%');
+            });
+        }
+
+        if ($platform !== 'All' && $platform !== '') {
+            $qry = $qry->where('search_tags', 'like', '%' . $platform . '%');
+        }
+
+        if ($service_category !== 'All' && $service_category !== '') {
+            $qry = $qry->where('search_tags', 'like', '%' . $service_category . '%');
+        }
+
+        $qry = $qry->get();
+
+        return $qry;
     }
 }

@@ -48,4 +48,5 @@ Route::group([
     Route::resource('workers', 'Api\WorkersController', ['names' => ['index' => 'workers']]);
     Route::post('/vote-worker', 'Api\WorkerLikesController@voteLikeDislike');
     Route::post('/get-top-workers', 'Api\WorkersMainController@index');
+    Route::post('/favorites-worker', 'Api\WorkersMainController@workerFavorites');
 });

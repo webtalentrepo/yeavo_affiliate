@@ -17,7 +17,11 @@ class WorkersMainController extends Controller
 
     public function index(Request $request)
     {
-        $top_workers = $this->workersRepo->getLikesCount()->map(function ($el) {
+        $search_str = $request->input('search_str');
+        $platform = $request->input('platform');
+        $service_category = $request->input('service_category');
+
+        $top_workers = $this->workersRepo->getLikesCount($search_str, $platform, $service_category)->map(function ($el) {
             $el->search_tags = json_decode($el->search_tags);
 
             return $el;
@@ -40,7 +44,7 @@ class WorkersMainController extends Controller
             $recently_added[$tags[$i]] = $added_count;
         }
 
-        $trending_list = $this->workersRepo->getTrendingLists()->map(function ($el) {
+        $trending_list = $this->workersRepo->getTrendingLists($search_str, $platform, $service_category)->map(function ($el) {
             $el->search_tags = json_decode($el->search_tags);
 
             return $el;

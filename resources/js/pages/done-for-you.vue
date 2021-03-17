@@ -14,15 +14,15 @@
                         v-model="search_str"
                         solo
                         label="Search, e.g. upwork affiliate copywriting"
-                        @keyup.enter="searchData"
-                        @click:append="searchData"
+                        @keyup.enter="getTopWorkers"
+                        @click:append="getTopWorkers"
                     >
                         <template #append>
                             <img
                                 src="/assets/menu-icons/search.png"
                                 alt=""
                                 class="append-icon cursor-pointer"
-                                @click="searchData"
+                                @click="getTopWorkers"
                             />
                         </template>
                     </v-text-field>
@@ -46,6 +46,7 @@
                                     solo
                                     dense
                                     label="Platform"
+                                    @change="getTopWorkers"
                                 ></v-select>
                             </div>
                         </v-col>
@@ -59,6 +60,7 @@
                                     solo
                                     dense
                                     label="Service Category"
+                                    @change="getTopWorkers"
                                 ></v-select>
                             </div>
                         </v-col>
@@ -86,7 +88,7 @@
                     class="text-align-center"
                 >
                     <!--                    top workers here when back end completed-->
-                    <div v-if="top_workers">
+                    <div v-if="top_workers && top_workers.length">
                         <VueSlickCarousel v-bind="settings">
                             <div
                                 v-for="(worker, i) in top_workers"
@@ -117,9 +119,34 @@
                                         <v-card-title>
                                             <div class="worker-category">
                                                 <img
+                                                    v-if="
+                                                        filterFavorites(
+                                                            worker,
+                                                            0,
+                                                        )
+                                                    "
+                                                    src="/assets/menu-icons/small-heart-fill.png"
+                                                    alt=""
+                                                    @click="
+                                                        favoritesAction(
+                                                            worker,
+                                                            0,
+                                                        )
+                                                    "
+                                                />
+
+                                                <img
+                                                    v-else
                                                     src="/assets/menu-icons/small-heart.png"
                                                     alt=""
+                                                    @click="
+                                                        favoritesAction(
+                                                            worker,
+                                                            0,
+                                                        )
+                                                    "
                                                 />
+
                                                 <div>
                                                     {{
                                                         filterTag(worker, false)
@@ -233,7 +260,7 @@
                             <h2>Trending</h2>
                         </v-col>
                     </v-row>
-                    <div v-if="trending_list">
+                    <div v-if="trending_list && trending_list.length">
                         <v-row
                             v-for="(trend, t) in trending_list"
                             :key="t"
@@ -279,7 +306,123 @@
                                             {{ trend.owner_user.name }}
                                         </div>
                                     </v-col>
-                                    <v-col cols="6" md="6" sm="12" xs="12">
+                                    <v-col
+                                        cols="6"
+                                        md="6"
+                                        sm="12"
+                                        xs="12"
+                                        class="d-flex trend-like-item"
+                                    >
+                                        <img
+                                            v-if="filterFavorites(trend, 1)"
+                                            src="/assets/menu-icons/big-heart-fill.png"
+                                            alt=""
+                                            width="28px"
+                                            height="25px"
+                                            @click="favoritesAction(trend, 1)"
+                                        />
+
+                                        <img
+                                            v-else
+                                            src="/assets/menu-icons/big-heart.png"
+                                            alt=""
+                                            width="28px"
+                                            height="25px"
+                                            @click="favoritesAction(trend, 1)"
+                                        />
+
+                                        <div class="like-item">
+                                            <div class="list-like">
+                                                <div class="like">
+                                                    <img
+                                                        v-if="
+                                                            filterLike(
+                                                                trend,
+                                                                true,
+                                                                1,
+                                                            )
+                                                        "
+                                                        src="/assets/menu-icons/like-fill.png"
+                                                        alt=""
+                                                        @click="
+                                                            likeDislikeAction(
+                                                                trend,
+                                                                true,
+                                                                1,
+                                                            )
+                                                        "
+                                                    />
+
+                                                    <img
+                                                        v-else
+                                                        src="/assets/menu-icons/like.png"
+                                                        alt=""
+                                                        @click="
+                                                            likeDislikeAction(
+                                                                trend,
+                                                                true,
+                                                                1,
+                                                            )
+                                                        "
+                                                    />
+
+                                                    <span>
+                                                        {{
+                                                            trend.like_users
+                                                                .length
+                                                                ? trend
+                                                                      .like_users
+                                                                      .length
+                                                                : 0
+                                                        }}
+                                                    </span>
+                                                </div>
+                                                <div class="dis-like">
+                                                    <span>
+                                                        {{
+                                                            trend.dislike_users
+                                                                .length
+                                                                ? trend
+                                                                      .dislike_users
+                                                                      .length
+                                                                : 0
+                                                        }}
+                                                    </span>
+
+                                                    <img
+                                                        v-if="
+                                                            filterLike(
+                                                                trend,
+                                                                false,
+                                                                1,
+                                                            )
+                                                        "
+                                                        src="/assets/menu-icons/dislike-fill.png"
+                                                        alt=""
+                                                        @click="
+                                                            likeDislikeAction(
+                                                                trend,
+                                                                false,
+                                                                1,
+                                                            )
+                                                        "
+                                                    />
+
+                                                    <img
+                                                        v-else
+                                                        src="/assets/menu-icons/dislike.png"
+                                                        alt=""
+                                                        @click="
+                                                            likeDislikeAction(
+                                                                trend,
+                                                                false,
+                                                                1,
+                                                            )
+                                                        "
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </v-col>
                                 </v-row>
                             </v-col>
@@ -324,7 +467,6 @@ export default {
     components: { DoneForYouHeader, PageHeader, VueSlickCarousel },
     data: () => ({
         search_str: '',
-        searchData: '',
         platform: '',
         service_category: '',
         show_workers: [0, 1, 2, 3, 4],
@@ -352,6 +494,7 @@ export default {
         trending_list: null,
         like_list: [[], []],
         dislike_list: [[], []],
+        favorites_list: [[], []],
         user_id: null,
         settings: {
             dots: false,
@@ -395,93 +538,192 @@ export default {
 
             this.getTopWorkers();
         } else {
-            this.$nextTick(() => {
-                this.user_id = this.$store.state.userData.id;
+            const intervalCheck = setInterval(() => {
+                if (this.$store.state.userData) {
+                    this.user_id = this.$store.state.userData.id;
 
-                this.getTopWorkers();
-            });
+                    this.getTopWorkers();
+
+                    clearInterval(intervalCheck);
+                }
+            }, 200);
         }
     },
     methods: {
         getTopWorkers() {
-            this.top_workers = null;
-            this.trending_list = null;
+            this.favorites_list = [[], []];
+            this.like_list = [[], []];
+            this.dislike_list = [[], []];
+            this.$http
+                .post('/get-top-workers', {
+                    search_str: this.search_str,
+                    platform: this.platform,
+                    service_category: this.service_category,
+                })
+                .then((r) => {
+                    if (r.data.result === 'success') {
+                        this.top_workers = r.data.top_workers;
+                        this.trending_list = r.data.trending_list;
+                        this.recent_list = r.data.recent_added;
 
-            this.$http.post('/get-top-workers', {}).then((r) => {
-                if (r.data.result === 'success') {
-                    this.top_workers = r.data.top_workers;
-                    this.trending_list = r.data.trending_list;
-                    this.recent_list = r.data.recent_added;
+                        for (const el of this.top_workers) {
+                            const like_list = el.like_users.filter((el1) => {
+                                return this.user_id === el1.id;
+                            });
 
-                    for (const el of this.top_workers) {
-                        const like_list = el.like_users.filter((el1) => {
-                            return this.user_id === el1.id;
-                        });
+                            if (like_list && like_list.length) {
+                                for (const item of like_list) {
+                                    this.$set(
+                                        this.like_list[0],
+                                        this.like_list[0].length,
+                                        item.pivot.worker_id,
+                                    );
+                                }
+                            }
 
-                        if (like_list && like_list.length) {
-                            for (const item of like_list) {
-                                this.$set(
-                                    this.like_list[0],
-                                    this.like_list[0].length,
-                                    item.pivot.worker_id,
-                                );
+                            const dislike_list = el.dislike_users.filter(
+                                (el2) => {
+                                    return this.user_id === el2.id;
+                                },
+                            );
+
+                            if (dislike_list && dislike_list.length) {
+                                for (const item of dislike_list) {
+                                    this.$set(
+                                        this.dislike_list[0],
+                                        this.dislike_list[0].length,
+                                        item.pivot.worker_id,
+                                    );
+                                }
+                            }
+
+                            const fav_list = el.favorites_users.filter(
+                                (fEl) => {
+                                    return this.user_id === fEl.id;
+                                },
+                            );
+
+                            if (fav_list && fav_list.length) {
+                                for (const item1 of fav_list) {
+                                    this.$set(
+                                        this.favorites_list[0],
+                                        this.favorites_list[0].length,
+                                        item1.pivot.worker_id,
+                                    );
+                                }
                             }
                         }
 
-                        const dislike_list = el.dislike_users.filter((el2) => {
-                            return this.user_id === el2.id;
-                        });
+                        for (const tEl of this.trending_list) {
+                            const like_list = tEl.like_users.filter((el1) => {
+                                return this.user_id === el1.id;
+                            });
 
-                        if (dislike_list && dislike_list.length) {
-                            for (const item of dislike_list) {
-                                this.$set(
-                                    this.dislike_list[0],
-                                    this.dislike_list[0].length,
-                                    item.pivot.worker_id,
-                                );
+                            if (like_list && like_list.length) {
+                                for (const item of like_list) {
+                                    this.$set(
+                                        this.like_list[1],
+                                        this.like_list[1].length,
+                                        item.pivot.worker_id,
+                                    );
+                                }
+                            }
+
+                            const dislike_list = tEl.dislike_users.filter(
+                                (el2) => {
+                                    return this.user_id === el2.id;
+                                },
+                            );
+
+                            if (dislike_list && dislike_list.length) {
+                                for (const item of dislike_list) {
+                                    this.$set(
+                                        this.dislike_list[1],
+                                        this.dislike_list[1].length,
+                                        item.pivot.worker_id,
+                                    );
+                                }
+                            }
+
+                            const fav_list = tEl.favorites_users.filter(
+                                (fEl) => {
+                                    return this.user_id === fEl.id;
+                                },
+                            );
+
+                            if (fav_list && fav_list.length) {
+                                for (const item1 of fav_list) {
+                                    this.$set(
+                                        this.favorites_list[1],
+                                        this.favorites_list[1].length,
+                                        item1.pivot.worker_id,
+                                    );
+                                }
                             }
                         }
+
+                        this.$forceUpdate();
                     }
-
-                    for (const tEl of this.trending_list) {
-                        const like_list = tEl.like_users.filter((el1) => {
-                            return this.user_id === el1.id;
-                        });
-
-                        if (like_list && like_list.length) {
-                            for (const item of like_list) {
-                                this.$set(
-                                    this.like_list[1],
-                                    this.like_list[1].length,
-                                    item.pivot.worker_id,
-                                );
-                            }
-                        }
-
-                        const dislike_list = tEl.dislike_users.filter((el2) => {
-                            return this.user_id === el2.id;
-                        });
-
-                        if (dislike_list && dislike_list.length) {
-                            for (const item of dislike_list) {
-                                this.$set(
-                                    this.dislike_list[1],
-                                    this.dislike_list[1].length,
-                                    item.pivot.worker_id,
-                                );
-                            }
-                        }
-                    }
-                }
-            });
+                });
         },
 
         async setLikes(id, flag, add) {
-            await this.$http.post('/vote-worker', {
-                worker_id: id,
-                flag: flag,
-                add: add,
-            });
+            await this.$http
+                .post('/vote-worker', {
+                    worker_id: id,
+                    flag: flag,
+                    add: add,
+                })
+                .then((r) => {
+                    if (r.data.result === 'success') {
+                        this.getTopWorkers();
+                    }
+                });
+        },
+
+        async setFavorites(id, add) {
+            await this.$http
+                .post('/favorites-worker', {
+                    worker_id: id,
+                    add: add,
+                })
+                .then((r) => {
+                    if (r.data.result === 'success') {
+                        this.getTopWorkers();
+                    }
+                });
+        },
+
+        favoritesAction(item, ind) {
+            if (!item) {
+                return;
+            }
+
+            if (this.favorites_list[ind].length) {
+                if (this.favorites_list[ind].indexOf(item.id) > -1) {
+                    this.favorites_list[ind] = this.favorites_list[ind].filter(
+                        (el) => {
+                            return el !== item.id;
+                        },
+                    );
+
+                    this.$forceUpdate();
+
+                    this.setFavorites(item.id, 'no');
+
+                    return;
+                }
+            }
+
+            this.$set(
+                this.favorites_list[ind],
+                this.favorites_list[ind].length,
+                item.id,
+            );
+
+            this.setFavorites(item.id, 'yes');
+
+            this.$forceUpdate();
         },
 
         likeDislikeAction(item, flag, ind) {
@@ -572,6 +814,14 @@ export default {
             }
 
             return false;
+        },
+
+        filterFavorites(item, ind) {
+            if (!item) {
+                return false;
+            }
+
+            return this.favorites_list[ind].indexOf(item.id) > -1;
         },
 
         filterTag(item, flag) {
