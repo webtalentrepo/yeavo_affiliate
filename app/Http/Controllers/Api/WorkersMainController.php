@@ -53,4 +53,21 @@ class WorkersMainController extends Controller
             'trending_list' => $trending_list,
         ]);
     }
+
+    public function workerFavorites(Request $request)
+    {
+        $user = auth()->user();
+
+        $worker_id = $request->input('worker_id');
+
+        if ($request->input('add') === 'yes') {
+            $user->favorite_workers()->attach($worker_id);
+        } else {
+            $user->favorite_workers()->detach($worker_id);
+        }
+
+        return response()->json([
+            'result' => 'success'
+        ]);
+    }
 }
