@@ -232,3 +232,14 @@
         min-width: 155px;
     }
 }
+
+.trend-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    a {
+        display: block;
+        width: 100%;
+    }
+}
