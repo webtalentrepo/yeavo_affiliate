@@ -102,15 +102,10 @@
                                         </div>
                                     </div>
                                     <v-card class="mx-auto" max-width="200">
-                                        <a
-                                            :href="worker.worker_url"
-                                            target="_blank"
-                                        >
-                                            <v-img
-                                                :src="`/storage${worker.image_name}`"
-                                                height="120px"
-                                            ></v-img>
-                                        </a>
+                                        <v-img
+                                            :src="`/storage${worker.image_name}`"
+                                            height="120px"
+                                        ></v-img>
 
                                         <v-card-text>
                                             {{ worker.worker_description }}

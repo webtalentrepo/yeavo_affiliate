@@ -38,14 +38,14 @@ class WorkerCommentsController extends Controller
     public function store(Request $request)
     {
         $comment = new WorkerComment();
-        $comment->body = $request->get('comment_body');
+        $comment->body = $request->input('comment_body');
         $comment->user()->associate($request->user());
 
         if ($request->input('is_reply') == 'yes') {
-            $comment->parent_id = $request->get('comment_id');
+            $comment->parent_id = $request->input('comment_id');
         }
 
-        $worker = Worker::find($request->get('worker_id'));
+        $worker = Worker::find($request->input('worker_id'));
         $worker->comments()->save($comment);
 
         return response()->json(['result' => 'success']);

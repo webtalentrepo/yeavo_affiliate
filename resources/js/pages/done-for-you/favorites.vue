@@ -24,12 +24,10 @@
                         class="cursor-pointer"
                     >
                         <v-col cols="4" md="4" sm="11" xs="12">
-                            <a :href="trend.worker_url" target="_blank">
-                                <v-img
-                                    :src="`/storage${trend.image_name}`"
-                                    aspect-ratio="1.7"
-                                ></v-img
-                            ></a>
+                            <v-img
+                                :src="`/storage${trend.image_name}`"
+                                aspect-ratio="1.7"
+                            ></v-img>
                         </v-col>
                         <v-col
                             cols="7"
