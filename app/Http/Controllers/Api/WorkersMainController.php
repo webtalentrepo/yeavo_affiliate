@@ -74,4 +74,18 @@ class WorkersMainController extends Controller
             'result' => 'success'
         ]);
     }
+
+    public function getFavoritesList()
+    {
+        $user = auth()->user();
+
+        $favorites = $user->favorite_workers()
+            ->with(['like_users', 'dislike_users', 'favorites_users', 'owner_user'])
+            ->get();
+
+        return response()->json([
+            'result'         => 'success',
+            'favorites_list' => $favorites,
+        ]);
+    }
 }
