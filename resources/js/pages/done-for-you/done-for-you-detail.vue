@@ -9,7 +9,14 @@
                 </v-row>
 
                 <v-row v-if="worker" justify="center">
-                    <v-col cols="7" lg="7" md="8" sm="10" xs="11">
+                    <v-col
+                        cols="7"
+                        lg="7"
+                        md="8"
+                        sm="10"
+                        xs="11"
+                        class="worker-detail"
+                    >
                         <v-row justify="center">
                             <v-col
                                 cols="12"
@@ -18,6 +25,60 @@
                                 {{ filterTag(worker, false) }}
                             </v-col>
                         </v-row>
+                        <div class="like-widget">
+                            <div class="list-like">
+                                <div class="like">
+                                    <img
+                                        v-if="filterLike(worker, true)"
+                                        src="/assets/menu-icons/like-fill.png"
+                                        alt=""
+                                        @click="likeDislikeAction(worker, true)"
+                                    />
+
+                                    <img
+                                        v-else
+                                        src="/assets/menu-icons/like.png"
+                                        alt=""
+                                        @click="likeDislikeAction(worker, true)"
+                                    />
+
+                                    <span>
+                                        {{
+                                            worker.like_users.length
+                                                ? worker.like_users.length
+                                                : 0
+                                        }}
+                                    </span>
+                                </div>
+                                <div class="dis-like">
+                                    <span>
+                                        {{
+                                            worker.dislike_users.length
+                                                ? worker.dislike_users.length
+                                                : 0
+                                        }}
+                                    </span>
+
+                                    <img
+                                        v-if="filterLike(worker, false)"
+                                        src="/assets/menu-icons/dislike-fill.png"
+                                        alt=""
+                                        @click="
+                                            likeDislikeAction(worker, false)
+                                        "
+                                    />
+
+                                    <img
+                                        v-else
+                                        src="/assets/menu-icons/dislike.png"
+                                        alt=""
+                                        @click="
+                                            likeDislikeAction(worker, false)
+                                        "
+                                    />
+                                </div>
+                            </div>
+                        </div>
                         <form enctype="multipart/form-data">
                             <v-row justify="center">
                                 <v-col cols="12" class="worker-image">
@@ -204,6 +265,9 @@ export default {
         worker_id: null,
         worker: null,
         showReplyBox: null,
+        like_list: [],
+        dislike_list: [],
+        user_id: null,
     }),
     created() {
         if (this.$route.params && this.$route.params.id) {
@@ -211,13 +275,119 @@ export default {
         }
     },
     mounted() {
-        this.getWorkerDetail();
+        if (this.$store.state.userData) {
+            this.user_id = this.$store.state.userData.id;
+
+            this.getWorkerDetail();
+        } else {
+            const intervalCheck = setInterval(() => {
+                if (this.$store.state.userData) {
+                    this.user_id = this.$store.state.userData.id;
+
+                    this.getWorkerDetail();
+
+                    clearInterval(intervalCheck);
+                }
+            }, 200);
+        }
     },
     methods: {
         ...mapActions({
             postData: 'post',
             getData: 'getData',
         }),
+
+        async setLikes(id, flag, add) {
+            await this.$http
+                .post('/vote-worker', {
+                    worker_id: id,
+                    flag: flag,
+                    add: add,
+                })
+                .then((r) => {
+                    if (r.data.result === 'success') {
+                        this.getWorkerDetail();
+                    }
+                });
+        },
+
+        likeDislikeAction(item, flag) {
+            if (!item) {
+                return;
+            }
+
+            if (flag) {
+                if (this.like_list.length) {
+                    if (this.like_list.indexOf(item.id) > -1) {
+                        this.like_list = this.like_list.filter((el) => {
+                            return el !== item.id;
+                        });
+
+                        this.$forceUpdate();
+
+                        this.setLikes(item.id, 'like', 'no');
+
+                        return;
+                    }
+                }
+
+                if (this.dislike_list.length) {
+                    if (this.dislike_list.indexOf(item.id) > -1) {
+                        return;
+                    }
+                }
+
+                this.$set(this.like_list, this.like_list.length, item.id);
+
+                this.setLikes(item.id, 'like', 'yes');
+
+                this.$forceUpdate();
+            } else {
+                if (this.dislike_list.length) {
+                    if (this.dislike_list.indexOf(item.id) > -1) {
+                        this.dislike_list = this.dislike_list.filter((el) => {
+                            return el !== item.id;
+                        });
+
+                        this.$forceUpdate();
+
+                        this.setLikes(item.id, 'dislike', 'no');
+
+                        return;
+                    }
+                }
+
+                if (this.like_list.length) {
+                    if (this.like_list.indexOf(item.id) > -1) {
+                        return;
+                    }
+                }
+
+                this.$set(this.dislike_list, this.dislike_list.length, item.id);
+
+                this.setLikes(item.id, 'dislike', 'yes');
+
+                this.$forceUpdate();
+            }
+        },
+
+        filterLike(item, flag) {
+            if (!item) {
+                return false;
+            }
+
+            if (flag) {
+                if (this.like_list.indexOf(item.id) > -1) {
+                    return true;
+                }
+            } else {
+                if (this.dislike_list.indexOf(item.id) > -1) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
 
         getWorkerDetail() {
             this.worker = null;
@@ -236,6 +406,38 @@ export default {
 
                             return el;
                         });
+
+                        const like_list = this.worker.like_users.filter(
+                            (el1) => {
+                                return this.user_id === el1.id;
+                            },
+                        );
+
+                        if (like_list && like_list.length) {
+                            for (const item of like_list) {
+                                this.$set(
+                                    this.like_list,
+                                    this.like_list.length,
+                                    item.pivot.worker_id,
+                                );
+                            }
+                        }
+
+                        const dislike_list = this.worker.dislike_users.filter(
+                            (el2) => {
+                                return this.user_id === el2.id;
+                            },
+                        );
+
+                        if (dislike_list && dislike_list.length) {
+                            for (const item of dislike_list) {
+                                this.$set(
+                                    this.dislike_list,
+                                    this.dislike_list.length,
+                                    item.pivot.worker_id,
+                                );
+                            }
+                        }
                     }
                 }
             });

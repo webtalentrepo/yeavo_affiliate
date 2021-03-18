@@ -301,7 +301,7 @@
     padding: 12px !important;
 
     .comment-content {
-        border: 2px solid #f3f3f3;
+        border: 1px solid #f3f3f3;
         border-radius: 6px;
         position: relative;
 
@@ -330,6 +330,46 @@
                 img {
                     margin-right: 3px;
                 }
+            }
+        }
+    }
+}
+
+.like-widget {
+    position: fixed;
+    right: 50px;
+    top: 250px;
+
+    .list-like {
+        border: 2px solid #f3f3f3;
+        width: 200px;
+        max-width: 200px;
+        min-height: 40px;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+
+        .like, .dis-like {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40px;
+            width: 50%;
+            cursor: pointer;
+        }
+
+        .like {
+            border-right: 1px solid #f3f3f3;
+
+            span {
+                margin-left: 10px;
+            }
+        }
+
+        .dis-like {
+            span {
+                margin-right: 10px;
             }
         }
     }
