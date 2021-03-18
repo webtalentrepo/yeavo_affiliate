@@ -35,12 +35,20 @@
                             >
                                 <v-row>
                                     <v-col cols="12" class="list-title">
-                                        {{ row.worker_title }}
+                                        <router-link
+                                            :to="`/done-for-you/details/${row.id}`"
+                                        >
+                                            {{ row.worker_title }}
+                                        </router-link>
                                     </v-col>
                                 </v-row>
                                 <v-row>
                                     <v-col cols="7">
-                                        {{ row.worker_description }}
+                                        <router-link
+                                            :to="`/done-for-you/details/${row.id}`"
+                                        >
+                                            {{ row.worker_description }}
+                                        </router-link>
                                     </v-col>
                                     <v-col cols="5" class="justify-center">
                                         <div class="list-like">

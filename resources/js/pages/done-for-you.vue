@@ -102,14 +102,22 @@
                                         </div>
                                     </div>
                                     <v-card class="mx-auto" max-width="200">
-                                        <v-img
-                                            :src="`/storage${worker.image_name}`"
-                                            height="120px"
-                                        ></v-img>
+                                        <router-link
+                                            :to="`/done-for-you/details/${worker.id}`"
+                                        >
+                                            <v-img
+                                                :src="`/storage${worker.image_name}`"
+                                                height="120px"
+                                            ></v-img>
+                                        </router-link>
 
-                                        <v-card-text>
-                                            {{ worker.worker_description }}
-                                        </v-card-text>
+                                        <router-link
+                                            :to="`/done-for-you/details/${worker.id}`"
+                                        >
+                                            <v-card-text>
+                                                {{ worker.worker_title }}
+                                            </v-card-text>
+                                        </router-link>
 
                                         <v-card-title>
                                             <div class="worker-category">
@@ -269,12 +277,14 @@
                                 xs="12"
                                 class="trend-link"
                             >
-                                <a :href="trend.worker_url" target="_blank">
+                                <router-link
+                                    :to="`/done-for-you/details/${trend.id}`"
+                                >
                                     <v-img
                                         :src="`/storage${trend.image_name}`"
                                         aspect-ratio="1.7"
                                     ></v-img>
-                                </a>
+                                </router-link>
                             </v-col>
                             <v-col
                                 cols="8"
@@ -285,7 +295,11 @@
                             >
                                 <v-row>
                                     <v-col cols="12" class="list-title">
-                                        {{ trend.worker_description }}
+                                        <router-link
+                                            :to="`/done-for-you/details/${trend.id}`"
+                                        >
+                                            {{ trend.worker_title }}
+                                        </router-link>
                                     </v-col>
                                 </v-row>
                                 <v-row>
