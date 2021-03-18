@@ -79,11 +79,26 @@ class WorkersController extends Controller
      * Display the specified resource.
      *
      * @param \App\Models\Worker $worker
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Worker $worker)
     {
-        //
+        return response()->json([
+            'result'  => 'success',
+            'message' => [
+                'id'                 => $worker->id,
+                'user_id'            => $worker->user_id,
+                'worker_title'       => $worker->worker_title,
+                'worker_url'         => $worker->worker_url,
+                'worker_description' => $worker->worker_description,
+                'image_name'         => $worker->image_name,
+                'like_users'         => $worker->like_users()->get(),
+                'dislike_users'      => $worker->dislike_users()->get(),
+                'owner_user'         => $worker->owner_user()->first(),
+                'comments'           => $worker->comments()->with(['replies', 'user'])->get(),
+                'search_tags'        => json_decode($worker->search_tags),
+            ]
+        ]);
     }
 
     /**

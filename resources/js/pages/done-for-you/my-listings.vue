@@ -17,10 +17,14 @@
                             class="cursor-pointer"
                         >
                             <v-col cols="3" md="3" sm="11" xs="12">
-                                <v-img
-                                    :src="`/storage${row.image_name}`"
-                                    aspect-ratio="1.7"
-                                ></v-img>
+                                <router-link
+                                    :to="`/done-for-you/details/${row.id}`"
+                                >
+                                    <v-img
+                                        :src="`/storage${row.image_name}`"
+                                        aspect-ratio="1.7"
+                                    ></v-img>
+                                </router-link>
                             </v-col>
                             <v-col
                                 cols="7"

@@ -74,7 +74,7 @@ const layouts = [
         },
     },
     {
-        path: '/done-for-you/details',
+        path: '/done-for-you/details/:id',
         name: 'Details',
         // eslint-disable-next-line no-undef
         component: (resolve) =>

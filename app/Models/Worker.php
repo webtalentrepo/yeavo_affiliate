@@ -31,6 +31,6 @@ class Worker extends Model
 
     public function comments()
     {
-        return $this->morphMany(WorkerComment::class, 'commentable')->whereNull('parent_id');
+        return $this->morphMany(WorkerComment::class, 'commentable')->where('parent_id', 0);
     }
 }
