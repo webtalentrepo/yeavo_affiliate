@@ -95,7 +95,11 @@ class WorkersController extends Controller
                 'like_users'         => $worker->like_users()->get(),
                 'dislike_users'      => $worker->dislike_users()->get(),
                 'owner_user'         => $worker->owner_user()->first(),
-                'comments'           => $worker->comments()->with(['replies', 'user'])->get(),
+                'comments'           => $worker->comments()->with([
+                    'replies.user' => function ($q) {
+                        return $q->orderBy('id');
+                    }, 'user'
+                ])->get(),
                 'search_tags'        => json_decode($worker->search_tags),
             ]
         ]);

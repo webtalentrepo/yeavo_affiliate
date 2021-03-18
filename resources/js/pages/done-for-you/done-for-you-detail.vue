@@ -87,6 +87,7 @@
                                             w) in worker.comments"
                                             :key="w"
                                             class="worker-comments"
+                                            justify="end"
                                         >
                                             <v-col
                                                 cols="12"
@@ -99,7 +100,9 @@
                                                     {{ w_comment.body }}
                                                 </div>
                                                 <div class="comment-reply">
-                                                    <v-btn>
+                                                    <v-btn
+                                                        @click="showReply(w)"
+                                                    >
                                                         <img
                                                             src="/assets/menu-icons/reply.png"
                                                             alt=""
@@ -107,6 +110,73 @@
                                                         Reply
                                                     </v-btn>
                                                 </div>
+                                            </v-col>
+                                            <v-col
+                                                v-if="
+                                                    w_comment.replies &&
+                                                    w_comment.replies.length
+                                                "
+                                                cols="11"
+                                                class="worker-comment-reply"
+                                            >
+                                                <v-row
+                                                    v-for="(w_reply,
+                                                    r) in w_comment.replies"
+                                                    :key="r"
+                                                    class="worker-comments"
+                                                >
+                                                    <v-col
+                                                        cols="12"
+                                                        class="comment-content"
+                                                    >
+                                                        <div
+                                                            class="comment-user"
+                                                        >
+                                                            {{
+                                                                w_reply.user
+                                                                    .name
+                                                            }}
+                                                        </div>
+                                                        <div
+                                                            class="comment-body"
+                                                        >
+                                                            {{ w_reply.body }}
+                                                        </div>
+                                                        <div
+                                                            class="comment-reply"
+                                                        >
+                                                            <v-btn
+                                                                @click="
+                                                                    showReply(w)
+                                                                "
+                                                            >
+                                                                <img
+                                                                    src="/assets/menu-icons/reply.png"
+                                                                    alt=""
+                                                                />
+                                                                Reply
+                                                            </v-btn>
+                                                        </div>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-col>
+                                            <v-col
+                                                v-show="filterReplyBox(w)"
+                                                class="add-comment"
+                                            >
+                                                <v-textarea
+                                                    v-model="reply_body"
+                                                    solo
+                                                    clearable
+                                                    label="Add a reply..."
+                                                    rows="1"
+                                                    @keyup.enter="
+                                                        saveComment(
+                                                            false,
+                                                            w_comment.id,
+                                                        )
+                                                    "
+                                                ></v-textarea>
                                             </v-col>
                                         </v-row>
                                     </div>
@@ -130,8 +200,10 @@ export default {
     components: { DoneForYouHeader, ValidationProvider, ValidationObserver },
     data: () => ({
         comment_body: '',
+        reply_body: '',
         worker_id: null,
         worker: null,
+        showReplyBox: null,
     }),
     created() {
         if (this.$route.params && this.$route.params.id) {
@@ -156,36 +228,89 @@ export default {
             }).then((r) => {
                 if (r.data.result === 'success') {
                     this.worker = r.data.message;
+
+                    if (this.worker.comments && this.worker.comments.length) {
+                        this.showReplyBox = [];
+                        this.worker.comments.map((el, key) => {
+                            this.showReplyBox[key] = false;
+
+                            return el;
+                        });
+                    }
                 }
             });
         },
 
         saveComment(flag, id) {
-            this.$refs.observer.validate().then((r) => {
-                if (r) {
-                    const post_data = {
-                        url: '/worker_comments',
-                        data: {
-                            is_reply: flag ? 'no' : 'yes',
-                            comment_body: this.comment_body,
-                            comment_id: flag ? 0 : id,
-                            worker_id: this.worker_id,
-                        },
-                    };
-
-                    this.postData({ ...post_data })
-                        .then((re) => {
-                            this.comment_body = '';
-                            if (re.data.result === 'success') {
-                                this.getWorkerDetail();
-                            }
-                        })
-                        .catch((e) => {
-                            this.comment_body = '';
-                            console.log(e);
-                        });
+            if (!flag) {
+                if (
+                    this.reply_body.replaceAll('\n', '') === '' ||
+                    this.reply_body.replaceAll('&nbsp;', '') === '' ||
+                    this.reply_body.replaceAll(' ', '') === ''
+                ) {
+                    return;
                 }
-            });
+
+                const post_data = {
+                    url: '/worker_comments',
+                    data: {
+                        is_reply: 'yes',
+                        comment_body: this.reply_body,
+                        comment_id: id,
+                        worker_id: this.worker_id,
+                    },
+                };
+
+                this.postData({ ...post_data })
+                    .then((re) => {
+                        this.comment_body = '';
+                        this.reply_body = '';
+                        if (re.data.result === 'success') {
+                            this.getWorkerDetail();
+                        }
+                    })
+                    .catch((e) => {
+                        this.comment_body = '';
+                        console.log(e);
+                    });
+            } else {
+                this.$refs.observer.validate().then((r) => {
+                    if (r) {
+                        const post_data = {
+                            url: '/worker_comments',
+                            data: {
+                                is_reply: 'no',
+                                comment_body: this.comment_body,
+                                comment_id: id,
+                                worker_id: this.worker_id,
+                            },
+                        };
+
+                        this.postData({ ...post_data })
+                            .then((re) => {
+                                this.comment_body = '';
+                                this.reply_body = '';
+                                if (re.data.result === 'success') {
+                                    this.getWorkerDetail();
+                                }
+                            })
+                            .catch((e) => {
+                                this.comment_body = '';
+                                console.log(e);
+                            });
+                    }
+                });
+            }
+        },
+
+        showReply(i) {
+            this.showReplyBox[i] = true;
+
+            this.$forceUpdate();
+        },
+
+        filterReplyBox(i) {
+            return this.showReplyBox && this.showReplyBox[i];
         },
 
         filterTag(item, flag) {
