@@ -78,6 +78,15 @@
                                     />
                                 </div>
                             </div>
+                            <div class="visit-link-wrap">
+                                <a
+                                    class="visit-worker-link v-btn"
+                                    :href="worker.worker_url"
+                                    target="_blank"
+                                >
+                                    Visit Link
+                                </a>
+                            </div>
                         </div>
                         <form enctype="multipart/form-data">
                             <v-row justify="center">
@@ -390,7 +399,8 @@ export default {
         },
 
         getWorkerDetail() {
-            this.worker = null;
+            this.like_list = [];
+            this.dislike_list = [];
 
             this.getData({
                 url: `/workers/${this.worker_id}`,
@@ -399,6 +409,36 @@ export default {
                 if (r.data.result === 'success') {
                     this.worker = r.data.message;
 
+                    const like_list = this.worker.like_users.filter((el1) => {
+                        return this.user_id === el1.id;
+                    });
+
+                    if (like_list && like_list.length) {
+                        for (const item of like_list) {
+                            this.$set(
+                                this.like_list,
+                                this.like_list.length,
+                                item.pivot.worker_id,
+                            );
+                        }
+                    }
+
+                    const dislike_list = this.worker.dislike_users.filter(
+                        (el2) => {
+                            return this.user_id === el2.id;
+                        },
+                    );
+
+                    if (dislike_list && dislike_list.length) {
+                        for (const item of dislike_list) {
+                            this.$set(
+                                this.dislike_list,
+                                this.dislike_list.length,
+                                item.pivot.worker_id,
+                            );
+                        }
+                    }
+
                     if (this.worker.comments && this.worker.comments.length) {
                         this.showReplyBox = [];
                         this.worker.comments.map((el, key) => {
@@ -406,38 +446,6 @@ export default {
 
                             return el;
                         });
-
-                        const like_list = this.worker.like_users.filter(
-                            (el1) => {
-                                return this.user_id === el1.id;
-                            },
-                        );
-
-                        if (like_list && like_list.length) {
-                            for (const item of like_list) {
-                                this.$set(
-                                    this.like_list,
-                                    this.like_list.length,
-                                    item.pivot.worker_id,
-                                );
-                            }
-                        }
-
-                        const dislike_list = this.worker.dislike_users.filter(
-                            (el2) => {
-                                return this.user_id === el2.id;
-                            },
-                        );
-
-                        if (dislike_list && dislike_list.length) {
-                            for (const item of dislike_list) {
-                                this.$set(
-                                    this.dislike_list,
-                                    this.dislike_list.length,
-                                    item.pivot.worker_id,
-                                );
-                            }
-                        }
                     }
                 }
             });

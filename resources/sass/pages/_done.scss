@@ -374,3 +374,18 @@
         }
     }
 }
+
+.visit-link-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+
+    .visit-worker-link {
+        text-transform: capitalize;
+        color: #fff;
+        background: #333;
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-weight: bold;
+    }
+}
